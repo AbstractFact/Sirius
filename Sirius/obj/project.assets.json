@@ -4459,11 +4459,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\jovan\\source\\repos\\Sirius\\Sirius\\Sirius.csproj",
+      "projectUniqueName": "C:\\Users\\jovan\\source\\repos\\SiriusGIT\\Sirius\\Sirius.csproj",
       "projectName": "Sirius",
-      "projectPath": "C:\\Users\\jovan\\source\\repos\\Sirius\\Sirius\\Sirius.csproj",
+      "projectPath": "C:\\Users\\jovan\\source\\repos\\SiriusGIT\\Sirius\\Sirius.csproj",
       "packagesPath": "C:\\Users\\jovan\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\jovan\\source\\repos\\Sirius\\Sirius\\obj\\",
+      "outputPath": "C:\\Users\\jovan\\source\\repos\\SiriusGIT\\Sirius\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"

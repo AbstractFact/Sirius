@@ -1,4 +1,8 @@
 import AbstractView from "./AbstractView.js";
+import {Series} from "../models/Series.js";
+import {Actor} from "../models/Actor.js";
+import {User} from "../models/User.js";
+
 
 export default class extends AbstractView {
     constructor(params) {
@@ -11,6 +15,25 @@ export default class extends AbstractView {
         fetch("https://localhost:44365/Series", {method: "GET"})
         .then(p => p.json().then(data => {
                 data.forEach(d => {
+                    const series = new Series(d["id"], d["title"], d["year"]);
+                    series.print();
+
+                //     const prodavnica = new Prodavnica(d["ime"], d["id"]);
+                //     d["proizvodi"].forEach(pr =>{
+                //         prodavnica.dodajProizvod(new Proizvod(pr["id"],pr["sifra"],
+                //         pr["ime"],pr["cena"],pr["kolicina"]));
+                //     });
+                //     prodavnica.crtaj(document.body);
+
+            });
+        }));
+
+            fetch("https://localhost:44365/Actor", {method: "GET"})
+        .then(p => p.json().then(data => {
+                data.forEach(d => {
+                    const actor = new Actor(d["id"], d["name"], d["birthplace"], d["birthday"], d["biography"]);
+                    actor.print();
+
                 //     const prodavnica = new Prodavnica(d["ime"], d["id"]);
                 //     d["proizvodi"].forEach(pr =>{
                 //         prodavnica.dodajProizvod(new Proizvod(pr["id"],pr["sifra"],
@@ -19,6 +42,21 @@ export default class extends AbstractView {
                 //     prodavnica.crtaj(document.body);
                 });
             }));
+
+            fetch("https://localhost:44365/User", {method: "GET"})
+            .then(p => p.json().then(data => {
+                    data.forEach(d => {
+                        const user = new User(d["id"], d["username"], d["password"]);
+                        user.print();
+    
+                    //     const prodavnica = new Prodavnica(d["ime"], d["id"]);
+                    //     d["proizvodi"].forEach(pr =>{
+                    //         prodavnica.dodajProizvod(new Proizvod(pr["id"],pr["sifra"],
+                    //         pr["ime"],pr["cena"],pr["kolicina"]));
+                    //     });
+                    //     prodavnica.crtaj(document.body);
+                    });
+                }));
     }
 
     async getHtml() 

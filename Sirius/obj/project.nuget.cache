@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "5EY4eYMbWgjQAZlZgytaoiiNHLCPgEDBObbSeDjzKoc7ibfx6lRMHKpINwgCLN1NwnE3FfN2ax11rKPkJm6g/g==",
+  "dgSpecHash": "/im8wx3QQFjqeNnTuhjDghtozaw4dyDCyTDJ02RUdGPCGXTtNR9r0Py0A1ST07wtyNiegYdnFoCW7QPdwWJshg==",
   "success": true,
-  "projectFilePath": "C:\\Users\\jovan\\source\\repos\\Sirius\\Sirius\\Sirius.csproj",
+  "projectFilePath": "C:\\Users\\jovan\\source\\repos\\SiriusGIT\\Sirius\\Sirius.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\jovan\\.nuget\\packages\\microsoft.csharp\\4.7.0\\microsoft.csharp.4.7.0.nupkg.sha512",
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder\\microsoft.netcore.platforms\\1.1.0\\microsoft.netcore.platforms.1.1.0.nupkg.sha512",

@@ -12,16 +12,10 @@ namespace Sirius.Entities
         public String Username { get; set; }
         public String Password { get; set; }
         public List<Rating> Ratings { get; set; }
-        public List<User> Friends { get; set; }
 
-        public Rating rate(Series series, int stars, String comment)
+        public Rating Rate(Series series, int stars, String comment)
         {
             return null;
-        }
-
-        public void befriend(User user)
-        {
-
         }
     }
 }

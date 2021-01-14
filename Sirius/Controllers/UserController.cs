@@ -42,15 +42,36 @@ namespace Sirius.Controllers
         [HttpGet]
         public async Task<ActionResult> GetAll()
         {
+            //var res = await _client.Cypher
+            //            .Match("(user:User)")
+            //            .Return(user => user.As<User>())
+            //            .ResultsAsync;
+
             var res = await _client.Cypher
-                        .Match("(user:User)")
-                        .Return(user => user.As<User>())
-                        .ResultsAsync;
+                        .OptionalMatch("(user:User)-[FRIENDS]-(friend:User)")
+                        //.Where((User user) => user.ID == 1234)
+                        .Return((user, friend) => new
+                        {
+                            User = user.As<User>(),
+                            Friends = friend.CollectAs<User>()
+                        }).ResultsAsync;
 
             if (res != null)
                 return Ok(res);
             else
                 return BadRequest();
+        }
+
+        [HttpGet("{id}")]
+        public async Task<User> Get(int id)
+        {
+            var res = await _client.Cypher
+                        .Match("(user:User)")
+                        .Where((User user) => user.ID == id)
+                        .Return(user => user.As<User>())
+                        .ResultsAsync;
+
+            return res.FirstOrDefault();
         }
 
         [HttpPost]
@@ -106,6 +127,22 @@ namespace Sirius.Controllers
                               .Where((User u) => u.ID == id)
                               .Delete("u");
 
+            await res.ExecuteWithoutResultsAsync();
+
+            if (res != null)
+                return Ok();
+            else
+                return BadRequest();
+        }
+
+        [HttpPost("Befriend/{user1ID}/{user2ID}")]
+        public async Task<ActionResult> Befriend(int user1ID, int user2ID)
+        {
+            var res = _client.Cypher
+                    .Match("(user1:User)", "(user2:User)")
+                    .Where((User user1) => user1.ID == user1ID)
+                    .AndWhere((User user2) => user2.ID == user2ID)
+                    .Create("(user1)-[:FRIENDS]->(user2)");
 
             await res.ExecuteWithoutResultsAsync();
 
