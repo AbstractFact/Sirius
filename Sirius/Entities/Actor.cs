@@ -12,6 +12,7 @@ namespace Sirius.Entities
         public String Birthplace { get; set; }
         public String Birthday { get; set; }
         public String Biography { get; set; }
+        public List<Series> Filmography { get; set; }
 
         public DateTime getBirthday()
         {
@@ -22,11 +23,5 @@ namespace Sirius.Entities
             return startDateTime.AddMilliseconds(timestamp).ToLocalTime();
         }
 
-        public List<Series> filmography { get; set; }
-
-        public Role playedIn(Series movie, String role)
-        {
-            return null;
-        }
     }
 }

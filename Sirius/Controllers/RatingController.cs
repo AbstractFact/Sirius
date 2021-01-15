@@ -13,13 +13,13 @@ namespace Sirius.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class RoleController : ControllerBase
+    public class RatingController : ControllerBase
     {
-        private readonly ILogger<RoleController> _logger;
+        private readonly ILogger<RatingController> _logger;
         private readonly IGraphClient _client;
         private int maxID;
 
-        public RoleController(ILogger<RoleController> logger, IGraphClient client)
+        public RatingController(ILogger<RatingController> logger, IGraphClient client)
         {
             _logger = logger;
             _client = client;
@@ -29,8 +29,8 @@ namespace Sirius.Controllers
         private async Task<int> MaxID()
         {
             var query = await _client.Cypher
-                        .Match("(a:Actor)-[r:IN_ROLE]-(s:Series)")
-                        .Return(r => r.As<Role>().ID)
+                        .Match("(u:User)-[r:RATING]-(s:Series)")
+                        .Return(r => r.As<Rating>().ID)
                         .OrderByDescending("r.ID")
                         //.Return<int>("ID(s)")
                         //.OrderByDescending("ID(s)")
@@ -39,18 +39,18 @@ namespace Sirius.Controllers
             return query.FirstOrDefault();
         }
 
-        [HttpGet("GetActorRoles/{actorID}")]
-        public async Task<ActionResult> GetActorRoles(int actorID)
+        [HttpGet("{seriesID}")]
+        public async Task<ActionResult> GetSeriesRating(int seriesID)
         {
             var res = await _client.Cypher
-                        .Match("(a:Actor)-[r:IN_ROLE]-(s:Series)")
-                        .Where((Actor a)=>a.ID==actorID)
-                        .Return((a, r, s) => new
+                        .Match("(u:User)-[r:RATING]-(s:Series)")
+                        .Return((u, r, s) => new
                         {
-                            r.As<Role>().ID,
-                            Actor = a.As<Actor>(),
+                            r.As<Rating>().ID,
+                            User = u.As<User>(),
                             Series = s.CollectAs<Series>(),
-                            r.As<Role>().InRole
+                            r.As<Rating>().Stars,
+                            r.As<Rating>().Comment
                         })
                         .ResultsAsync;
 
@@ -60,18 +60,19 @@ namespace Sirius.Controllers
                 return BadRequest();
         }
 
-        [HttpGet("GetRole/{id}")]
-        public async Task<ActionResult> GetRole(int id)
+        [HttpGet("GetRating/{id}")]
+        public async Task<ActionResult> GetRating(int id)
         {
             var res = await _client.Cypher
-                        .Match("(a:Actor)-[r:IN_ROLE]-(s:Series)")
-                        .Where((Role r) => r.ID == id)
-                        .Return((a, r, s) => new
+                        .Match("(u:User)-[r:RATING]-(s:Series)")
+                        .Where((Rating r) => r.ID == id)
+                        .Return((u, r, s) => new
                         {
-                            r.As<Role>().ID,
-                            Actor = a.As<Actor>(),
+                            r.As<Rating>().ID,
+                            User = u.As<User>(),
                             Series = s.CollectAs<Series>(),
-                            r.As<Role>().InRole
+                            r.As<Rating>().Stars,
+                            r.As<Rating>().Comment,
                         })
                         .ResultsAsync;
 
@@ -81,17 +82,18 @@ namespace Sirius.Controllers
                 return BadRequest();
         }
 
-        [HttpPost("AddRole/{actorID}/{role}/{seriesID}")]
-        public async Task<ActionResult> AddRole(int actorID, String role, int seriesID)
+        [HttpPost("AddRating/{userID}/{seriesID}/{stars}")]
+        public async Task<ActionResult> AddRating([FromBody] string comment, int userID, int seriesID, int stars)
         {
             maxID = await MaxID();
 
             var res = _client.Cypher
-                    .Match("(actor:Actor)", "(series:Series)")
-                    .Where((Actor actor) => actor.ID == actorID)
+                    .Match("(user:User)", "(series:Series)")
+                    .Where((User user) => user.ID == userID)
                     .AndWhere((Series series) => series.ID == seriesID)
-                    .Create("(actor)-[:IN_ROLE { ID: $id, InRole: $role }]->(series)")
-                    .WithParam("role", role)
+                    .Create("(user)-[:RATING { ID: $id, Stars: $stars, Comment: $comment }]->(series)")
+                    .WithParam("comment", comment)
+                    .WithParam("stars", stars)
                     .WithParam("id", maxID+1);
 
             await res.ExecuteWithoutResultsAsync();
@@ -102,15 +104,16 @@ namespace Sirius.Controllers
                 return BadRequest();
         }
 
-
-        [HttpPut("{id}")]
-        public async Task<ActionResult> Put([FromBody] string role, int id)
+        [HttpPut("{id}/{stars}")]
+        public async Task<ActionResult> Put([FromBody] string comment, int stars, int id)
         {
             var res = _client.Cypher
-                        .Match("(a:Actor)-[r:IN_ROLE]-(s:Series)")
-                        .Where((Role r) => r.ID == id)
-                        .Set("r.InRole = $role")
-                        .WithParam("role", role);
+                        .Match("(u:User)-[r:RATING]-(s:Series)")
+                        .Where((Rating r) => r.ID == id)
+                        .Set("r.Comment = $comment")
+                        .Set("r.Stars = $stars")
+                        .WithParam("comment", comment)
+                        .WithParam("stars", stars);
 
             await res.ExecuteWithoutResultsAsync();
 
@@ -124,8 +127,8 @@ namespace Sirius.Controllers
         public async Task<ActionResult> Delete(int id)
         {
             var res = _client.Cypher
-                              .Match("(a:Actor)-[r:IN_ROLE]->(s:Series)")
-                              .Where((Role r) => r.ID == id)
+                              .Match("(u:User)-[r:RATING]->(s:Series)")
+                              .Where((Rating r) => r.ID == id)
                               .Delete("r");
 
             await res.ExecuteWithoutResultsAsync();
