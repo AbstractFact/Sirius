@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Sirius.Services;
 
 namespace Sirius
 {
@@ -32,6 +33,9 @@ namespace Sirius
             neo4jclient.ConnectAsync();
 
             services.AddSingleton<IGraphClient>(neo4jclient);
+
+            //services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddSingleton<RedisService>();
 
             services.AddMvc().AddJsonOptions(options =>
             {
@@ -56,18 +60,26 @@ namespace Sirius
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, RedisService redisService)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
+            else
+            {
+                app.UseHsts();
+            }
+
+            redisService.Connect();
 
             app.UseHttpsRedirection();
 
             app.UseRouting();
 
             app.UseCors("CORS");
+
+            app.UseMvc();
 
             app.UseAuthorization();
 

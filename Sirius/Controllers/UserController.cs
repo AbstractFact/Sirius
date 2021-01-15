@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Sirius.Entities;
 using Neo4jClient.Cypher;
+using Sirius.Services;
 
 namespace Sirius.Controllers
 {
@@ -17,12 +18,15 @@ namespace Sirius.Controllers
     {
         private readonly ILogger<SeriesController> _logger;
         private readonly IGraphClient _client;
+        private readonly RedisService _redis_client;
         private int maxID;
 
-        public UserController(ILogger<SeriesController> logger, IGraphClient client)
+        public UserController(ILogger<SeriesController> logger, IGraphClient client, RedisService redis_client)
         {
             _logger = logger;
             _client = client;
+            _redis_client = redis_client;
+
             maxID = 0;
         }
 
@@ -65,6 +69,10 @@ namespace Sirius.Controllers
         [HttpGet("{id}")]
         public async Task<User> Get(int id)
         {
+            //await _redis_client.Set($"{id}","How many claps per person should this article get?");
+            //var definitely = await _redis_client.Get($"{id}");
+            //return definitely;
+
             var res = await _client.Cypher
                         .Match("(user:User)")
                         .Where((User user) => user.ID == id)

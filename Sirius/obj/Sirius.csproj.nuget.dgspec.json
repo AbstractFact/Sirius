@@ -50,6 +50,10 @@
             "Neo4jClient": {
               "target": "Package",
               "version": "[4.0.3, )"
+            },
+            "StackExchange.Redis": {
+              "target": "Package",
+              "version": "[2.2.4, )"
             }
           },
           "imports": [
