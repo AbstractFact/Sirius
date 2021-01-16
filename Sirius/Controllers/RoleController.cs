@@ -39,6 +39,27 @@ namespace Sirius.Controllers
             return query.FirstOrDefault();
         }
 
+        [HttpGet("GetSeriesRoles/{seriesID}")]
+        public async Task<ActionResult> GetSeriesRoles(int seriesID)
+        {
+            var res = await _client.Cypher
+                        .Match("(a:Actor)-[r:IN_ROLE]-(s:Series)")
+                        .Where((Series s) => s.ID == seriesID)
+                        .Return((a, r, s) => new
+                        {
+                            r.As<Role>().ID,
+                            Actor = a.As<Actor>(),
+                            Series = s.CollectAs<Series>(),
+                            r.As<Role>().InRole
+                        })
+                        .ResultsAsync;
+
+            if (res != null)
+                return Ok(res);
+            else
+                return BadRequest();
+        }
+
         [HttpGet("GetActorRoles/{actorID}")]
         public async Task<ActionResult> GetActorRoles(int actorID)
         {

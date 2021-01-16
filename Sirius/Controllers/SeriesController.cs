@@ -32,8 +32,6 @@ namespace Sirius.Controllers
                         .Match("(s:Series)")
                         .Return<int>(s => s.As<Series>().ID)
                         .OrderByDescending("s.ID")
-                        //.Return<int>("ID(s)")
-                        //.OrderByDescending("ID(s)")
                         .ResultsAsync;
 
             return query.FirstOrDefault();
@@ -58,7 +56,7 @@ namespace Sirius.Controllers
         {
             maxID = await MaxID();
 
-            var newSeries = new Series { ID = maxID + 1, Title = s.Title, Year = s.Year };
+            var newSeries = new Series { ID = maxID + 1, Title = s.Title, Year = s.Year, Genre= s.Genre, Plot=s.Plot, Seasons=s.Seasons, Rating=0.0f};
             var res = _client.Cypher
                         .Create("(series:Series $newSeries)")
                         .WithParam("newSeries", newSeries);
@@ -75,28 +73,20 @@ namespace Sirius.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult> Put([FromBody] Series series, int id)
         {
-            //try
-            //{
-                var res = _client.Cypher
-                                  .Match("(s:Series)")
-                                  //.Where("ID(s) = {id}")
-                                  .Where((Series s) => s.ID == id)
-                                  //.Where("s.ID = $id")
-                                  .Set("s = $series")
-                                  .WithParam("series", series);//new Series { ID = series.ID, Title = series.Title, Year = series.Year });
+            var res = _client.Cypher
+                                .Match("(s:Series)")
+                                .Where((Series s) => s.ID == id)
+                                .Set("s = $series")
+                                .WithParam("series", series);
 
-                await res.ExecuteWithoutResultsAsync();
+            await res.ExecuteWithoutResultsAsync();
 
-            //}
-            //catch(Exception e)
-            //{
-            //    return BadRequest();
-            //}
             if (res != null)
                 return Ok();
             else
                 return BadRequest();
         }
+
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
@@ -106,7 +96,6 @@ namespace Sirius.Controllers
                               .Where((Series s) => s.ID == id)
                               .Delete("s");
                               
-
             await res.ExecuteWithoutResultsAsync();
 
             if (res != null)

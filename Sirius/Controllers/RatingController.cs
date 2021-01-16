@@ -39,11 +39,58 @@ namespace Sirius.Controllers
             return query.FirstOrDefault();
         }
 
-        [HttpGet("{seriesID}")]
-        public async Task<ActionResult> GetSeriesRating(int seriesID)
+        [HttpGet("GetUserRatings/{userID}")]
+        public async Task<ActionResult> GetUserRatings(int userID)
         {
             var res = await _client.Cypher
                         .Match("(u:User)-[r:RATING]-(s:Series)")
+                        .Where((User u) => u.ID == userID)
+                        .Return((u, r, s) => new
+                        {
+                            r.As<Rating>().ID,
+                            User = u.As<User>(),
+                            Series = s.CollectAs<Series>(),
+                            r.As<Rating>().Stars,
+                            r.As<Rating>().Comment
+                        })
+                        .ResultsAsync;
+
+            if (res != null)
+                return Ok(res);
+            else
+                return BadRequest();
+        }
+
+        [HttpGet("GetSeriesAvgRating/{seriesID}")]
+        public async Task<float> GetSeriesAvgRating(int seriesID)
+        {
+            var res = await _client.Cypher
+                            .Match("(u:User)-[r:RATING]-(s:Series)")
+                            .Where((Series s) => s.ID == seriesID)
+                            .Return((r) => Return.As<float>("avg(r.Stars)"))
+                            .ResultsAsync;
+
+            return res.FirstOrDefault();
+
+
+            //var query = client.Cypher.Match("(n1)")
+            //           .Where((Node n1) => n1.Identifier == identifier)
+            //           .OptionalMatch("p=(n1)-[:r1|r2*..2]->(n2)")
+            //           .Unwind("relationships(p)", "rel")
+            //           .ReturnDistinct((n1, rel, n2) => new
+            //           {​​​​
+            //               startNode = Return.As<Node<string>>("startNode(rel)"),
+            //               endNode = Return.As<Node<string>>("endNode(rel)"),
+            //               relationship = Return.As<string>("type(rel)")
+            //           }​​​​);
+        }
+
+        [HttpGet("GetSeriesRatings/{seriesID}")]
+        public async Task<ActionResult> GetSeriesRatings(int seriesID)
+        {
+            var res = await _client.Cypher
+                        .Match("(u:User)-[r:RATING]-(s:Series)")
+                        .Where((Series s) => s.ID == seriesID)
                         .Return((u, r, s) => new
                         {
                             r.As<Rating>().ID,
@@ -91,12 +138,16 @@ namespace Sirius.Controllers
                     .Match("(user:User)", "(series:Series)")
                     .Where((User user) => user.ID == userID)
                     .AndWhere((Series series) => series.ID == seriesID)
-                    .Create("(user)-[:RATING { ID: $id, Stars: $stars, Comment: $comment }]->(series)")
+                    .Merge("(user)-[:RATING { ID: $id, Stars: $stars, Comment: $comment }]->(series)")
                     .WithParam("comment", comment)
                     .WithParam("stars", stars)
                     .WithParam("id", maxID+1);
 
             await res.ExecuteWithoutResultsAsync();
+
+            float avgrtng = await GetSeriesAvgRating(seriesID);
+
+            await UpdateRating(seriesID, avgrtng);
 
             if (res != null)
                 return Ok();
@@ -114,6 +165,24 @@ namespace Sirius.Controllers
                         .Set("r.Stars = $stars")
                         .WithParam("comment", comment)
                         .WithParam("stars", stars);
+
+            await res.ExecuteWithoutResultsAsync();
+
+            if (res != null)
+                return Ok();
+            else
+                return BadRequest();
+        }
+
+
+        [HttpPut("UpdateRating/{id}/{rating}")]
+        public async Task<ActionResult> UpdateRating(int id, float rating)
+        {
+            var res = _client.Cypher
+                                .Match("(s:Series)")
+                                .Where((Series s) => s.ID == id)
+                                .Set("s.Rating = $rating")
+                                .WithParam("rating", rating);
 
             await res.ExecuteWithoutResultsAsync();
 

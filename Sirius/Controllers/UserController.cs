@@ -46,11 +46,6 @@ namespace Sirius.Controllers
         [HttpGet]
         public async Task<ActionResult> GetAll()
         {
-            //var res = await _client.Cypher
-            //            .Match("(user:User)")
-            //            .Return(user => user.As<User>())
-            //            .ResultsAsync;
-
             var res = await _client.Cypher
                         .OptionalMatch("(user:User)-[FRIENDS]-(friend:User)")
                         //.Where((User user) => user.ID == 1234)
@@ -150,7 +145,24 @@ namespace Sirius.Controllers
                     .Match("(user1:User)", "(user2:User)")
                     .Where((User user1) => user1.ID == user1ID)
                     .AndWhere((User user2) => user2.ID == user2ID)
-                    .Create("(user1)-[:FRIENDS]->(user2)");
+                    .Merge("(user1)-[:FRIENDS]->(user2)");
+
+            await res.ExecuteWithoutResultsAsync();
+
+            if (res != null)
+                return Ok();
+            else
+                return BadRequest();
+        }
+
+        [HttpDelete("Unfriend/{user1ID}/{user2ID}")]
+        public async Task<ActionResult> Unfriend(int user1ID, int user2ID)
+        {
+            var res = _client.Cypher
+                    .Match("(user1:User)-[f:FRIENDS]->(user2:User)")
+                    .Where((User user1) => user1.ID == user1ID)
+                    .AndWhere((User user2) => user2.ID == user2ID)
+                    .Delete("f");
 
             await res.ExecuteWithoutResultsAsync();
 
@@ -161,4 +173,3 @@ namespace Sirius.Controllers
         }
     }
 }
-
