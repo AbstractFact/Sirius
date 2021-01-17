@@ -1,15 +1,19 @@
 //import { Role } from "./Role.js"
 
 export class Series {
-    constructor(id, title, year) {
+    constructor(id, title, year, genre, plot, seasons, rating) {
         this.id = id;
         this.title = title;
         this.year = year;
+        this.genre = genre;
+        this.plot = plot;
+        this.seasons = seasons;
+        this.rating = rating;
     }
 
-    print() {
-        console.log(this.id + "\n"+this.title+ "\n"+this.year + "\n");
-    }
+    // print() {
+    //     console.log(this.id + "\n"+this.title+ "\n"+this.year + "\n");
+    // }
 
 //     dodajProizvod(newProizvod) {
 //          this.proizvodi.push(newProizvod);

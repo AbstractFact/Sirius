@@ -51,6 +51,21 @@ namespace Sirius.Controllers
                 return BadRequest();
         }
 
+        [HttpGet("GetSeries/{seriesID}")]
+        public async Task<ActionResult> GetSeries(int seriesID)
+        {
+            var res = await _client.Cypher
+                        .Match("(s:Series)")
+                        .Where((Series s) => s.ID == seriesID)
+                        .Return(s => s.As<Series>())
+                        .ResultsAsync;
+
+            if (res != null)
+                return Ok(res);
+            else
+                return BadRequest();
+        }
+
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] Series s)
         {

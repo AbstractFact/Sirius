@@ -1,7 +1,11 @@
 import Home from "./views/Home.js";
-import MostWatched from "./views/MostWatched.js";
+import Series from "./views/Series.js";
 import SeriesView from "./views/SeriesView.js";
+import Actors from "./views/Actors.js";
+import ActorView from "./views/ActorView.js";
 import MySeriesList from "./views/MySeriesList.js";
+import Login from "./views/Login.js";
+import Signup from "./views/Signup.js";
 
 const pathToRegex = path => new RegExp("^" + path.replace(/\//g, "\\/").replace(/:\w+/g, "(.+)") + "$");
 
@@ -22,9 +26,14 @@ const navigateTo = url => {
 const router = async () => {
     const routes = [
         { path: "/", view: Home },
-        { path: "/series", view: MostWatched },
+        { path: "/series", view: Series },
         { path: "/series/:id", view: SeriesView },
-        { path: "/myserieslist", view: MySeriesList }
+        { path: "/actors", view: Actors },
+        { path: "/actors/:id", view: ActorView },
+        { path: "/myserieslist", view: MySeriesList },
+        { path: "/login", view: Login },
+        { path: "/signup", view: Signup },
+        { path: "/logout", view: Home }
     ];
 
     // Test each route for potential match
@@ -60,4 +69,24 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     router();
+
+    var event = new CustomEvent('ready');
+
+    // Dispatch the event
+    dispatchEvent(event);
+
+    // document.body.querySelector("#loginform").addEventListener("submit", e => {
+    //     e.preventDefault();
+
+    //     // const email = signupForm['signup-email'].value;
+    //     // const password = signupForm['signup-password'].value;
+    //     // const passwordRepeated = signupForm['confirm-password'].value;
+    //     login();
+    //     // if (login())
+    //     //     //navigateTo("http://localhost:5060");
+    //     // else
+    //     // {
+
+    //     // };
+    // });
 });

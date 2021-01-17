@@ -10,9 +10,4 @@ export default class {
     async getHtml() {
         return "";
     }
-
-    async getContent()
-    {
-        
-    }
 }

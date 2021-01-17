@@ -49,7 +49,7 @@ namespace Sirius.Controllers
                         {
                             r.As<Role>().ID,
                             Actor = a.As<Actor>(),
-                            Series = s.CollectAs<Series>(),
+                            Series = s.As<Series>(),
                             r.As<Role>().InRole
                         })
                         .ResultsAsync;
@@ -70,7 +70,7 @@ namespace Sirius.Controllers
                         {
                             r.As<Role>().ID,
                             Actor = a.As<Actor>(),
-                            Series = s.CollectAs<Series>(),
+                            Series = s.As<Series>(),
                             r.As<Role>().InRole
                         })
                         .ResultsAsync;

@@ -1,5 +1,4 @@
 
-
 export class Actor {
     constructor(id, name, birthplace, birthday, biography) {
         this.id = id;

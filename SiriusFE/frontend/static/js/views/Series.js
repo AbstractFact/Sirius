@@ -4,7 +4,7 @@ import {Series} from "../models/Series.js";
 export default class extends AbstractView {
     constructor(params) {
         super(params);
-        this.setTitle("Most Watched");
+        this.setTitle("All Series");
     }
 
     async getHtml() 
@@ -15,28 +15,34 @@ export default class extends AbstractView {
         .then(p => p.json().then(data => {
                 i=0;
                 html=`
-                    <h1>Most watched series</h1>
+                    <h1>All Series</h1>
                     <br/>
                     <table class="table table-striped">
                         <thead>
                             <tr>
                             <th scope="col">#</th>
-                            <th scope="col">ID</th>
                             <th scope="col">Title</th>
                             <th scope="col">Year</th>
+                            <th scope="col">Genre</th>
+                            <th scope="col">Plot</th>
+                            <th scope="col">Seasons</th>
+                            <th scope="col">Rating</th>
                             </tr>
                         </thead>
                         <tbody>`;
 
             data.forEach(d => {
-                    const series = new Series(d["id"], d["title"], d["year"]);
+                    const series = new Series(d["id"], d["title"], d["year"], d["genre"], d["plot"], d["seasons"], d["rating"]);
 
                     html+=`
                         <tr>
                         <th scope="row">${++i}</th>
-                        <td>${series.id}</td>
-                        <td>${series.title}</td>
+                        <td><a href="/series/${series.id}" data-link>${series.title}</a></td>
                         <td>${series.year}</td>
+                        <td>${series.genre}</td>
+                        <td>${series.plot}</td>
+                        <td>${series.seasons}</td>
+                        <td>`+ +(Math.round(series.rating + "e+1") + "e-1")+`</td>
                         </tr>`;
                  });
 
