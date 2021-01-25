@@ -77,20 +77,64 @@ namespace Sirius.Controllers
             return res.FirstOrDefault();
         }
 
+        [HttpGet("GetUserID/{username}")]
+        public async Task<int> GetUserID(string username)
+        {
+            //await _redis_client.Set($"{id}","How many claps per person should this article get?");
+            //var definitely = await _redis_client.Get($"{id}");
+            //return definitely;
+
+            var res = await _client.Cypher
+                        .Match("(user:User)")
+                        .Where((User user) => user.Username == username)
+                        .Return(user => user.As<User>())
+                        .ResultsAsync;
+
+            if (res.Count()!=0)
+                return res.FirstOrDefault().ID;
+            else
+                return -1;
+        }
+
+        [HttpPost("Login")]
+        public async Task<User> Login([FromBody] User user)
+        {
+            //await _redis_client.Set($"{id}","How many claps per person should this article get?");
+            //var definitely = await _redis_client.Get($"{id}");
+            //return definitely;
+
+            var res = await _client.Cypher
+                        .Match("(u:User)")
+                        .Where((User u) => u.Username == user.Username)
+                        .AndWhere((User u) => u.Password == user.Password)
+                        .Return(u => u.As<User>())
+                        .ResultsAsync;
+
+            return res.FirstOrDefault();
+        }
+
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] User u)
         {
             maxID = await MaxID();
 
-            var newUser = new User { ID = maxID + 1, Username = u.Username, Password = u.Password };
-            var res = _client.Cypher
-                        .Create("(user:User $newUser)")
-                        .WithParam("newUser", newUser);
 
-            await res.ExecuteWithoutResultsAsync();
+            int id = await GetUserID(u.Username);
 
-            if (res != null)
-                return Ok();
+            if (id == -1)
+            {
+                var newUser = new User { ID = maxID + 1, Username = u.Username, Password = u.Password };
+
+                var res = _client.Cypher.Create("(user:User $newUser)")
+                                        .WithParam("newUser", newUser);
+
+                await res.ExecuteWithoutResultsAsync();
+
+                if (res != null)
+                    return Ok();
+                else
+                    return BadRequest();
+            }
             else
                 return BadRequest();
         }

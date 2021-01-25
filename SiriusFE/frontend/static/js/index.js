@@ -7,6 +7,8 @@ import MySeriesList from "./views/MySeriesList.js";
 import Login from "./views/Login.js";
 import Signup from "./views/Signup.js";
 
+var view;
+
 const pathToRegex = path => new RegExp("^" + path.replace(/\//g, "\\/").replace(/:\w+/g, "(.+)") + "$");
 
 const getParams = match => {
@@ -33,7 +35,6 @@ const router = async () => {
         { path: "/myserieslist", view: MySeriesList },
         { path: "/login", view: Login },
         { path: "/signup", view: Signup },
-        { path: "/logout", view: Home }
     ];
 
     // Test each route for potential match
@@ -53,7 +54,8 @@ const router = async () => {
         };
     }
 
-    const view = new match.route.view(getParams(match));
+    //const view = new match.route.view(getParams(match));
+    view = new match.route.view(getParams(match));
 
     document.querySelector("#app").innerHTML = await view.getHtml();
 };
@@ -66,27 +68,40 @@ document.addEventListener("DOMContentLoaded", () => {
             e.preventDefault();
             navigateTo(e.target.href);
         }
+
+        if (e.target.matches("[loginbtn]")) {
+            e.preventDefault();
+            if(view.login()==true)
+            {
+                alert("Boom");
+                navigateTo("/");
+            }
+        }
+
+        if (e.target.matches("[signupbtn]")) {
+            e.preventDefault();
+            if(view.signup())
+            {
+                alert("Boom");
+                navigateTo("/");
+            }
+        }
+
+        if (e.target.matches("[logout]")) {
+            e.preventDefault();
+            logout();
+            navigateTo(e.target.href);
+        }
     });
 
     router();
-
-    var event = new CustomEvent('ready');
-
-    // Dispatch the event
-    dispatchEvent(event);
-
-    // document.body.querySelector("#loginform").addEventListener("submit", e => {
-    //     e.preventDefault();
-
-    //     // const email = signupForm['signup-email'].value;
-    //     // const password = signupForm['signup-password'].value;
-    //     // const passwordRepeated = signupForm['confirm-password'].value;
-    //     login();
-    //     // if (login())
-    //     //     //navigateTo("http://localhost:5060");
-    //     // else
-    //     // {
-
-    //     // };
-    // });
 });
+
+function logout()
+{
+    document.querySelector("#login").style.display="block";
+    document.querySelector("#signup").style.display="block";
+    document.querySelector("#logout").style.display="none";
+    localStorage.username=null;
+    localStorage.userid=null;
+}

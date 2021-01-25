@@ -47,9 +47,7 @@ namespace Sirius.Controllers
                         .Where((User u) => u.ID == userID)
                         .Return((u, l, s) => new
                         {
-                            l.As<UserSeriesList>().ID,
-                            User = u.As<User>(),
-                            Series = s.CollectAs<Series>(),
+                            Series = s.As<Series>(),
                             l.As<UserSeriesList>().Status
                         })
                         .ResultsAsync;

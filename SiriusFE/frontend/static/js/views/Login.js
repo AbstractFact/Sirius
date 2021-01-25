@@ -1,6 +1,9 @@
 import AbstractView from "./AbstractView.js";
 import {User} from "../models/User.js"
 
+localStorage.username=null;
+localStorage.userid=null;
+
 export default class extends AbstractView {
     constructor(params) {
         super(params);
@@ -8,28 +11,69 @@ export default class extends AbstractView {
         this.setTitle("Login");
     }
 
-
     async getHtml() 
     {
-        var html;
+       var html;
 
        html=`
-       <form id="loginform">
+       <form id="login-form">
             <div class="container">
                 <div class="inputitem">
                     <label for="uname"><b>Username</b></label>
-                    <input type="text" placeholder="Enter Username" name="uname" required>
+                    <input type="text" placeholder="Enter Username" name="uname" id="login-username" required>
                 </div>
+
                 <div class="inputitem">
                     <label for="psw"><b>Password</b></label>
-                    <input type="password" placeholder="Enter Password" name="psw" required>
+                    <input type="password" placeholder="Enter Password" name="psw" id="login-password" required>
                 </div>
             
-                <button class="inputitem" type="submit">Login</button>
+                <button class="inputitem" type="submit" loginbtn>Login</button>
             </div>
         </form>`;
 
         return html;
+    }
+
+    login()
+    {
+        const loginForm = document.querySelector('#login-form');
+        const username = loginForm['login-username'].value;
+        const password = loginForm['login-password'].value;
+
+        fetch("https://localhost:44365/User/Login", { method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                // I u body se smešta string reprezentacija objekta koji se šalje
+                body: JSON.stringify({ "username": username, "password": password })
+            }).then(p => {
+                if (p.ok) 
+                {
+                    localStorage.username=username;
+
+                    fetch("https://localhost:44365/User/GetUserID/"+localStorage.username, {method: "GET"})
+                    .then(p => p.json().then(data => {
+                            if(data!=-1)
+                            {
+                                localStorage.userid=data;
+
+                                document.querySelector("#login").style.display="none";
+                                document.querySelector("#signup").style.display="none";
+                                document.querySelector("#logout").style.display="block";
+
+                                alert("Welcome to Sirius "+username);
+                                return true;
+                            }
+                            else
+                            {
+                                alert("User not found!");
+                                return false;
+                            }
+                        })
+                    );
+                };
+        });
     }
 
                 
@@ -105,34 +149,6 @@ export default class extends AbstractView {
 
     // await fetch("https://localhost:44365/Series/GetSeries/"+this.postId, {method: "GET"})
     // .then(p => p.json().then(d => {
+
+       
 }
-
-document.addEventListener("ready", () => {
-    document.body.querySelector("#loginform").addEventListener("submit", e => {
-        e.preventDefault();
-
-        // const email = signupForm['signup-email'].value;
-        // const password = signupForm['signup-password'].value;
-        // const passwordRepeated = signupForm['confirm-password'].value;
-
-        login();
-    });
-});
-
-
-function login()
-{
-    console.log("Tu");
-}
-// var passwordError;
-// var emailError;
-// var usernameError;
-// //  signup
-// const signupForm = document.querySelector('#signup-form');
-// signupForm.addEventListener('submit', (e) => {
-//   e.preventDefault();
-  
-//   // get user info
-//   const email = signupForm['signup-email'].value;
-//   const password = signupForm['signup-password'].value;
-//   const passwordRepeated = signupForm['confirm-password'].value;

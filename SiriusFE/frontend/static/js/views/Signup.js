@@ -1,10 +1,14 @@
 import AbstractView from "./AbstractView.js";
 import {User} from "../models/User.js"
 
+localStorage.username=null;
+localStorage.userid=null;
+
 export default class extends AbstractView {
     constructor(params) {
         super(params);
         this.postId = params.id;
+        this.userID = params.userID;
         this.setTitle("Signup");
     }
 
@@ -13,19 +17,20 @@ export default class extends AbstractView {
         var html;
 
        html=`
-       <form method="post">
+       <form id="signup-form" method="post">
             <div class="container">
                 <div class="inputitem">
                     <label for="uname"><b>Username</b></label>
-                    <input type="text" placeholder="Enter Username" name="uname" required>
+                    <input type="text" placeholder="Enter Username" name="uname" id="login-username" required>
                 </div>
                 <div class="inputitem">
                     <label for="psw"><b>Password</b></label>
-                    <input type="password" placeholder="Enter Password" name="psw" required>
+                    <input type="password" placeholder="Enter Password" name="psw" id="login-password" required>
                 </div>
-                <button class="inputitem" type="submit">Signup</button>
+                <button class="inputitem" type="submit" signupbtn>Signup</button>
             </div>
         </form>    `;
+        
                 
         //         const series = new Series(d[0]["id"], d[0]["title"], d[0]["year"], d[0]["genre"], d[0]["plot"], d[0]["seasons"], d[0]["rating"]);
         //         html=`
@@ -100,6 +105,48 @@ export default class extends AbstractView {
         return html;
 
     }
+
+       
+    signup()
+    {
+        const signupForm = document.querySelector('#signup-form');
+        const username = signupForm['login-username'].value;
+        const password = signupForm['login-password'].value;    
+        
+        fetch("https://localhost:44365/User", { method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                // I u body se smešta string reprezentacija objekta koji se šalje
+                body: JSON.stringify({ "username": username, "password": password })
+            }).then(p => {
+            if (p.ok) {
+
+                localStorage.username=username;
+
+                fetch("https://localhost:44365/User/GetUserID/"+localStorage.username, {method: "GET"})
+                .then(p => p.json().then(data => {
+
+                        localStorage.userid=data;
+
+                        document.querySelector("#login").style.display="none";
+                        document.querySelector("#signup").style.display="none";
+                        document.querySelector("#logout").style.display="block";
+
+                        alert("Welcome to Sirius "+username);
+                        return true;
+                    })
+                );
+            }
+            else
+            {
+                alert("User already exists!");
+                return false;
+            }
+            }
+        );
+    }
+
 
     // await fetch("https://localhost:44365/Series/GetSeries/"+this.postId, {method: "GET"})
     // .then(p => p.json().then(d => {

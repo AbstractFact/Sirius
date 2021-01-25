@@ -10,7 +10,7 @@ export default class extends AbstractView {
     async getHtml() 
     {
         var html,i;
-
+        console.log(localStorage.username);
         await fetch("https://localhost:44365/Series", {method: "GET"})
         .then(p => p.json().then(data => {
                 i=0;
