@@ -97,12 +97,8 @@ namespace Sirius.Controllers
         }
 
         [HttpPost("Login")]
-        public async Task<User> Login([FromBody] User user)
+        public async Task<ActionResult<User>> Login([FromBody] User user)
         {
-            //await _redis_client.Set($"{id}","How many claps per person should this article get?");
-            //var definitely = await _redis_client.Get($"{id}");
-            //return definitely;
-
             var res = await _client.Cypher
                         .Match("(u:User)")
                         .Where((User u) => u.Username == user.Username)
@@ -110,14 +106,16 @@ namespace Sirius.Controllers
                         .Return(u => u.As<User>())
                         .ResultsAsync;
 
-            return res.FirstOrDefault();
+            if (res.Count() != 0)
+                return Ok(res.FirstOrDefault());
+            else
+                return BadRequest();
         }
 
         [HttpPost]
-        public async Task<ActionResult> Post([FromBody] User u)
+        public async Task<ActionResult<int>> Post([FromBody] User u)
         {
             maxID = await MaxID();
-
 
             int id = await GetUserID(u.Username);
 
@@ -131,7 +129,11 @@ namespace Sirius.Controllers
                 await res.ExecuteWithoutResultsAsync();
 
                 if (res != null)
-                    return Ok();
+                {
+                    id = await GetUserID(u.Username);
+                    return Ok(id);
+                }
+
                 else
                     return BadRequest();
             }

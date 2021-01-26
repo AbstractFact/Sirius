@@ -17,8 +17,8 @@ export default class extends AbstractView {
 
         await fetch("https://localhost:44365/Actor/GetActor/"+this.postId, {method: "GET"})
         .then(p => p.json().then(d => {
-                
-                const actor = new Actor(d[0]["id"], d[0]["name"], d[0]["birthplace"], d[0]["birthday"], d[0]["biography"]);
+                console.log(d[0]["id"]);
+                const actor = new Actor(d[0]["id"], d[0]["name"], d[0]["sex"], d[0]["birthplace"], d[0]["birthday"], d[0]["biography"]);
 
                 html=`
                     <h1>Actor: ${actor.name}</h1>
@@ -26,6 +26,7 @@ export default class extends AbstractView {
                     <table class="table table-striped">
                         <thead>
                             <tr>
+                            <th scope="col">Sex</th>
                             <th scope="col">Birthplace</th>
                             <th scope="col">Birthday</th>
                             </tr>
@@ -34,6 +35,7 @@ export default class extends AbstractView {
 
                     html+=`
                         <tr>
+                        <td>${actor.sex}</td>
                         <td>${actor.birthplace}</td>
                         <td>${actor.birthday}</td>
                         </tr>`;
@@ -42,14 +44,45 @@ export default class extends AbstractView {
                         </tbody>
                         </table>
                         <p>
-                            <a href="/series" data-link>Add actor to your list <tmp></a>.
-                        </p>
-                        <p>
                             ${actor.biography}
                         </p>
-                        <br/>`;
-        }));
 
+                        <br/>
+                        <br/>
+                        
+                        <form id="addactor-form" style="width:50%;">
+                        <div class="form-group col-md-10">
+                            <div class="form-group col-md-10">
+                            <label for="inputName">Name</label>
+                            <input type="text" class="form-control" id="inputName" value="${actor.name}">
+                            </div>
+                            <div class="form-group col-md-4">
+                            <label for="inputSex">Sex</label>
+                            <select id="inputSex" class="form-control">
+                                <option selected>${actor.sex}</option>
+                                <option>Male</option>
+                                <option>Female</option>
+                            </select>
+                        </div>
+                            <div class="form-group col-md-10">
+                            <label for="inputBirthplace">Birthplace</label>
+                            <input type="text" class="form-control" id="inputBirthplace" value="${actor.birthplace}">
+                            </div>
+                            <div class="form-group col-md-8">
+                            <label for="inputBirthday">Birthday</label>
+                            <input type="text" class="form-control" id="inputBirthday" value="${actor.birthday}">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                            <label for="inputBiography">Biography</label>
+                            <textarea type="text" class="form-control" id="inputBiography">${actor.biography}</textarea>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width:20%;" editActorBtn>Edit Actor</button>
+                        <button type="submit" class="btn btn-danger" style="width:20%; float:right;" deleteActorBtn>Delete Actor</button>
+                        </form>`;
+        }));
 
         await fetch("https://localhost:44365/Role/GetActorRoles/"+this.postId, {method: "GET"})
         .then(p => p.json().then(d => {
@@ -84,6 +117,42 @@ export default class extends AbstractView {
         }));
 
         return html;
+    }
 
+    EditActor()
+    {
+        const addActorForm = document.querySelector('#addactor-form');
+        const name = addActorForm['inputName'].value;
+        const sex = addActorForm['inputSex'].value;
+        const birthplace = addActorForm['inputBirthplace'].value;  
+        const birthday = addActorForm['inputBirthday'].value;
+        const biography = addActorForm['inputBiography'].value; 
+        
+        console.log(name);
+        console.log(sex);
+        console.log(birthplace);
+        console.log(birthday);
+        console.log(biography);
+        
+        fetch("https://localhost:44365/Actor/"+this.postId, { method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ "name": name, "sex": sex, "birthplace":birthplace , "birthday":birthday , "biography":biography})
+            }).then(p => {
+                if (p.ok) {
+                    alert("Actor "+name+" edited!");
+                }
+            }
+        );
+    }
+
+    DeleteActor()
+    {      
+        fetch("https://localhost:44365/Actor/"+this.postId, { method: "DELETE"}).then(p => {
+            if (p.ok) {
+                alert("Actor "+this.name+" deleted!");
+            }
+        });
     }
 }

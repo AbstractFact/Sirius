@@ -47,8 +47,11 @@ namespace Sirius.Controllers
                         .Where((User u) => u.ID == userID)
                         .Return((u, l, s) => new
                         {
+                            l.As<UserSeriesList>().ID,
                             Series = s.As<Series>(),
-                            l.As<UserSeriesList>().Status
+                            l.As<UserSeriesList>().Status,
+                            l.As<UserSeriesList>().Stars,
+                            l.As<UserSeriesList>().Comment
                         })
                         .ResultsAsync;
 
@@ -87,7 +90,9 @@ namespace Sirius.Controllers
                             l.As<UserSeriesList>().ID,
                             User = u.As<User>(),
                             Series = s.CollectAs<Series>(),
-                            l.As<UserSeriesList>().Status
+                            l.As<UserSeriesList>().Status,
+                            l.As<UserSeriesList>().Stars,
+                            l.As<UserSeriesList>().Comment
                         })
                         .ResultsAsync;
 
@@ -106,7 +111,7 @@ namespace Sirius.Controllers
                     .Match("(user:User)", "(series:Series)")
                     .Where((User user) => user.ID == userID)
                     .AndWhere((Series series) => series.ID == seriesID)
-                    .Create("(user)-[:LISTED { ID: $id, Status: $status }]->(series)")
+                    .Create("(user)-[:LISTED { ID: $id, Status: $status, Stars: 0, Comment: \"\" }]->(series)")
                     .WithParam("status", status)
                     .WithParam("id", maxID + 1);
 
@@ -118,14 +123,38 @@ namespace Sirius.Controllers
                 return BadRequest();
         }
 
-        [HttpPut("{id}/{status}")]
-        public async Task<ActionResult> Put(int id, string status)
+        [HttpPut("{id}/{seriesID}")]
+        public async Task<ActionResult> Put([FromBody] List<string> data, int id, int seriesID)
         {
             var res = _client.Cypher
                         .Match("(u:User)-[l:LISTED]-(s:Series)")
                         .Where((UserSeriesList l) => l.ID == id)
                         .Set("l.Status = $status")
-                        .WithParam("status", status);
+                        .Set("l.Stars = $stars")
+                        .Set("l.Comment = $comment")
+                        .WithParam("status", data[0])
+                        .WithParam("stars", int.Parse(data[1]))
+                        .WithParam("comment", data[2]);
+
+            await res.ExecuteWithoutResultsAsync();
+
+            float avgrtng = await GetSeriesAvgRating(seriesID);
+
+            await UpdateRating(seriesID, avgrtng);
+
+            if (res != null)
+                return Ok();
+            else
+                return BadRequest();
+        }
+
+        public async Task<ActionResult> UpdateRating(int id, float rating)
+        {
+            var res = _client.Cypher
+                                .Match("(s:Series)")
+                                .Where((Series s) => s.ID == id)
+                                .Set("s.Rating = $rating")
+                                .WithParam("rating", rating);
 
             await res.ExecuteWithoutResultsAsync();
 
@@ -133,6 +162,19 @@ namespace Sirius.Controllers
                 return Ok();
             else
                 return BadRequest();
+        }
+
+        [HttpGet("GetSeriesAvgRating/{seriesID}")]
+        public async Task<float> GetSeriesAvgRating(int seriesID)
+        {
+            var res = await _client.Cypher
+                            .Match("(u:User)-[l:LISTED]-(s:Series)")
+                            .Where((Series s) => s.ID == seriesID)
+                            .AndWhere((UserSeriesList l) => l.Stars != 0)
+                            .Return((l) => Return.As<float>("avg(l.Stars)"))
+                            .ResultsAsync;
+
+            return res.FirstOrDefault();
         }
 
         [HttpDelete("{id}")]

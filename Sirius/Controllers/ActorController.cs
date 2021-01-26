@@ -73,7 +73,7 @@ namespace Sirius.Controllers
         {
             maxID = await MaxID();
 
-            var newActor = new Actor { ID = maxID + 1, Name = a.Name, Birthplace = a.Birthplace, Birthday = a.Birthday, Biography = a.Biography };
+            var newActor = new Actor { ID = maxID + 1, Name = a.Name, Sex=a.Sex, Birthplace = a.Birthplace, Birthday = a.Birthday, Biography = a.Biography };
             var res = _client.Cypher
                         .Create("(actor:Actor $newActor)")
                         .WithParam("newActor", newActor);

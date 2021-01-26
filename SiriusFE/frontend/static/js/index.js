@@ -71,20 +71,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (e.target.matches("[loginbtn]")) {
             e.preventDefault();
-            if(view.login()==true)
-            {
-                alert("Boom");
-                navigateTo("/");
-            }
+            handleLogin();
         }
 
         if (e.target.matches("[signupbtn]")) {
             e.preventDefault();
-            if(view.signup())
-            {
-                alert("Boom");
-                navigateTo("/");
-            }
+            handleSignup();
         }
 
         if (e.target.matches("[logout]")) {
@@ -92,16 +84,95 @@ document.addEventListener("DOMContentLoaded", () => {
             logout();
             navigateTo(e.target.href);
         }
+
+        if (e.target.matches("[addSeriesBtn]")) {
+            e.preventDefault();
+            view.AddSeries();
+            navigateTo("/series");
+        }
+
+        if (e.target.matches("[editSeriesBtn]")) {
+            e.preventDefault();
+            view.EditSeries();
+            navigateTo("/series");
+        }
+
+        if (e.target.matches("[deleteSeriesBtn]")) {
+            //e.preventDefault();
+            view.DeleteSeries();
+            navigateTo("/series");
+        }
+
+        if (e.target.matches("[addSeriesToListBtn]")) {
+            e.preventDefault();
+            view.AddSeriesToList();
+            navigateTo("/series");
+        }
+
+        if (e.target.matches("[addActorBtn]")) {
+            e.preventDefault();
+            view.AddActor();
+            navigateTo("/actors");
+        }
+
+        if (e.target.matches("[editActorBtn]")) {
+            e.preventDefault();
+            view.EditActor();
+            navigateTo("/actors");
+        }
+
+        if (e.target.matches("[deleteActorBtn]")) {
+            //e.preventDefault();
+            view.DeleteActor();
+            navigateTo("/actors");
+        }
+
+        if (e.target.matches("[editMyListBtn]")) {
+            e.preventDefault();
+            view.EditList();
+            navigateTo("/myserieslist");
+        }
+
+        if(window.location.href=="http://localhost:5060/myserieslist")
+        {
+            const entries = view.GetEntries();
+            entries.forEach(entrie => {
+                const id = entrie.id;
+                if (e.target.id==id) {
+                    e.preventDefault();
+                    view.EditEntry(id);
+                } 
+            });
+        }
     });
 
     router();
 });
 
+async function handleLogin()
+{
+    await view.login();
+    if(localStorage.username!=0)
+    {
+        navigateTo("/");
+    } 
+}
+
+async function handleSignup()
+{
+    await view.signup();
+    if(localStorage.username!=0)
+    {
+        navigateTo("/");
+    } 
+}
+
 function logout()
 {
     document.querySelector("#login").style.display="block";
     document.querySelector("#signup").style.display="block";
+    document.querySelector("#mylist").style.display="none";
     document.querySelector("#logout").style.display="none";
-    localStorage.username=null;
+    localStorage.username=0;
     localStorage.userid=null;
 }

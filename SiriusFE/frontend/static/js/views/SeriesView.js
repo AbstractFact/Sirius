@@ -51,7 +51,65 @@ export default class extends AbstractView {
                         <p>
                             ${series.plot}
                         </p>
-                        <br/>`;
+                        <br/>
+                        
+                        <br/>
+
+                        <div style="display:block">
+                        <form id="addseries-form" style="width:50%; float:left;">
+                        <div class="form-group col-md-8">
+                            <div class="form-group col-md-8">
+                            <label for="inputTitle">Title</label>
+                            <input type="text" class="form-control" id="inputTitle" value="${series.title}">
+                            </div>
+                            <div class="form-group col-md-3">
+                            <label for="inputYear">Year</label>
+                            <input type="number" class="form-control" id="inputYear" value="${series.year}">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="inputGenre">Genre</label>
+                            <select id="inputGenre" class="form-control">
+                                <option selected>${series.genre}</option>
+                                <option>Drama</option>
+                                <option>Comedy</option>
+                                <option>Crime</option>
+                                <option>Fantasy</option>
+                                <option>Sci-fi</option>
+                            </select>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                            <label for="inputPlot">Plot</label>
+                            <textarea type="text" class="form-control" id="inputPlot">${series.plot}</textarea>
+                            </div>
+                            <div class="form-group col-md-2">
+                            <label for="inputZip">Seasons</label>
+                            <input type="number" class="form-control" id="inputSeasons" value="${series.seasons}">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width:20%" editSeriesBtn>Edit Series</button>
+                        <button type="submit" class="btn btn-danger" style="width:30%; float:right" deleteSeriesBtn>Delete Series</button>
+                        </form>`;
+
+                        console.log(localStorage.username);
+                        if(localStorage.username!=0)
+                            html+=`<form id="addseriestolist-form" style="width:50%; float:right;">
+                            <div class="form-group col-md-8">
+                                <label for="inputStatus">Status</label>
+                                <select id="inputStatus" class="form-control">
+                                    <option selected>Select Status</option>
+                                    <option>Watching</option>
+                                    <option>Plan to Watch</option>
+                                    <option>On Hold</option>
+                                    <option>Dropped</option>
+                                    <option>Completed</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="width:30%" addSeriesToListBtn>Add Series to List</button>
+                            </form></div>`; 
+                        else
+                            html+=`</div>`;    
         }));
 
 
@@ -60,7 +118,9 @@ export default class extends AbstractView {
                 i=0;
 
                 html+=`
-                    <h2>Cast</h1>
+                <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+                <div style="display:block">
+                    <h2>Cast</h2>
                     <br/>
                     <table class="table table-striped">
                         <thead>
@@ -70,11 +130,12 @@ export default class extends AbstractView {
                             <th scope="col">Actor</th>
                             </tr>
                         </thead>
-                        <tbody>`;
+                        <tbody>
+                </div>`;
 
                 d.forEach(data => {
 
-                    const actor = new Actor(data["actor"]["id"], data["actor"]["name"], data["actor"]["birthplace"], data["actor"]["birthday"], data["actor"]["biography"]);
+                    const actor = new Actor(data["actor"]["id"], data["actor"]["name"], data["actor"]["sex"], data["actor"]["birthplace"], data["actor"]["birthday"], data["actor"]["biography"]);
                     const series = new Series(data["series"]["id"], data["series"]["title"], data["series"]["year"], data["series"]["genre"], data["series"]["plot"], data["series"]["seasons"], data["series"]["rating"]);
                     const role = new Role(data["id"], actor, series, data["inRole"]);
 
@@ -88,14 +149,52 @@ export default class extends AbstractView {
         }));
 
         return html;
+    }
 
+    EditSeries()
+    {
+        const addSeriesForm = document.querySelector('#addseries-form');
+        const title = addSeriesForm['inputTitle'].value;
+        const year = parseInt(addSeriesForm['inputYear'].value);  
+        const genre = addSeriesForm['inputGenre'].value;
+        const plot = addSeriesForm['inputPlot'].value;  
+        const seasons = parseInt(addSeriesForm['inputSeasons'].value);
+        
+        fetch("https://localhost:44365/Series/"+this.postId, { method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({"title": title, "year": year, "genre":genre , "plot":plot , "seasons":seasons})
+            }).then(p => {
+            if (p.ok) {
+                alert("Series "+title+" edited!");
+            }
+            }
+        );
+    }
 
-        // //     const prodavnica = new Prodavnica(d["ime"], d["id"]);
-        // //     d["proizvodi"].forEach(pr =>{
-        // //         prodavnica.dodajProizvod(new Proizvod(pr["id"],pr["sifra"],
-        // //         pr["ime"],pr["cena"],pr["kolicina"]));
-        // //     });
-        // //     prodavnica.crtaj(document.body);
-        // });
+    DeleteSeries()
+    {
+        fetch("https://localhost:44365/Series/"+this.postId, { method: "DELETE"}).then(p => {
+            if (p.ok) 
+            {
+                alert("Series "+title+" deleted!");
+            }
+        });
+    }
+
+    async AddSeriesToList()
+    {
+        const addSeriesToListForm = document.querySelector('#addseriestolist-form');
+        const userid = localStorage.userid;
+        const seriesid = this.postId;  
+        const status = addSeriesToListForm['inputStatus'].value; 
+        
+        fetch("https://localhost:44365/UserSeriesList/AddSeriesToList/"+userid+"/"+seriesid+"/"+status, { method: "POST"}).then(p => 
+        {
+            if (p.ok) {
+                alert("Series added to your list!");
+            }
+        });
     }
 }
