@@ -87,20 +87,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (e.target.matches("[addSeriesBtn]")) {
             e.preventDefault();
-            view.AddSeries();
-            navigateTo("/series");
+            handleAddSeries();
         }
 
         if (e.target.matches("[editSeriesBtn]")) {
             e.preventDefault();
-            view.EditSeries();
-            navigateTo("/series");
+            handleEditSeries();
         }
 
         if (e.target.matches("[deleteSeriesBtn]")) {
-            //e.preventDefault();
-            view.DeleteSeries();
-            navigateTo("/series");
+            e.preventDefault();
+            handleDeleteSeries();
         }
 
         if (e.target.matches("[addSeriesToListBtn]")) {
@@ -111,20 +108,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (e.target.matches("[addActorBtn]")) {
             e.preventDefault();
-            view.AddActor();
-            navigateTo("/actors");
+            handleAddActor();
         }
 
         if (e.target.matches("[editActorBtn]")) {
             e.preventDefault();
-            view.EditActor();
-            navigateTo("/actors");
+            handleEditActor();
         }
 
         if (e.target.matches("[deleteActorBtn]")) {
-            //e.preventDefault();
-            view.DeleteActor();
-            navigateTo("/actors");
+            e.preventDefault();
+            handleDeleteActor();
         }
 
         if (e.target.matches("[editMyListBtn]")) {
@@ -133,15 +127,46 @@ document.addEventListener("DOMContentLoaded", () => {
             navigateTo("/myserieslist");
         }
 
+        if (e.target.matches("[addRoleBtn]")) {
+            e.preventDefault();
+            handleAddRole();
+        }
+
         if(window.location.href=="http://localhost:5060/myserieslist")
         {
             const entries = view.GetEntries();
             entries.forEach(entrie => {
                 const id = entrie.id;
+
                 if (e.target.id==id) {
                     e.preventDefault();
                     view.EditEntry(id);
-                } 
+                };
+
+                if (e.target.id=="R"+id) {
+                    e.preventDefault();
+                    view.DeleteEntry(id);
+                };
+            });
+        }
+
+        if(window.location.href.includes("http://localhost:5060/series/"))
+        {
+            const roles = view.GetRoles();
+            roles.forEach(role => {
+                const id = role.id;
+
+                if (e.target.id==id) {
+                    e.preventDefault();
+                    view.EditRole(id);
+                    location.reload();
+                };
+
+                if (e.target.id=="R"+id) {
+                    e.preventDefault();
+                    view.DeleteRole(id);
+                    location.reload();
+                };
             });
         }
     });
@@ -165,6 +190,48 @@ async function handleSignup()
     {
         navigateTo("/");
     } 
+}
+
+async function handleAddSeries()
+{
+    await view.AddSeries();
+    location.reload();
+}
+
+async function handleEditSeries()
+{
+    await view.EditSeries();
+    location.reload();
+}
+
+async function handleDeleteSeries()
+{
+    await view.DeleteSeries();
+    navigateTo("/series");
+}
+
+async function handleAddActor()
+{
+    await view.AddActor();
+    location.reload();
+}
+
+async function handleEditActor()
+{
+    await view.EditActor();
+    location.reload();
+}
+
+async function handleDeleteActor()
+{
+    await view.DeleteActor();
+    navigateTo("/actors");
+}
+
+async function handleAddRole()
+{
+    await view.AddRole();
+    location.reload();
 }
 
 function logout()

@@ -94,7 +94,7 @@ export default class extends AbstractView {
         return html;
     }
 
-    AddSeries()
+    async AddSeries()
     {
         const addSeriesForm = document.querySelector('#addseries-form');
         const title = addSeriesForm['inputTitle'].value;
@@ -102,19 +102,20 @@ export default class extends AbstractView {
         const genre = addSeriesForm['inputGenre'].value;
         const plot = addSeriesForm['inputPlot'].value;  
         const seasons = parseInt(addSeriesForm['inputSeasons'].value);
+
+
+        const response =  await  fetch("https://localhost:44365/Series", { method: "POST",
+                                    headers: {
+                                        "Content-Type": "application/json"
+                                    },
+                                    body: JSON.stringify({ "title": title, "year": year, "genre":genre , "plot":plot , "seasons":seasons})
+                                });
+
+        if (response.ok) {
+            addSeriesForm.reset();
+            alert("Series "+title+" added to database!");
+        }
         
-        fetch("https://localhost:44365/Series", { method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ "title": title, "year": year, "genre":genre , "plot":plot , "seasons":seasons})
-            }).then(p => {
-            if (p.ok) {
-                addSeriesForm.reset();
-                alert("Series "+title+" added to database!");
-            }
-            }
-        );
     }
 }
 

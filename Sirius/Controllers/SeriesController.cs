@@ -107,6 +107,8 @@ namespace Sirius.Controllers
         public async Task<ActionResult> Delete(int id)
         {
             var res = _client.Cypher
+                              .Match("(s:Series)")
+                              .Where((Series s) => s.ID == id)
                               .OptionalMatch("(s:Series)<-[r]-()")
                               .Where((Series s) => s.ID == id)
                               .Delete("r, s");

@@ -87,7 +87,7 @@ export default class extends AbstractView {
         return html;
     }
 
-    AddActor()
+    async AddActor()
     {
         const addActorForm = document.querySelector('#addactor-form');
         const name = addActorForm['inputName'].value;
@@ -96,17 +96,17 @@ export default class extends AbstractView {
         const birthday = addActorForm['inputBirthday'].value;
         const biography = addActorForm['inputBiography'].value;  
         
-        fetch("https://localhost:44365/Actor", { method: "POST",
+        const response = await fetch("https://localhost:44365/Actor", { method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({ "name": name, "sex": sex, "birthplace":birthplace , "birthday":birthday , "biography":biography})
-            }).then(p => {
-            if (p.ok) {
-                addActorForm.reset();
-                alert("Actor "+name+" added to database!");
-            }
-            }
-        );
+            });
+
+        if(response.ok)
+        {
+            addActorForm.reset();
+            alert("Actor "+name+" added to database!");
+        }
     }
 }

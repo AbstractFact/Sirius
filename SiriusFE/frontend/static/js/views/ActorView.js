@@ -114,12 +114,14 @@ export default class extends AbstractView {
                         <td><a href="/series/${series.id}" data-link>${role.series.title}</a></td>
                         </tr>`;
                 });
+
+                html+=`</tbody></table>`;
         }));
 
         return html;
     }
 
-    EditActor()
+    async EditActor()
     {
         const addActorForm = document.querySelector('#addactor-form');
         const name = addActorForm['inputName'].value;
@@ -133,26 +135,27 @@ export default class extends AbstractView {
         console.log(birthplace);
         console.log(birthday);
         console.log(biography);
-        
-        fetch("https://localhost:44365/Actor/"+this.postId, { method: "PUT",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ "name": name, "sex": sex, "birthplace":birthplace , "birthday":birthday , "biography":biography})
-            }).then(p => {
-                if (p.ok) {
-                    alert("Actor "+name+" edited!");
-                }
-            }
-        );
+
+        const response =  await fetch("https://localhost:44365/Actor/"+this.postId, { method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({"id": parseInt(this.postId), "name": name, "sex": sex, "birthplace":birthplace , "birthday":birthday , "biography":biography})
+        });
+
+        if (response.ok) 
+        {
+            alert("Actor "+name+" edited!");
+        }
     }
 
-    DeleteActor()
+    async DeleteActor()
     {      
-        fetch("https://localhost:44365/Actor/"+this.postId, { method: "DELETE"}).then(p => {
-            if (p.ok) {
-                alert("Actor "+this.name+" deleted!");
-            }
-        });
+        const response = await fetch("https://localhost:44365/Actor/"+this.postId, { method: "DELETE"});
+
+        if (response.ok) 
+        {
+            alert("Actor deleted!");
+        }
     }
 }

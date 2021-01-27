@@ -33,6 +33,7 @@ export default class extends AbstractView {
                             <th scope="col">My Rating</th>
                             <th scope="col">Comment</th>
                             <th scope="col"></th>
+                            <th scope="col"></th>
                             </tr>
                         </thead>
                         <tbody>`;
@@ -77,11 +78,13 @@ export default class extends AbstractView {
                             <textarea type="text" class="form-control" id="inputComment">${comment}</textarea>
                         </td>
                         <td>
-                            <button type="submit" class="btn btn-primary" style="width:70%" id="${entry.id}">Save Changes</button>
+                            <button type="submit" class="btn btn-primary" style="width:60%" id="${entry.id}">Save Changes</button>
+                        </td>
+                        <td>
+                            <button type="submit" class="btn btn-danger" style="width:100%" id="R${entry.id}">X</button>
                         </td>
                         </tr>`;
                 });
-            //html+=`<br/><button type="submit" class="btn btn-primary" style="width:20%" editMyListBtn>Save Changes</button>`;
         }));
 
         return html;
@@ -116,5 +119,14 @@ export default class extends AbstractView {
                 }
             }
         );
+    }
+
+    DeleteEntry(id)
+    {
+        fetch("https://localhost:44365/UserSeriesList/"+id, { method: "DELETE"}).then(p => {
+            if (p.ok) {
+                alert("Entry deleted!");
+            }
+        });
     }
 }

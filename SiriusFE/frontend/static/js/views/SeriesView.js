@@ -7,6 +7,7 @@ export default class extends AbstractView {
     constructor(params) {
         super(params);
         this.postId = params.id;
+        this.roles = new Array();
         this.setTitle("Viewing Series");
     }
 
@@ -92,7 +93,6 @@ export default class extends AbstractView {
                         <button type="submit" class="btn btn-danger" style="width:30%; float:right" deleteSeriesBtn>Delete Series</button>
                         </form>`;
 
-                        console.log(localStorage.username);
                         if(localStorage.username!=0)
                             html+=`<form id="addseriestolist-form" style="width:50%; float:right;">
                             <div class="form-group col-md-8">
@@ -128,10 +128,11 @@ export default class extends AbstractView {
                             <th scope="col">#</th>
                             <th scope="col">Role</th>
                             <th scope="col">Actor</th>
+                            <th scope="col"></th>
+                            <th scope="col"></th>
                             </tr>
                         </thead>
-                        <tbody>
-                </div>`;
+                        <tbody>`;
 
                 d.forEach(data => {
 
@@ -139,19 +140,56 @@ export default class extends AbstractView {
                     const series = new Series(data["series"]["id"], data["series"]["title"], data["series"]["year"], data["series"]["genre"], data["series"]["plot"], data["series"]["seasons"], data["series"]["rating"]);
                     const role = new Role(data["id"], actor, series, data["inRole"]);
 
+                    this.roles.push(role);
+
                     html+=`
-                        <tr>
+                        <tr id="${role.id}">
                         <th scope="row">${++i}</th>
-                        <td>${role.inrole}</td>
+                        <td><input type="text" class="form-control" id="editRole" value="${role.inrole}"></td>
                         <td><a href="/actors/${role.actor.id}" data-link>${role.actor.name}</a></td>
+                        <td>
+                            <button type="submit" class="btn btn-primary" style="width:60%" id="${role.id}">Save Changes</button>
+                        </td>
+                        <td>
+                            <button type="submit" class="btn btn-danger" style="width:100%" id="R${role.id}">X</button>
+                        </td>
                         </tr>`;
                 });
         }));
 
+            html+=`</div></tbody></table>
+            <form id="addrole-form" style="width:40%">
+            <div class="form-group col-md-8">
+                <label for="inputActor">Actors</label>
+                <select id="inputActor" class="form-control">
+                    <option selected>Select Actor</option>`;
+                    
+                    
+            await fetch("https://localhost:44365/Actor", {method: "GET"})
+                .then(p => p.json().then(data => {
+                    data.forEach(d => {
+                        const actor = new Actor(d["id"], d["name"], d["sex"], d["birthplace"], d["birthday"], d["biography"]);
+
+                        html+=`<option value="${actor.id}">${actor.name}, ${actor.birthplace}</option>`;
+                    });
+            }));
+
+            html+=`</select>
+            <label for="inputRole">Role</label>
+            <input type="text" class="form-control" id="inputRole" placeholder="Enter role">
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:30%" addRoleBtn>Add Role</button>
+            </form>`;
+
         return html;
     }
 
-    EditSeries()
+    GetRoles()
+    {
+        return this.roles;
+    }
+
+    async EditSeries()
     {
         const addSeriesForm = document.querySelector('#addseries-form');
         const title = addSeriesForm['inputTitle'].value;
@@ -159,28 +197,28 @@ export default class extends AbstractView {
         const genre = addSeriesForm['inputGenre'].value;
         const plot = addSeriesForm['inputPlot'].value;  
         const seasons = parseInt(addSeriesForm['inputSeasons'].value);
-        
-        fetch("https://localhost:44365/Series/"+this.postId, { method: "PUT",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({"title": title, "year": year, "genre":genre , "plot":plot , "seasons":seasons})
-            }).then(p => {
-            if (p.ok) {
-                alert("Series "+title+" edited!");
-            }
-            }
-        );
+
+        const response =  await fetch("https://localhost:44365/Series/"+this.postId, 
+        { method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({"id": parseInt(this.postId), "title": title, "year": year, "genre":genre , "plot":plot , "seasons":seasons})
+        });
+
+        if (response.ok) 
+        {
+            alert("Series "+title+" edited!");
+        }
     }
 
-    DeleteSeries()
+    async DeleteSeries()
     {
-        fetch("https://localhost:44365/Series/"+this.postId, { method: "DELETE"}).then(p => {
-            if (p.ok) 
-            {
-                alert("Series "+title+" deleted!");
-            }
-        });
+        const response =  await fetch("https://localhost:44365/Series/"+this.postId, { method: "DELETE"});
+
+        if (response.ok) {
+            alert("Series " + "deleted!");
+        }
     }
 
     async AddSeriesToList()
@@ -196,5 +234,42 @@ export default class extends AbstractView {
                 alert("Series added to your list!");
             }
         });
+    }
+
+    async AddRole()
+    {
+        const addroleform = document.querySelector("#addrole-form");
+        const actorid = addroleform["inputActor"].value;
+        const role = addroleform["inputRole"].value;
+
+        const response = await fetch("https://localhost:44365/Role/AddRole/"+actorid+"/"+role+"/"+this.postId, { method: "POST"});
+
+        if(response.ok)
+        {
+            alert("Role added!");
+        };
+    }
+
+    async EditRole(id)
+    {
+        const row = document.getElementById(id);
+        const role = row.querySelector('#editRole').value;
+
+        const response = await fetch("https://localhost:44365/Role/"+id, { method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(role)
+        });
+
+        if(response.ok)
+        {
+            alert("Role edited!");
+        };
+    }
+
+    DeleteRole(id)
+    {
+        fetch("https://localhost:44365/Role/"+id, { method: "DELETE"});
     }
 }
