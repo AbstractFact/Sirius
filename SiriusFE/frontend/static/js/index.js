@@ -9,6 +9,23 @@ import Signup from "./views/Signup.js";
 
 var view;
 
+if(localStorage.logged==0)
+{
+    var html=document.body.querySelector(".topnav").innerHTML;
+    html+=
+    `<a href="/login" id="login" class="nav__link" data-link>Login</a>
+    <a href="/signup" id="signup" class="nav__link" data-link>Signup</a>`;
+    document.body.querySelector(".topnav").innerHTML=html;
+}
+else
+{
+    var html=document.body.querySelector(".topnav").innerHTML;
+    html+=
+    `<a href="/myserieslist" id="mylist" class="nav__link" data-link>My Series List</a>
+    <a href="/" id="logout" class="nav__link" logout>Logout</a>`;
+    document.body.querySelector(".topnav").innerHTML=html;
+}
+
 const pathToRegex = path => new RegExp("^" + path.replace(/\//g, "\\/").replace(/:\w+/g, "(.+)") + "$");
 
 const getParams = match => {
@@ -102,8 +119,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (e.target.matches("[addSeriesToListBtn]")) {
             e.preventDefault();
-            view.AddSeriesToList();
-            navigateTo("/series");
+            handleAddSeriesToList();
         }
 
         if (e.target.matches("[addActorBtn]")) {
@@ -141,11 +157,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (e.target.id==id) {
                     e.preventDefault();
                     view.EditEntry(id);
+                    //location.reload();
                 };
 
                 if (e.target.id=="R"+id) {
                     e.preventDefault();
                     view.DeleteEntry(id);
+                    //location.reload();
                 };
             });
         }
@@ -177,18 +195,20 @@ document.addEventListener("DOMContentLoaded", () => {
 async function handleLogin()
 {
     await view.login();
-    if(localStorage.username!=0)
+    if(localStorage.logged!=0)
     {
         navigateTo("/");
+        location.reload();
     } 
 }
 
 async function handleSignup()
 {
     await view.signup();
-    if(localStorage.username!=0)
+    if(localStorage.logged!=0)
     {
         navigateTo("/");
+        location.reload();
     } 
 }
 
@@ -207,6 +227,12 @@ async function handleEditSeries()
 async function handleDeleteSeries()
 {
     await view.DeleteSeries();
+    navigateTo("/series");
+}
+
+async function handleAddSeriesToList()
+{
+    await view.AddSeriesToList();
     navigateTo("/series");
 }
 
@@ -236,10 +262,8 @@ async function handleAddRole()
 
 function logout()
 {
-    document.querySelector("#login").style.display="block";
-    document.querySelector("#signup").style.display="block";
-    document.querySelector("#mylist").style.display="none";
-    document.querySelector("#logout").style.display="none";
-    localStorage.username=0;
-    localStorage.userid=null;
+    localStorage.userid=0;
+    localStorage.logged=0;
+    navigateTo("/");
+    location.reload();
 }

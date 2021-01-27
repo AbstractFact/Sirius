@@ -17,7 +17,7 @@ export default class extends AbstractView {
 
         await fetch("https://localhost:44365/Actor/GetActor/"+this.postId, {method: "GET"})
         .then(p => p.json().then(d => {
-                console.log(d[0]["id"]);
+    
                 const actor = new Actor(d[0]["id"], d[0]["name"], d[0]["sex"], d[0]["birthplace"], d[0]["birthday"], d[0]["biography"]);
 
                 html=`
@@ -47,7 +47,6 @@ export default class extends AbstractView {
                             ${actor.biography}
                         </p>
 
-                        <br/>
                         <br/>
                         
                         <form id="addactor-form" style="width:50%;">
@@ -129,12 +128,6 @@ export default class extends AbstractView {
         const birthplace = addActorForm['inputBirthplace'].value;  
         const birthday = addActorForm['inputBirthday'].value;
         const biography = addActorForm['inputBiography'].value; 
-        
-        console.log(name);
-        console.log(sex);
-        console.log(birthplace);
-        console.log(birthday);
-        console.log(biography);
 
         const response =  await fetch("https://localhost:44365/Actor/"+this.postId, { method: "PUT",
             headers: {

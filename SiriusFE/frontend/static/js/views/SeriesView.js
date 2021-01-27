@@ -47,13 +47,8 @@ export default class extends AbstractView {
                         </tbody>
                         </table>
                         <p>
-                            <a href="/series" data-link>Add series to your list</a>.
-                        </p>
-                        <p>
                             ${series.plot}
-                        </p>
-                        <br/>
-                        
+                        </p>    
                         <br/>
 
                         <div style="display:block">
@@ -93,7 +88,7 @@ export default class extends AbstractView {
                         <button type="submit" class="btn btn-danger" style="width:30%; float:right" deleteSeriesBtn>Delete Series</button>
                         </form>`;
 
-                        if(localStorage.username!=0)
+                        if(localStorage.logged!=0)
                             html+=`<form id="addseriestolist-form" style="width:50%; float:right;">
                             <div class="form-group col-md-8">
                                 <label for="inputStatus">Status</label>
@@ -228,12 +223,12 @@ export default class extends AbstractView {
         const seriesid = this.postId;  
         const status = addSeriesToListForm['inputStatus'].value; 
         
-        fetch("https://localhost:44365/UserSeriesList/AddSeriesToList/"+userid+"/"+seriesid+"/"+status, { method: "POST"}).then(p => 
-        {
-            if (p.ok) {
-                alert("Series added to your list!");
-            }
-        });
+        const response = await fetch("https://localhost:44365/UserSeriesList/AddSeriesToList/"+userid+"/"+seriesid+"/"+status, { method: "POST"});
+
+        if (response.ok)
+            alert("Series added to your list!");
+        else
+            alert("Series is already in your list!");
     }
 
     async AddRole()

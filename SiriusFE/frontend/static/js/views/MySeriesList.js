@@ -12,8 +12,8 @@ export default class extends AbstractView {
     async getHtml() 
     {
         var html,i;
-    
-        if(localStorage.userid!=null)
+
+        if(localStorage.userid!=0)
 
         await fetch("https://localhost:44365/UserSeriesList/GetUserSeriesList/"+localStorage.userid, {method: "GET"})
         .then(p => p.json().then(data => {
@@ -102,11 +102,6 @@ export default class extends AbstractView {
         const status = row.querySelector('#inputStatus').value;
         const stars = row.querySelector('#inputStars').value;  
         const comment = row.querySelector('#inputComment').value;
-
-        console.log(serid);
-        console.log(status);
-        console.log(stars);
-        console.log(comment);
 
         fetch("https://localhost:44365/UserSeriesList/"+id+"/"+serid, { method: "PUT",
                 headers: {

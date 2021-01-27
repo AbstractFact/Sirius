@@ -114,8 +114,7 @@ export default class extends AbstractView {
         if (response.ok) {
             addSeriesForm.reset();
             alert("Series "+title+" added to database!");
-        }
-        
+        }   
     }
 }
 

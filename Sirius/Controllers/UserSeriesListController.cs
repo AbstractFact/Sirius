@@ -102,23 +102,48 @@ namespace Sirius.Controllers
                 return BadRequest();
         }
 
+        public async Task<int> GetListedSeries(int userID, int seriesID)
+        {
+            var res = await _client.Cypher
+                        .Match("(u:User)-[l:LISTED]-(s:Series)")
+                        .Where((Series s) => s.ID == seriesID)
+                        .AndWhere((User u) => u.ID == userID)
+                        .Return((u, l, s) => new
+                        {
+                            l.As<UserSeriesList>().ID,
+                        })
+                        .ResultsAsync;
+
+            if (res.Count()!=0)
+                return res.FirstOrDefault().ID;
+            else
+                return -1;
+        }
+
         [HttpPost("AddSeriesToList/{userID}/{seriesID}/{status}")]
         public async Task<ActionResult> AddSeriesToList(string status, int userID, int seriesID)
         {
             maxID = await MaxID();
 
-            var res = _client.Cypher
-                    .Match("(user:User)", "(series:Series)")
-                    .Where((User user) => user.ID == userID)
-                    .AndWhere((Series series) => series.ID == seriesID)
-                    .Create("(user)-[:LISTED { ID: $id, Status: $status, Stars: 0, Comment: \"\" }]->(series)")
-                    .WithParam("status", status)
-                    .WithParam("id", maxID + 1);
+            int tmp = await GetListedSeries(userID, seriesID);
 
-            await res.ExecuteWithoutResultsAsync();
+            if (tmp == -1)
+            {
+                var res = _client.Cypher
+                        .Match("(user:User)", "(series:Series)")
+                        .Where((User user) => user.ID == userID)
+                        .AndWhere((Series series) => series.ID == seriesID)
+                        .Create("(user)-[:LISTED { ID: $id, Status: $status, Stars: 0, Comment: \"\" }]->(series)")
+                        .WithParam("status", status)
+                        .WithParam("id", maxID + 1);
 
-            if (res != null)
-                return Ok();
+                await res.ExecuteWithoutResultsAsync();
+
+                if (res != null)
+                    return Ok();
+                else
+                    return BadRequest();
+            }
             else
                 return BadRequest();
         }

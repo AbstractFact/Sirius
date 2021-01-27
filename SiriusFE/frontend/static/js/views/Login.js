@@ -1,9 +1,6 @@
 import AbstractView from "./AbstractView.js";
 import {User} from "../models/User.js"
 
-localStorage.username=null;
-localStorage.userid=null;
-
 export default class extends AbstractView {
     constructor(params) {
         super(params);
@@ -50,20 +47,15 @@ export default class extends AbstractView {
                                 });
         if (!response.ok) {
             alert("User not found!");
-            localStorage.userid=null;
-            localStorage.username=0;
+            localStorage.userid=0;
+            localStorage.logged=0;
         }
         else
         {
             const json = await response.json();
 
-            localStorage.userid=json.id;
-            localStorage.username=json["username"];
-
-            document.querySelector("#login").style.display="none";
-            document.querySelector("#signup").style.display="none";
-            document.querySelector("#mylist").style.display="block";
-            document.querySelector("#logout").style.display="block";
+            localStorage.userid=json["id"];
+            localStorage.logged=1;
 
             alert("Welcome to Sirius "+username); 
         }                                                   
