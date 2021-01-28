@@ -32,6 +32,7 @@ export default class extends AbstractView {
                             <th scope="col">Status</th>
                             <th scope="col">My Rating</th>
                             <th scope="col">Comment</th>
+                            <th scope="col">Favourite</th>
                             <th scope="col"></th>
                             <th scope="col"></th>
                             </tr>
@@ -43,8 +44,11 @@ export default class extends AbstractView {
                     const status = d["status"];
                     const stars = d["stars"];
                     const comment = d["comment"];
+                    const favourite = d["favourite"];
 
-                    const entry = new MySeriesList(d["id"], series, status, stars, comment);
+                    const checked= favourite?`checked`:``;
+
+                    const entry = new MySeriesList(d["id"], series, status, stars, comment, favourite);
                     this.entries.push(entry);
 
                     html+=`
@@ -78,6 +82,9 @@ export default class extends AbstractView {
                             <textarea type="text" class="form-control" id="inputComment">${comment}</textarea>
                         </td>
                         <td>
+                            <input type="checkbox" id="inputFav" name="fav" ${checked}>
+                        </td>
+                        <td>
                             <button type="submit" class="btn btn-primary" style="width:60%" id="${entry.id}">Save Changes</button>
                         </td>
                         <td>
@@ -85,6 +92,9 @@ export default class extends AbstractView {
                         </td>
                         </tr>`;
                 });
+            
+                html+=`</tbody>
+                </table>`;
         }));
 
         return html;
@@ -95,25 +105,25 @@ export default class extends AbstractView {
         return this.entries;
     }
 
-    EditEntry(id)
+    async EditEntry(id)
     {
         const row = document.getElementById(id);
         const serid = row.querySelector('.serid').id;
         const status = row.querySelector('#inputStatus').value;
         const stars = row.querySelector('#inputStars').value;  
         const comment = row.querySelector('#inputComment').value;
+        const fav = row.querySelector('#inputFav').checked;
 
-        fetch("https://localhost:44365/UserSeriesList/"+id+"/"+serid, { method: "PUT",
+        const response = await fetch("https://localhost:44365/UserSeriesList/"+id+"/"+serid+"/"+fav, { method: "PUT",
                 headers: {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify([status, stars, comment])
-            }).then(p => {
-                if (p.ok) {
-                    alert("Entry "+serid+" edited!");
-                }
-            }
-        );
+        });
+
+        if (response.ok){
+            alert("Entry "+serid+" edited!");
+        };
     }
 
     DeleteEntry(id)

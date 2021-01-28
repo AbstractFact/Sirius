@@ -4,6 +4,7 @@ import SeriesView from "./views/SeriesView.js";
 import Actors from "./views/Actors.js";
 import ActorView from "./views/ActorView.js";
 import MySeriesList from "./views/MySeriesList.js";
+import Friends from "./views/Friends.js";
 import Login from "./views/Login.js";
 import Signup from "./views/Signup.js";
 
@@ -22,6 +23,7 @@ else
     var html=document.body.querySelector(".topnav").innerHTML;
     html+=
     `<a href="/myserieslist" id="mylist" class="nav__link" data-link>My Series List</a>
+    <a href="/friends" id="friends" class="nav__link" data-link>Friends</a>
     <a href="/" id="logout" class="nav__link" logout>Logout</a>`;
     document.body.querySelector(".topnav").innerHTML=html;
 }
@@ -50,6 +52,7 @@ const router = async () => {
         { path: "/actors", view: Actors },
         { path: "/actors/:id", view: ActorView },
         { path: "/myserieslist", view: MySeriesList },
+        { path: "/friends", view: Friends },
         { path: "/login", view: Login },
         { path: "/signup", view: Signup },
     ];
@@ -148,6 +151,11 @@ document.addEventListener("DOMContentLoaded", () => {
             handleAddRole();
         }
 
+        if (e.target.matches("[addFriendBtn]")) {
+            e.preventDefault();
+            handleAddFriend();
+        }
+
         if(window.location.href=="http://localhost:5060/myserieslist")
         {
             const entries = view.GetEntries();
@@ -156,14 +164,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 if (e.target.id==id) {
                     e.preventDefault();
-                    view.EditEntry(id);
-                    //location.reload();
+                    handleEditEntry(id);
                 };
 
                 if (e.target.id=="R"+id) {
                     e.preventDefault();
-                    view.DeleteEntry(id);
-                    //location.reload();
+                    handleDeleteEntry(id);
                 };
             });
         }
@@ -183,6 +189,20 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (e.target.id=="R"+id) {
                     e.preventDefault();
                     view.DeleteRole(id);
+                    location.reload();
+                };
+            });
+        }
+
+        if(window.location.href.includes("http://localhost:5060/friends"))
+        {
+            const friends = view.GetFriends();
+            friends.forEach(friend => {
+                const id = friend.id;
+
+                if (e.target.id=="R"+id) {
+                    e.preventDefault();
+                    view.Unfriend(id);
                     location.reload();
                 };
             });
@@ -257,6 +277,24 @@ async function handleDeleteActor()
 async function handleAddRole()
 {
     await view.AddRole();
+    location.reload();
+}
+
+async function handleAddFriend()
+{
+    await view.Befriend();
+    location.reload();
+}
+
+async function handleEditEntry(id)
+{
+    await view.EditEntry(id);
+    location.reload();
+}
+
+async function handleDeleteEntry(id)
+{
+    await view.DeleteEntry(id);
     location.reload();
 }
 

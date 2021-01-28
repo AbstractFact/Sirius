@@ -51,7 +51,8 @@ namespace Sirius.Controllers
                             Series = s.As<Series>(),
                             l.As<UserSeriesList>().Status,
                             l.As<UserSeriesList>().Stars,
-                            l.As<UserSeriesList>().Comment
+                            l.As<UserSeriesList>().Comment,
+                            l.As<UserSeriesList>().Favourite
                         })
                         .ResultsAsync;
 
@@ -92,7 +93,8 @@ namespace Sirius.Controllers
                             Series = s.CollectAs<Series>(),
                             l.As<UserSeriesList>().Status,
                             l.As<UserSeriesList>().Stars,
-                            l.As<UserSeriesList>().Comment
+                            l.As<UserSeriesList>().Comment,
+                            l.As<UserSeriesList>().Favourite
                         })
                         .ResultsAsync;
 
@@ -120,8 +122,8 @@ namespace Sirius.Controllers
                 return -1;
         }
 
-        [HttpPost("AddSeriesToList/{userID}/{seriesID}/{status}")]
-        public async Task<ActionResult> AddSeriesToList(string status, int userID, int seriesID)
+        [HttpPost("AddSeriesToList/{userID}/{seriesID}/{status}/{fav}")]
+        public async Task<ActionResult> AddSeriesToList(string status, bool fav, int userID, int seriesID)
         {
             maxID = await MaxID();
 
@@ -133,8 +135,9 @@ namespace Sirius.Controllers
                         .Match("(user:User)", "(series:Series)")
                         .Where((User user) => user.ID == userID)
                         .AndWhere((Series series) => series.ID == seriesID)
-                        .Create("(user)-[:LISTED { ID: $id, Status: $status, Stars: 0, Comment: \"\" }]->(series)")
+                        .Create("(user)-[:LISTED { ID: $id, Status: $status, Stars: 0, Comment: \"\", Favourite: $fav}]->(series)")
                         .WithParam("status", status)
+                        .WithParam("fav", fav)
                         .WithParam("id", maxID + 1);
 
                 await res.ExecuteWithoutResultsAsync();
@@ -148,8 +151,8 @@ namespace Sirius.Controllers
                 return BadRequest();
         }
 
-        [HttpPut("{id}/{seriesID}")]
-        public async Task<ActionResult> Put([FromBody] List<string> data, int id, int seriesID)
+        [HttpPut("{id}/{seriesID}/{favourite}")]
+        public async Task<ActionResult> Put([FromBody] List<string> data, int id, int seriesID, bool favourite)
         {
             var res = _client.Cypher
                         .Match("(u:User)-[l:LISTED]-(s:Series)")
@@ -157,9 +160,11 @@ namespace Sirius.Controllers
                         .Set("l.Status = $status")
                         .Set("l.Stars = $stars")
                         .Set("l.Comment = $comment")
+                        .Set("l.Favourite = $favourite")
                         .WithParam("status", data[0])
                         .WithParam("stars", int.Parse(data[1]))
-                        .WithParam("comment", data[2]);
+                        .WithParam("comment", data[2])
+                        .WithParam("favourite", favourite);
 
             await res.ExecuteWithoutResultsAsync();
 

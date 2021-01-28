@@ -14,5 +14,6 @@ namespace Sirius.Entities
 
         public int Stars { get; set; }
         public string Comment { get; set; }
+        public bool Favourite { get; set; }
     }
 }

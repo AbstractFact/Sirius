@@ -184,19 +184,41 @@ namespace Sirius.Controllers
                 return BadRequest();
         }
 
-        [HttpPost("Befriend/{user1ID}/{user2ID}")]
-        public async Task<ActionResult> Befriend(int user1ID, int user2ID)
+        [HttpGet("GetAllFriends/{userID}")]
+        public async Task<ActionResult> GetAllFriends(int userID)
         {
-            var res = _client.Cypher
-                    .Match("(user1:User)", "(user2:User)")
-                    .Where((User user1) => user1.ID == user1ID)
-                    .AndWhere((User user2) => user2.ID == user2ID)
-                    .Merge("(user1)-[:FRIENDS]->(user2)");
-
-            await res.ExecuteWithoutResultsAsync();
+            var res = await _client.Cypher
+                        .OptionalMatch("(user:User)-[FRIENDS]-(friend:User)")
+                        .Where((User user) => user.ID == userID)
+                        .Return(friend => friend.As<User>())
+                        .ResultsAsync;
 
             if (res != null)
-                return Ok();
+                return Ok(res);
+            else
+                return BadRequest();
+        }
+
+        [HttpPost("Befriend/{user1ID}/{user2Username}")]
+        public async Task<ActionResult> Befriend(int user1ID, string user2Username)
+        {
+            int user2ID = await GetUserID(user2Username);
+
+            if (user2ID != -1)
+            {
+                var res = _client.Cypher
+                        .Match("(user1:User)", "(user2:User)")
+                        .Where((User user1) => user1.ID == user1ID)
+                        .AndWhere((User user2) => user2.ID == user2ID)
+                        .Merge("(user1)-[:FRIENDS]->(user2)");
+
+                await res.ExecuteWithoutResultsAsync();
+
+                if (res != null)
+                    return Ok();
+                else
+                    return BadRequest();
+            }
             else
                 return BadRequest();
         }

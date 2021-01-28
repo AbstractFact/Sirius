@@ -100,6 +100,8 @@ export default class extends AbstractView {
                                     <option>Dropped</option>
                                     <option>Completed</option>
                                 </select>
+                                <input type="checkbox" id="inputFav" name="fav">
+                                <label for="inputFav"> Favourite</label><br>
                             </div>
                             <button type="submit" class="btn btn-primary" style="width:30%" addSeriesToListBtn>Add Series to List</button>
                             </form></div>`; 
@@ -222,8 +224,9 @@ export default class extends AbstractView {
         const userid = localStorage.userid;
         const seriesid = this.postId;  
         const status = addSeriesToListForm['inputStatus'].value; 
+        const fav = addSeriesToListForm['inputFav'].checked;
         
-        const response = await fetch("https://localhost:44365/UserSeriesList/AddSeriesToList/"+userid+"/"+seriesid+"/"+status, { method: "POST"});
+        const response = await fetch("https://localhost:44365/UserSeriesList/AddSeriesToList/"+userid+"/"+seriesid+"/"+status+"/"+fav, { method: "POST"});
 
         if (response.ok)
             alert("Series added to your list!");
