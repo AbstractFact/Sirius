@@ -119,7 +119,7 @@ namespace Sirius.Controllers
             var res = _client.Cypher
                               .Match("(a:Actor)")
                               .Where((Actor a) => a.ID == id)
-                              .Delete("a");
+                              .DetachDelete("a");
 
 
             await res.ExecuteWithoutResultsAsync();

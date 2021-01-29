@@ -103,7 +103,7 @@ namespace Sirius.Controllers
         }
 
         [HttpPost("AddRole/{actorID}/{role}/{seriesID}")]
-        public async Task<ActionResult> AddRole(int actorID, String role, int seriesID)
+        public async Task<ActionResult> AddRole(int actorID, string role, int seriesID)
         {
             maxID = await MaxID();
 

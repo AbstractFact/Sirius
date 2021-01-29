@@ -62,6 +62,26 @@ namespace Sirius.Controllers
                 return BadRequest();
         }
 
+        [HttpGet("GetUserFavourites/{userID}")]
+        public async Task<ActionResult> GetUserFavourites(int userID)
+        {
+            var res = await _client.Cypher
+                        .Match("(u:User)-[l:LISTED]-(s:Series)")
+                        .Where((User u) => u.ID == userID)
+                        .AndWhere((UserSeriesList l) => l.Favourite == true)
+                        .Return((s, u) => new
+                        {
+                            Series = s.As<Series>(),
+                            u.As<User>().Username
+                        })
+                        .ResultsAsync;
+
+            if (res != null)
+                return Ok(res);
+            else
+                return BadRequest();
+        }
+
         [HttpGet("GetSeriesPopularity/{seriesID}")]
         public async Task<ActionResult> GetSeriesPopularity(int seriesID)
         {

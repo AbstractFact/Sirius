@@ -4,7 +4,7 @@ import {User} from "../models/User.js"
 export default class extends AbstractView {
     constructor(params) {
         super(params);
-        this.setTitle("My Series List");
+        this.setTitle("Friends");
         this.friends=new Array();
     }
 
@@ -18,14 +18,14 @@ export default class extends AbstractView {
         .then(p => p.json().then(data => {
                 i=0;
                 html=`
-                    <h1>My Series List</h1>
+                    <h1>My Friends</h1>
                     <br/>
                     <table class="table table-striped">
                         <thead>
                             <tr>
                             <th scope="col">#</th>
                             <th scope="col">Username</th>
-                            
+                            <th scope="col">Recommendations</th>
                             <th scope="col"></th>
                             </tr>
                         </thead>
@@ -41,7 +41,7 @@ export default class extends AbstractView {
                     <tr id="${friend.id}">
                     <th scope="row">${++i}</th>
                     <td>${friend.username}</td>
-                    
+                    <td><a href="/favourites/${friend.id}" data-link>View</a></td>
                     <td>
                         <button type="submit" class="btn btn-danger" style="width:50%" id="R${friend.id}">Unfriend</button>
                     </td>
@@ -53,7 +53,7 @@ export default class extends AbstractView {
                 </tbody>
                 </table>
                 <p>
-                    <a href="/favourites" data-link>View recommended series</a>.
+                    <a href="/favourites" data-link>View all recommended series</a>.
                 </p>
 
                 <br/>

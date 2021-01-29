@@ -5,6 +5,8 @@ import Actors from "./views/Actors.js";
 import ActorView from "./views/ActorView.js";
 import MySeriesList from "./views/MySeriesList.js";
 import Friends from "./views/Friends.js";
+import Favourites from "./views/Favourites.js";
+import FavouritesView from "./views/FavouritesView.js";
 import Login from "./views/Login.js";
 import Signup from "./views/Signup.js";
 
@@ -53,6 +55,8 @@ const router = async () => {
         { path: "/actors/:id", view: ActorView },
         { path: "/myserieslist", view: MySeriesList },
         { path: "/friends", view: Friends },
+        { path: "/favourites", view: Favourites },
+        { path: "/favourites/:id", view: FavouritesView },
         { path: "/login", view: Login },
         { path: "/signup", view: Signup },
     ];

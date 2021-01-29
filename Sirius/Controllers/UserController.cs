@@ -185,7 +185,7 @@ namespace Sirius.Controllers
         }
 
         [HttpGet("GetAllFriends/{userID}")]
-        public async Task<ActionResult> GetAllFriends(int userID)
+        public async Task<List<User>> GetAllFriends(int userID)
         {
             var res = await _client.Cypher
                         .OptionalMatch("(user:User)-[FRIENDS]-(friend:User)")
@@ -194,10 +194,33 @@ namespace Sirius.Controllers
                         .ResultsAsync;
 
             if (res != null)
-                return Ok(res);
+                return res.ToList();
             else
-                return BadRequest();
+                return null;
         }
+
+        //[HttpGet("GetAllRecommendations/{userID}")]
+        //public async Task<ActionResult> GetAllRecommendations(int userID)
+        //{
+        //    List<User> friends = await GetAllFriends(userID);
+        //    List<Object> tmp = new List<Object>();
+
+        //    var res = await _client.Cypher
+        //                .Match("(u:User)-[l:LISTED]-(s:Series)")
+        //                .Where((User u) => u.ID == userID)
+        //                .AndWhere((UserSeriesList l) => l.Favourite == true)
+        //                .Return((s, u) => new
+        //                {
+        //                    Series = s.As<Series>(),
+        //                    u.As<User>().Username
+        //                })
+        //                .ResultsAsync;
+
+        //    if (res != null)
+        //        return Ok(res);
+        //    else
+        //        return BadRequest();
+        //}
 
         [HttpPost("Befriend/{user1ID}/{user2Username}")]
         public async Task<ActionResult> Befriend(int user1ID, string user2Username)
