@@ -58,7 +58,7 @@ const router = async () => {
         { path: "/favourites", view: Favourites },
         { path: "/favourites/:id", view: FavouritesView },
         { path: "/login", view: Login },
-        { path: "/signup", view: Signup },
+        { path: "/signup", view: Signup }
     ];
 
     // Test each route for potential match

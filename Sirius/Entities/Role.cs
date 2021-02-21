@@ -10,6 +10,6 @@ namespace Sirius.Entities
         public int ID { get; set; }
         public Series Series { get; set; }
         public Actor Actor { get; set; }
-        public String InRole { get; set; }
+        public string InRole { get; set; }
     }
 }

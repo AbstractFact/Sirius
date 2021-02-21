@@ -1,5 +1,4 @@
 import AbstractView from "./AbstractView.js";
-import {User} from "../models/User.js"
 
 export default class extends AbstractView {
     constructor(params) {
@@ -40,11 +39,12 @@ export default class extends AbstractView {
 
 
         const response =  await fetch("https://localhost:44365/User/Login", { method: "POST",
-                                    headers: {
-                                    "Content-Type": "application/json"
-                                    },
-                                    body: JSON.stringify({ "username": username, "password": password })
-                                });
+            headers: {
+            "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ "username": username, "password": password })
+        });
+        
         if (!response.ok) {
             alert("User not found!");
             localStorage.userid=0;
@@ -57,7 +57,7 @@ export default class extends AbstractView {
             localStorage.userid=json["id"];
             localStorage.logged=1;
 
-            alert("Welcome to Sirius "+username); 
+            alert("Welcome back to Sirius "+username); 
         }                                                   
     }     
 }

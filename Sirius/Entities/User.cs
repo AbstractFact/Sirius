@@ -7,15 +7,9 @@ namespace Sirius.Entities
 {
     public class User
     {
-        //public String login { get; set; }
         public int ID { get; set; }
-        public String Username { get; set; }
-        public String Password { get; set; }
+        public string Username { get; set; }
+        public string Password { get; set; }
         public List<Rating> Ratings { get; set; }
-
-        public Rating Rate(Series series, int stars, String comment)
-        {
-            return null;
-        }
     }
 }

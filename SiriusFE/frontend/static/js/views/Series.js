@@ -1,6 +1,5 @@
 import AbstractView from "./AbstractView.js";
 import {Series} from "../models/Series.js";
-import {Actor} from "../models/Actor.js";
 
 export default class extends AbstractView {
     constructor(params) 
@@ -52,47 +51,43 @@ export default class extends AbstractView {
         html+=`
             </tbody>
             </table>
-            <p>
-                <a href="/series" data-link>View most watched series</a>.
-            </p>
 
             <br/>
 
             <form id="addseries-form" style="width:50%">
-            <div class="form-group col-md-10">
                 <div class="form-group col-md-10">
-                <label for="inputTitle">Title</label>
-                <input type="text" class="form-control" id="inputTitle" placeholder="Title">
+                    <div class="form-group col-md-10">
+                    <label for="inputTitle">Title</label>
+                    <input type="text" class="form-control" id="inputTitle" placeholder="Title">
+                    </div>
+                    <div class="form-group col-md-3">
+                    <label for="inputYear">Year</label>
+                    <input type="number" class="form-control" id="inputYear" placeholder="Year">
+                    </div>
                 </div>
-                <div class="form-group col-md-3">
-                <label for="inputYear">Year</label>
-                <input type="number" class="form-control" id="inputYear" placeholder="Year">
+                <div class="form-group col-md-6">
+                    <label for="inputGenre">Genre</label>
+                    <select id="inputGenre" class="form-control">
+                        <option selected>Select Genre</option>
+                        <option>Drama</option>
+                        <option>Comedy</option>
+                        <option>Crime</option>
+                        <option>Fantasy</option>
+                        <option>Sci-fi</option>
+                    </select>
                 </div>
-            </div>
-            <div class="form-group col-md-6">
-                <label for="inputGenre">Genre</label>
-                <select id="inputGenre" class="form-control">
-                    <option selected>Select Genre</option>
-                    <option>Drama</option>
-                    <option>Comedy</option>
-                    <option>Crime</option>
-                    <option>Fantasy</option>
-                    <option>Sci-fi</option>
-                </select>
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                <label for="inputPlot">Plot</label>
-                <textarea type="text" class="form-control" id="inputPlot" placeholder=""></textarea>
-                </div>
-                <div class="form-group col-md-2">
-                <label for="inputZip">Seasons</label>
-                <input type="number" class="form-control" id="inputSeasons">
-                </div>`;        
-                html+=`
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="inputPlot">Plot</label>
+                        <textarea type="text" class="form-control" id="inputPlot" placeholder=""></textarea>
+                    </div>
+                    <div class="form-group col-md-2">
+                        <label for="inputZip">Seasons</label>
+                        <input type="number" class="form-control" id="inputSeasons">
+                    </div>
                 </div>
                 <button type="submit" class="btn btn-primary" style="width:20%" addSeriesBtn>Add Series</button>
-                </form>`;
+            </form>`;
 
         return html;
     }

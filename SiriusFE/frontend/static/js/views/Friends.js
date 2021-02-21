@@ -53,7 +53,7 @@ export default class extends AbstractView {
                 </tbody>
                 </table>
                 <p>
-                    <a href="/favourites" data-link>View all recommended series</a>.
+                    <a href="/favourites" data-link>View all recommended series</a>
                 </p>
 
                 <br/>

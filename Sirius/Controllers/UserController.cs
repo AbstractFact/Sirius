@@ -133,7 +133,6 @@ namespace Sirius.Controllers
                     id = await GetUserID(u.Username);
                     return Ok(id);
                 }
-
                 else
                     return BadRequest();
             }

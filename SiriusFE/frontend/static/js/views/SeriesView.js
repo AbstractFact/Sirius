@@ -18,7 +18,7 @@ export default class extends AbstractView {
         await fetch("https://localhost:44365/Series/GetSeries/"+this.postId, {method: "GET"})
         .then(p => p.json().then(d => {
                 
-                const series = new Series(d[0]["id"], d[0]["title"], d[0]["year"], d[0]["genre"], d[0]["plot"], d[0]["seasons"], d[0]["rating"]);
+                const series = new Series(d["id"], d["title"], d["year"], d["genre"], d["plot"], d["seasons"], d["rating"]);
                 html=`
                     <h1>Series: ${series.title}</h1>
                     <br/>
@@ -32,81 +32,78 @@ export default class extends AbstractView {
                             <th scope="col">Rating</th>
                             </tr>
                         </thead>
-                        <tbody>`;
-
-                    html+=`
-                        <tr>
-                        <td>${series.year}</td>
-                        <td>${series.genre}</td>
-                        <td>${series.plot}</td>
-                        <td>${series.seasons}</td>
-                        <td>`+ +(Math.round(series.rating + "e+1") + "e-1")+`</td>
-                        </tr>`;
-
-                    html+=`
+                        <tbody>
+                            <tr>
+                            <td>${series.year}</td>
+                            <td>${series.genre}</td>
+                            <td>${series.plot}</td>
+                            <td>${series.seasons}</td>
+                            <td>`+ +(Math.round(series.rating + "e+1") + "e-1")+`</td>
+                            </tr>
                         </tbody>
-                        </table>
-                        <p>
-                            ${series.plot}
-                        </p>    
-                        <br/>
+                    </table>
 
-                        <div style="display:block">
-                        <form id="addseries-form" style="width:50%; float:left;">
+                    <p>
+                        ${series.plot}
+                    </p>
+                    <br/>
+
+                    <div style="display:block">
+                    <form id="addseries-form" style="width:50%; float:left;">
+                    <div class="form-group col-md-8">
                         <div class="form-group col-md-8">
-                            <div class="form-group col-md-8">
-                            <label for="inputTitle">Title</label>
-                            <input type="text" class="form-control" id="inputTitle" value="${series.title}">
-                            </div>
-                            <div class="form-group col-md-3">
-                            <label for="inputYear">Year</label>
-                            <input type="number" class="form-control" id="inputYear" value="${series.year}">
-                            </div>
+                        <label for="inputTitle">Title</label>
+                        <input type="text" class="form-control" id="inputTitle" value="${series.title}">
                         </div>
-                        <div class="form-group col-md-4">
-                            <label for="inputGenre">Genre</label>
-                            <select id="inputGenre" class="form-control">
-                                <option selected>${series.genre}</option>
-                                <option>Drama</option>
-                                <option>Comedy</option>
-                                <option>Crime</option>
-                                <option>Fantasy</option>
-                                <option>Sci-fi</option>
-                            </select>
+                        <div class="form-group col-md-3">
+                        <label for="inputYear">Year</label>
+                        <input type="number" class="form-control" id="inputYear" value="${series.year}">
                         </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                            <label for="inputPlot">Plot</label>
-                            <textarea type="text" class="form-control" id="inputPlot">${series.plot}</textarea>
-                            </div>
-                            <div class="form-group col-md-2">
-                            <label for="inputZip">Seasons</label>
-                            <input type="number" class="form-control" id="inputSeasons" value="${series.seasons}">
-                            </div>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="inputGenre">Genre</label>
+                        <select id="inputGenre" class="form-control">
+                            <option selected>${series.genre}</option>
+                            <option>Drama</option>
+                            <option>Comedy</option>
+                            <option>Crime</option>
+                            <option>Fantasy</option>
+                            <option>Sci-fi</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                        <label for="inputPlot">Plot</label>
+                        <textarea type="text" class="form-control" id="inputPlot">${series.plot}</textarea>
                         </div>
-                        <button type="submit" class="btn btn-primary" style="width:20%" editSeriesBtn>Edit Series</button>
-                        <button type="submit" class="btn btn-danger" style="width:30%; float:right" deleteSeriesBtn>Delete Series</button>
-                        </form>`;
+                        <div class="form-group col-md-2">
+                        <label for="inputZip">Seasons</label>
+                        <input type="number" class="form-control" id="inputSeasons" value="${series.seasons}">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width:20%" editSeriesBtn>Edit Series</button>
+                    <button type="submit" class="btn btn-danger" style="width:30%; float:right" deleteSeriesBtn>Delete Series</button>
+                    </form>`;
 
-                        if(localStorage.logged!=0)
-                            html+=`<form id="addseriestolist-form" style="width:50%; float:right;">
-                            <div class="form-group col-md-8">
-                                <label for="inputStatus">Status</label>
-                                <select id="inputStatus" class="form-control">
-                                    <option selected>Select Status</option>
-                                    <option>Watching</option>
-                                    <option>Plan to Watch</option>
-                                    <option>On Hold</option>
-                                    <option>Dropped</option>
-                                    <option>Completed</option>
-                                </select>
-                                <input type="checkbox" id="inputFav" name="fav">
-                                <label for="inputFav"> Favourite</label><br>
-                            </div>
-                            <button type="submit" class="btn btn-primary" style="width:30%" addSeriesToListBtn>Add Series to List</button>
-                            </form></div>`; 
-                        else
-                            html+=`</div>`;    
+                    if(localStorage.logged!=0)
+                        html+=`<form id="addseriestolist-form" style="width:50%; float:right;">
+                        <div class="form-group col-md-8">
+                            <label for="inputStatus">Status</label>
+                            <select id="inputStatus" class="form-control">
+                                <option selected>Select Status</option>
+                                <option>Watching</option>
+                                <option>Plan to Watch</option>
+                                <option>On Hold</option>
+                                <option>Dropped</option>
+                                <option>Completed</option>
+                            </select>
+                            <input type="checkbox" id="inputFav" name="fav">
+                            <label for="inputFav"> Favourite</label><br>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width:30%" addSeriesToListBtn>Add Series to List</button>
+                        </form></div>`; 
+                    else
+                        html+=`</div>`;    
         }));
 
 
@@ -140,7 +137,7 @@ export default class extends AbstractView {
                     this.roles.push(role);
 
                     html+=`
-                        <tr id="${role.id}">
+                    <tr id="${role.id}">
                         <th scope="row">${++i}</th>
                         <td><input type="text" class="form-control" id="editRole" value="${role.inrole}"></td>
                         <td><a href="/actors/${role.actor.id}" data-link>${role.actor.name}</a></td>
@@ -150,7 +147,7 @@ export default class extends AbstractView {
                         <td>
                             <button type="submit" class="btn btn-danger" style="width:100%" id="R${role.id}">X</button>
                         </td>
-                        </tr>`;
+                    </tr>`;
                 });
         }));
 

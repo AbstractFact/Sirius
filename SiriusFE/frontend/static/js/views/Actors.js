@@ -33,54 +33,51 @@ export default class extends AbstractView {
                     const actor = new Actor(d["id"], d["name"], d["sex"], d["birthplace"], d["birthday"], d["biography"]);
 
                     html+=`
-                        <tr>
+                    <tr>
                         <th scope="row">${++i}</th>
                         <td><a href="/actors/${actor.id}" data-link>${actor.name}</a></td>
                         <td>${actor.sex}</td>
                         <td>${actor.birthplace}</td>
                         <td>${actor.birthday}</td>
-                        </tr>`;
+                    </tr>`;
             });
 
             html+=`
                 </tbody>
                 </table>
-                <p>
-                    <a href="/series" data-link>View most watched series</a>.
-                </p>
 
                 <br/>
                 
                 <form id="addactor-form" style="width:50%">
-                <div class="form-group col-md-10">
                     <div class="form-group col-md-10">
-                    <label for="inputName">Name</label>
-                    <input type="text" class="form-control" id="inputName" placeholder="Name">
+                        <div class="form-group col-md-10">
+                        <label for="inputName">Name</label>
+                        <input type="text" class="form-control" id="inputName" placeholder="Name">
+                        </div>
+                        <div class="form-group col-md-4">
+                        <label for="inputSex">Sex</label>
+                        <select id="inputSex" class="form-control">
+                            <option selected>Select Sex</option>
+                            <option>Male</option>
+                            <option>Female</option>
+                        </select>
                     </div>
-                    <div class="form-group col-md-4">
-                    <label for="inputSex">Sex</label>
-                    <select id="inputSex" class="form-control">
-                        <option selected>Select Sex</option>
-                        <option>Male</option>
-                        <option>Female</option>
-                    </select>
-                </div>
-                    <div class="form-group col-md-10">
-                    <label for="inputBirthplace">Birthplace</label>
-                    <input type="text" class="form-control" id="inputBirthplace" placeholder="Birthplace">
+                        <div class="form-group col-md-10">
+                        <label for="inputBirthplace">Birthplace</label>
+                        <input type="text" class="form-control" id="inputBirthplace" placeholder="Birthplace">
+                        </div>
+                        <div class="form-group col-md-8">
+                        <label for="inputBirthday">Birthday</label>
+                        <input type="text" class="form-control" id="inputBirthday" placeholder="Birthday">
+                        </div>
                     </div>
-                    <div class="form-group col-md-8">
-                    <label for="inputBirthday">Birthday</label>
-                    <input type="text" class="form-control" id="inputBirthday" placeholder="Birthday">
+                    <div class="form-row">
+                        <div class="form-group">
+                        <label for="inputBiography">Biography</label>
+                        <textarea type="text" class="form-control" id="inputBiography" placeholder=""></textarea>
+                        </div>
                     </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                    <label for="inputBiography">Biography</label>
-                    <textarea type="text" class="form-control" id="inputBiography" placeholder=""></textarea>
-                    </div>
-                </div>
-                <button type="submit" class="btn btn-primary" style="width:20%" addActorBtn>Add Actor</button>
+                    <button type="submit" class="btn btn-primary" style="width:20%" addActorBtn>Add Actor</button>
                 </form>`;
         }));
 

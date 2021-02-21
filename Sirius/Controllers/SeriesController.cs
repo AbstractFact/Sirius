@@ -61,7 +61,7 @@ namespace Sirius.Controllers
                         .ResultsAsync;
 
             if (res != null)
-                return Ok(res);
+                return Ok(res.FirstOrDefault());
             else
                 return BadRequest();
         }

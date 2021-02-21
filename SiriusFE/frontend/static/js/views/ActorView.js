@@ -17,70 +17,69 @@ export default class extends AbstractView {
 
         await fetch("https://localhost:44365/Actor/GetActor/"+this.postId, {method: "GET"})
         .then(p => p.json().then(d => {
-    
-                const actor = new Actor(d[0]["id"], d[0]["name"], d[0]["sex"], d[0]["birthplace"], d[0]["birthday"], d[0]["biography"]);
+            const actor = new Actor(d["id"], d["name"], d["sex"], d["birthplace"], d["birthday"], d["biography"]);
 
-                html=`
-                    <h1>Actor: ${actor.name}</h1>
-                    <br/>
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                            <th scope="col">Sex</th>
-                            <th scope="col">Birthplace</th>
-                            <th scope="col">Birthday</th>
-                            </tr>
-                        </thead>
-                        <tbody>`;
-
-                    html+=`
+            html=`
+                <h1>Actor: ${actor.name}</h1>
+                <br/>
+                <table class="table table-striped">
+                    <thead>
                         <tr>
-                        <td>${actor.sex}</td>
-                        <td>${actor.birthplace}</td>
-                        <td>${actor.birthday}</td>
-                        </tr>`;
+                        <th scope="col">Sex</th>
+                        <th scope="col">Birthplace</th>
+                        <th scope="col">Birthday</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
 
-                    html+=`
-                        </tbody>
-                        </table>
-                        <p>
-                            ${actor.biography}
-                        </p>
+                html+=`
+                    <tr>
+                    <td>${actor.sex}</td>
+                    <td>${actor.birthplace}</td>
+                    <td>${actor.birthday}</td>
+                    </tr>`;
 
-                        <br/>
-                        
-                        <form id="addactor-form" style="width:50%;">
+                html+=`
+                    </tbody>
+                    </table>
+                    <p>
+                        ${actor.biography}
+                    </p>
+
+                    <br/>
+                    
+                    <form id="addactor-form" style="width:50%;">
+                    <div class="form-group col-md-10">
                         <div class="form-group col-md-10">
-                            <div class="form-group col-md-10">
-                            <label for="inputName">Name</label>
-                            <input type="text" class="form-control" id="inputName" value="${actor.name}">
-                            </div>
-                            <div class="form-group col-md-4">
-                            <label for="inputSex">Sex</label>
-                            <select id="inputSex" class="form-control">
-                                <option selected>${actor.sex}</option>
-                                <option>Male</option>
-                                <option>Female</option>
-                            </select>
+                        <label for="inputName">Name</label>
+                        <input type="text" class="form-control" id="inputName" value="${actor.name}">
                         </div>
-                            <div class="form-group col-md-10">
-                            <label for="inputBirthplace">Birthplace</label>
-                            <input type="text" class="form-control" id="inputBirthplace" value="${actor.birthplace}">
-                            </div>
-                            <div class="form-group col-md-8">
-                            <label for="inputBirthday">Birthday</label>
-                            <input type="text" class="form-control" id="inputBirthday" value="${actor.birthday}">
-                            </div>
+                        <div class="form-group col-md-4">
+                        <label for="inputSex">Sex</label>
+                        <select id="inputSex" class="form-control">
+                            <option selected>${actor.sex}</option>
+                            <option>Male</option>
+                            <option>Female</option>
+                        </select>
+                    </div>
+                        <div class="form-group col-md-10">
+                        <label for="inputBirthplace">Birthplace</label>
+                        <input type="text" class="form-control" id="inputBirthplace" value="${actor.birthplace}">
                         </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                            <label for="inputBiography">Biography</label>
-                            <textarea type="text" class="form-control" id="inputBiography">${actor.biography}</textarea>
-                            </div>
+                        <div class="form-group col-md-8">
+                        <label for="inputBirthday">Birthday</label>
+                        <input type="text" class="form-control" id="inputBirthday" value="${actor.birthday}">
                         </div>
-                        <button type="submit" class="btn btn-primary" style="width:20%;" editActorBtn>Edit Actor</button>
-                        <button type="submit" class="btn btn-danger" style="width:20%; float:right;" deleteActorBtn>Delete Actor</button>
-                        </form>`;
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                        <label for="inputBiography">Biography</label>
+                        <textarea type="text" class="form-control" id="inputBiography">${actor.biography}</textarea>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width:20%;" editActorBtn>Edit Actor</button>
+                    <button type="submit" class="btn btn-danger" style="width:20%; float:right;" deleteActorBtn>Delete Actor</button>
+                    </form>`;
         }));
 
         await fetch("https://localhost:44365/Role/GetActorRoles/"+this.postId, {method: "GET"})

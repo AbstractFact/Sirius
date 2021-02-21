@@ -54,7 +54,7 @@ namespace Sirius.Controllers
         }
 
         [HttpGet("GetActor/{actorID}")]
-        public async Task<ActionResult> GetSeries(int actorID)
+        public async Task<ActionResult> GetActor(int actorID)
         {
             var res = await _client.Cypher
                         .Match("(a:Actor)")
@@ -63,7 +63,7 @@ namespace Sirius.Controllers
                         .ResultsAsync;
 
             if (res != null)
-                return Ok(res);
+                return Ok(res.FirstOrDefault());
             else
                 return BadRequest();
         }
@@ -120,7 +120,6 @@ namespace Sirius.Controllers
                               .Match("(a:Actor)")
                               .Where((Actor a) => a.ID == id)
                               .DetachDelete("a");
-
 
             await res.ExecuteWithoutResultsAsync();
 

@@ -82,6 +82,42 @@ namespace Sirius.Controllers
                 return BadRequest();
         }
 
+        [HttpGet("GetRecommendations/{userID}")]
+        public async Task<ActionResult<List<Object>>> GetRecommendations(int userID)
+        {
+            var frs = await _client.Cypher
+                       .OptionalMatch("(user:User)-[FRIENDS]-(friend:User)")
+                       .Where((User user) => user.ID == userID)
+                       .Return(friend => friend.As<User>())
+                       .ResultsAsync;
+
+            var friends = frs.ToList();
+            List<Object> res = new List<Object>();
+            foreach(User fr in friends)
+            {
+                var rs = await _client.Cypher
+                        .Match("(u:User)-[l:LISTED]-(s:Series)")
+                        .Where((User u) => u.ID == fr.ID)
+                        .AndWhere((UserSeriesList l) => l.Favourite == true)
+                        .Return((s, u) => new
+                        {
+                            Series = s.As<Series>(),
+                            u.As<User>().Username
+                        })
+                        .ResultsAsync;
+
+                rs.ToList().ForEach(rec =>
+                {
+                    res.Add(rec);
+                });
+            };
+
+            if (res != null)
+                return Ok(res);
+            else
+                return BadRequest();
+        }
+
         [HttpGet("GetSeriesPopularity/{seriesID}")]
         public async Task<ActionResult> GetSeriesPopularity(int seriesID)
         {
