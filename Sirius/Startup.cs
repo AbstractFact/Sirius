@@ -13,6 +13,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Sirius.Services;
+using Sirius.Hubs;
 
 namespace Sirius
 {
@@ -33,9 +34,9 @@ namespace Sirius
             neo4jclient.ConnectAsync();
 
             services.AddSingleton<IGraphClient>(neo4jclient);
+            services.AddSingleton<IRedisService, RedisService>();
 
-            //services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-            services.AddSingleton<RedisService>();
+            //services.AddSingleton<RedisService>();
 
             services.AddMvc().AddJsonOptions(options =>
             {
@@ -57,10 +58,15 @@ namespace Sirius
                            .AllowAnyOrigin();
                 });
             });
+
+            services.AddSignalR(options =>
+            {
+                options.EnableDetailedErrors = true;
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, RedisService redisService)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -71,7 +77,7 @@ namespace Sirius
                 app.UseHsts();
             }
 
-            redisService.Connect();
+            //redisService.Connect();
 
             app.UseHttpsRedirection();
 
@@ -86,6 +92,7 @@ namespace Sirius
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<MessageHub>("sirius");
             });
         }
     }

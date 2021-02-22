@@ -198,7 +198,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
 
-        if(window.location.href.includes("http://localhost:5060/friends"))
+        if(window.location.href.includes("http://localhost:5001/friends"))
         {
             const friends = view.GetFriends();
             friends.forEach(friend => {
@@ -287,7 +287,7 @@ async function handleAddRole()
 async function handleAddFriend()
 {
     await view.Befriend();
-    location.reload();
+    //location.reload();
 }
 
 async function handleEditEntry(id)
