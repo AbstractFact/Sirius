@@ -79,10 +79,8 @@ export default class extends AbstractView {
 
     async Befriend()
     {
-        console.log("uslo");
         const addFriendForm = document.querySelector('#addfriend-form');
         const username = addFriendForm['inputUsername'].value;
-
         //const response =  await  fetch("https://localhost:44365/User/Befriend/"+localStorage.userid+"/"+username, { method: "POST"});
         const response =  await  fetch("https://localhost:44365/User/SendFriendRequest/"+localStorage.userid+"/"+username, { method: "POST", 
         headers: {

@@ -1,17 +1,11 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Neo4jClient;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json;
-using System.Threading.Tasks;
 using Sirius.Services;
 using Sirius.Hubs;
 
@@ -30,13 +24,12 @@ namespace Sirius
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+
             var neo4jclient = new GraphClient(new Uri("http://localhost:7474/"), "neo4j", "SiriusAdmin0");
             neo4jclient.ConnectAsync();
-
             services.AddSingleton<IGraphClient>(neo4jclient);
-            services.AddSingleton<IRedisService, RedisService>();
 
-            //services.AddSingleton<RedisService>();
+            services.AddSingleton<IRedisService, RedisService>();
 
             services.AddMvc().AddJsonOptions(options =>
             {
@@ -76,8 +69,6 @@ namespace Sirius
             {
                 app.UseHsts();
             }
-
-            //redisService.Connect();
 
             app.UseHttpsRedirection();
 

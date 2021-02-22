@@ -71,18 +71,6 @@ namespace Sirius.Controllers
                             .ResultsAsync;
 
             return res.FirstOrDefault();
-
-
-            //var query = client.Cypher.Match("(n1)")
-            //           .Where((Node n1) => n1.Identifier == identifier)
-            //           .OptionalMatch("p=(n1)-[:r1|r2*..2]->(n2)")
-            //           .Unwind("relationships(p)", "rel")
-            //           .ReturnDistinct((n1, rel, n2) => new
-            //           {​​​​
-            //               startNode = Return.As<Node<string>>("startNode(rel)"),
-            //               endNode = Return.As<Node<string>>("endNode(rel)"),
-            //               relationship = Return.As<string>("type(rel)")
-            //           }​​​​);
         }
 
         [HttpGet("GetSeriesRatings/{seriesID}")]

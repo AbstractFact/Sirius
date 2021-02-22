@@ -47,6 +47,7 @@ export default class extends AbstractView {
             alert("User already exists!");
             localStorage.userid=0;
             localStorage.logged=0;
+            localStorage.username=0;
         }
         else
         {
@@ -54,6 +55,7 @@ export default class extends AbstractView {
 
             localStorage.userid=json["id"];
             localStorage.logged=1;
+            localStorage.username=username;
 
             alert("Welcome to Sirius "+username); 
         }   

@@ -90,23 +90,14 @@ namespace Sirius.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult> Put([FromBody] Actor actor, int id)
         {
-            //try
-            //{
             var res = _client.Cypher
                               .Match("(a:Actor)")
-                              //.Where("ID(s) = {id}")
                               .Where((Actor a) => a.ID == id)
-                              //.Where("s.ID = $id")
                               .Set("a = $actor")
                               .WithParam("actor", actor);
 
             await res.ExecuteWithoutResultsAsync();
 
-            //}
-            //catch(Exception e)
-            //{
-            //    return BadRequest();
-            //}
             if (res != null)
                 return Ok();
             else
