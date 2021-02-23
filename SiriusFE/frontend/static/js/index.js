@@ -155,9 +155,25 @@ document.addEventListener("DOMContentLoaded", () => {
             handleAddRole();
         }
 
-        if (e.target.matches("[addFriendBtn]")) {
+        if (e.target.matches("[sendFriendRequestBtn]")) {
             e.preventDefault();
-            handleAddFriend();
+            handleSendFriendRequest();
+        }
+
+        if (e.target.matches("[confirmRequestBtn]")) {
+            e.preventDefault();
+            var array = e.target.id.split(" ");
+            const requestID=array[0];
+            const senderID=array[1];
+            handleConfirmRequest(requestID, senderID);
+        }
+
+        if (e.target.matches("[removeRequestBtn]")) {
+            e.preventDefault();
+            var array = e.target.id.substring(1).split(" ");
+            const requestID=array[0];
+            const senderID=array[1];
+            handleRemoveRequest(requestID, senderID);
         }
 
         if(window.location.href=="http://localhost:5060/myserieslist")
@@ -284,10 +300,22 @@ async function handleAddRole()
     location.reload();
 }
 
-async function handleAddFriend()
+async function handleSendFriendRequest()
 {
-    await view.Befriend();
-    //location.reload();
+    await view.SendFriendRequest();
+    location.reload();
+}
+
+async function handleConfirmRequest(requestID, senderID)
+{
+    await view.ConfirmRequest(requestID, senderID);
+    location.reload();
+}
+
+async function handleRemoveRequest(requestID, senderID)
+{
+    await view.RemoveRequest(requestID, senderID);
+    location.reload();
 }
 
 async function handleEditEntry(id)

@@ -54,6 +54,7 @@ using System;
 using System.Text.Json;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Configuration;
+using Sirius.DTOs;
 using Sirius.Entities;
 using Sirius.Hubs;
 using StackExchange.Redis;
@@ -137,7 +138,7 @@ namespace Sirius.Services
 
                             redisPubSub.Subscribe("friendship.requests").OnMessage(message =>
                             {
-                                Message deserializedMessage = JsonSerializer.Deserialize<Message>(message.Message);
+                                FriendRequestNotificationDTO deserializedMessage = JsonSerializer.Deserialize<FriendRequestNotificationDTO>(message.Message);
                                 string groupName = $"channel:{deserializedMessage.ReceiverId}";
                                 _ = _hub.Clients.Group(groupName).SendAsync("ReceiveFriendRequests", deserializedMessage);
                             });

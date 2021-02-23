@@ -188,17 +188,18 @@ namespace Sirius.Controllers
                 return null;
         }
 
-        [HttpPost("Befriend/{user1ID}/{user2Username}")]
-        public async Task<ActionResult> Befriend(int user1ID, string user2Username)
+        [HttpPost("Befriend/{senderID}/{receiverID}/{requestID}")]
+        public async Task<ActionResult> Befriend(int senderID, int receiverID, string requestID)
         {
-            int user2ID = await GetUserID(user2Username);
+            //int user2ID = await GetUserID(user2Username);
 
-            if (user2ID != -1)
-            {
+            //if (user2ID != -1)
+            //{
+                await DeleteFriendRequest(receiverID, requestID, senderID);
                 var res = _client.Cypher
                         .Match("(user1:User)", "(user2:User)")
-                        .Where((User user1) => user1.ID == user1ID)
-                        .AndWhere((User user2) => user2.ID == user2ID)
+                        .Where((User user1) => user1.ID == senderID)
+                        .AndWhere((User user2) => user2.ID == receiverID)
                         .Merge("(user1)-[:FRIENDS]->(user2)");
 
                 await res.ExecuteWithoutResultsAsync();
@@ -207,9 +208,9 @@ namespace Sirius.Controllers
                     return Ok();
                 else
                     return BadRequest();
-            }
-            else
-                return BadRequest();
+            //}
+            //else
+            //    return BadRequest();
         }
 
         [HttpDelete("Unfriend/{user1ID}/{user2ID}")]
@@ -290,20 +291,6 @@ namespace Sirius.Controllers
             return result;
         }
 
-        [HttpGet("GetFriendRequestSends/{senderId}")]
-        public async Task<IEnumerable<int>> GetFriendRequestSends(int senderId)
-        {
-            IDatabase redisDB = _redisConnection.GetDatabase();
-            var result = await redisDB.SetMembersAsync("friend:" + senderId + ":request");
-
-            IList<int> arr = new List<int>();
-
-            foreach (var res in result)
-                arr.Add(Convert.ToInt32(res));
-
-            return arr;
-        }
-
         [HttpDelete("DeleteFriendRequest/{receiverId}/{requestId}/{senderId}")]
         public async Task DeleteFriendRequest(int receiverId, string requestId, int senderId)
         {
@@ -313,5 +300,6 @@ namespace Sirius.Controllers
             long deletedMessages = await redisDB.StreamDeleteAsync(channelName, new RedisValue[] { new RedisValue(requestId) });
             await redisDB.SetRemoveAsync("friend:" + senderId + ":request", receiverId);
         }
+
     }
 }
