@@ -1,20 +1,40 @@
-var Singleton = (function () {
-    var instance;
+var Connection = (function () {
+    var connection;
  
     function createInstance() {
-        var object = new Object("I am the instance");
-        console.log("aaa");
-        return object;
+        return new signalR.HubConnectionBuilder()
+        .withUrl("https://localhost:44365/sirius")
+        .configureLogging(signalR.LogLevel.Information)
+        .build();
     }
- 
+
+    async function start() {
+        try {
+            await connection.start();
+            console.log("SignalR Connected.");
+        } catch (err) {
+            console.log(err);
+            setTimeout(start, 5000);
+        }
+    };
+
     return {
         getInstance: function () {
-            if (!instance) {
-                instance = createInstance();
+            if (!connection) {
+                connection = createInstance();
+                connection.onclose(start);
+                start();
+
+                connection.on("ReceiveMessage", (message) => {
+                    console.log("stigla poruka:"+message);
+                    // const li = document.createElement("li");
+                    // li.textContent = `${user}: ${message}`;
+                    // document.getElementById("messageList").appendChild(li);
+                });
             }
-            return instance;
+            return connection;
         }
     };
 })();
  
-export default Singleton;
+export default Connection;

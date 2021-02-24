@@ -9,43 +9,25 @@ import Favourites from "./views/Favourites.js";
 import FavouritesView from "./views/FavouritesView.js";
 import Login from "./views/Login.js";
 import Signup from "./views/Signup.js";
-import Singleton from "./signalR/hubConnection.js"; 
+import Connection from "./signalR/hubConnection.js"; 
 
 var view;
 var connection;
 
-var instance1 = Singleton.getInstance();  
-
-
-connection = new signalR.HubConnectionBuilder()
-.withUrl("https://localhost:44365/sirius")
-.configureLogging(signalR.LogLevel.Information)
-.build();
-
-async function start() {
-    try {
-        await connection.start();
-        console.log("SignalR Connected.");
-        localStorage.isConnected="true";
-    } catch (err) {
-        console.log(err);
-        setTimeout(start, 5000);
-    }
-};
-
-connection.onclose(start);
-
-// Start the connection.
-start();
-
-connection.on("ReceiveFriendRequests", (message) => {
-    console.log("stigla poruka:"+message);
-    // const li = document.createElement("li");
-    // li.textContent = `${user}: ${message}`;
-    // document.getElementById("messageList").appendChild(li);
-});
-
-
+if(localStorage.signalRConnection)
+{
+    //if(localStorage.signalRConnection.length!=0)
+    console.log("uslo u then");
+    connection=JSON.parse(localStorage.signalRConnection);
+    //console.log(localStorage.signalRConnection);
+} 
+else
+{
+    console.log("uslo u else");
+    connection=Connection.getInstance();
+    localStorage.signalRConnection=JSON.stringify(connection);
+    //console.log(localStorage.signalRConnection);
+} 
 
 
 if(localStorage.logged==0)
@@ -263,8 +245,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 if (e.target.id=="R"+id) {
                     e.preventDefault();
-                    view.Unfriend(id);
-                    location.reload();
+                    handleUnfriend(id);
                 };
             });
         }
@@ -368,6 +349,12 @@ async function handleEditEntry(id)
 async function handleDeleteEntry(id)
 {
     await view.DeleteEntry(id);
+    location.reload();
+}
+
+async function handleUnfriend(id)
+{
+    await view.Unfriend(id);
     location.reload();
 }
 

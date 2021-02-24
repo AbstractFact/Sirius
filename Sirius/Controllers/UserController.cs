@@ -210,7 +210,7 @@ namespace Sirius.Controllers
         public async Task<ActionResult> Unfriend(int user1ID, int user2ID)
         {
             var res = _client.Cypher
-                    .Match("(user1:User)-[f:FRIENDS]->(user2:User)")
+                    .Match("(user1:User)-[f:FRIENDS]-(user2:User)")
                     .Where((User user1) => user1.ID == user1ID)
                     .AndWhere((User user2) => user2.ID == user2ID)
                     .Delete("f");

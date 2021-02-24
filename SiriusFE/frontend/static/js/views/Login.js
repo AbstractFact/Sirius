@@ -59,11 +59,18 @@ export default class extends AbstractView {
             localStorage.logged=1;
             localStorage.username=username;
 
+            // try {
+            //     await connection.invoke("StartReceivingRequests", parseInt(localStorage.userid));
+            // } catch (err) {
+            //     console.error(err);
+            // }
+
             try {
-                await connection.invoke("StartReceivingRequests", parseInt(localStorage.userid));
+                await connection.invoke("SendMessage", "poruka");
             } catch (err) {
                 console.error(err);
             }
+            
 
             alert("Welcome back to Sirius "+username); 
         }                                                   

@@ -166,9 +166,9 @@ export default class extends AbstractView {
         }   
     }
 
-    Unfriend(id)
+    async Unfriend(id)
     {
-        fetch("https://localhost:44365/User/Unfriend/"+localStorage.userid+"/"+id, { method: "DELETE"}).then(p => {
+        await fetch("https://localhost:44365/User/Unfriend/"+localStorage.userid+"/"+id, { method: "DELETE"}).then(p => {
             if (p.ok) 
             {
                 alert("User unfriended!");
