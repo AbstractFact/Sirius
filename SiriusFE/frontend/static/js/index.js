@@ -9,8 +9,44 @@ import Favourites from "./views/Favourites.js";
 import FavouritesView from "./views/FavouritesView.js";
 import Login from "./views/Login.js";
 import Signup from "./views/Signup.js";
+import Singleton from "./signalR/hubConnection.js"; 
 
 var view;
+var connection;
+
+var instance1 = Singleton.getInstance();  
+
+
+connection = new signalR.HubConnectionBuilder()
+.withUrl("https://localhost:44365/sirius")
+.configureLogging(signalR.LogLevel.Information)
+.build();
+
+async function start() {
+    try {
+        await connection.start();
+        console.log("SignalR Connected.");
+        localStorage.isConnected="true";
+    } catch (err) {
+        console.log(err);
+        setTimeout(start, 5000);
+    }
+};
+
+connection.onclose(start);
+
+// Start the connection.
+start();
+
+connection.on("ReceiveFriendRequests", (message) => {
+    console.log("stigla poruka:"+message);
+    // const li = document.createElement("li");
+    // li.textContent = `${user}: ${message}`;
+    // document.getElementById("messageList").appendChild(li);
+});
+
+
+
 
 if(localStorage.logged==0)
 {
@@ -95,7 +131,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (e.target.matches("[loginbtn]")) {
             e.preventDefault();
-            handleLogin();
+            handleLogin(connection);
         }
 
         if (e.target.matches("[signupbtn]")) {
@@ -176,6 +212,11 @@ document.addEventListener("DOMContentLoaded", () => {
             handleRemoveRequest(requestID, senderID);
         }
 
+        if (e.target.matches("[test]")) {
+            e.preventDefault();
+            view.test(connection);
+        }
+
         if(window.location.href=="http://localhost:5060/myserieslist")
         {
             const entries = view.GetEntries();
@@ -232,9 +273,9 @@ document.addEventListener("DOMContentLoaded", () => {
     router();
 });
 
-async function handleLogin()
+async function handleLogin(connection)
 {
-    await view.login();
+    await view.login(connection);
     if(localStorage.logged!=0)
     {
         navigateTo("/");

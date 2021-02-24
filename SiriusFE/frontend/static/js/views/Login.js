@@ -31,7 +31,7 @@ export default class extends AbstractView {
         return html;
     }
 
-    async login()
+    async login(connection)
     {
         const loginForm = document.querySelector('#login-form');
         const username = loginForm['login-username'].value;
@@ -58,6 +58,12 @@ export default class extends AbstractView {
             localStorage.userid=json["id"];
             localStorage.logged=1;
             localStorage.username=username;
+
+            try {
+                await connection.invoke("StartReceivingRequests", parseInt(localStorage.userid));
+            } catch (err) {
+                console.error(err);
+            }
 
             alert("Welcome back to Sirius "+username); 
         }                                                   

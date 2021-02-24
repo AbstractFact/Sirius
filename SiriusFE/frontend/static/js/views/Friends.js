@@ -110,10 +110,20 @@ export default class extends AbstractView {
                     </div>
                 </div>
                 <button type="submit" class="btn btn-primary" style="width:30%" sendFriendRequestBtn>Send Friend Request</button>
-                </form>`;
+                </form>
+                <button test>Test</button>`;
         }
 
         return html;
+    }
+
+    async test(connection)
+    {
+        try {
+            await connection.invoke("SendMessage", "message");
+        } catch (err) {
+            console.error(err);
+        }
     }
 
     GetFriends()
@@ -125,7 +135,7 @@ export default class extends AbstractView {
     {
         const addFriendForm = document.querySelector('#addfriend-form');
         const username = addFriendForm['inputUsername'].value;
-        const response =  await  fetch("https://localhost:44365/User/SendFriendRequest/"+localStorage.userid+"/"+username, { method: "POST", 
+        const response =  await  fetch("https://localhost:44365/User/SendFriendRequest/"+username, { method: "POST", 
         headers: {
             "Content-Type": "application/json"
             },

@@ -106,28 +106,28 @@ namespace Sirius.Services
                                     if (keyNameParts.Length == 4 && keyNameParts[0] == "messages" && keyNameParts[3] == "sirius")
                                     {
                                         int biggerId = int.Parse(keyNameParts[1]), smallerId = int.Parse(keyNameParts[2]);
-                                        string setKeyBigger = $"student:{biggerId}:chats";
-                                        string setKeySmaller = $"student:{smallerId}:chats";
+                                        string setKeyBigger = $"user:{biggerId}:chats";
+                                        string setKeySmaller = $"user:{smallerId}:chats";
                                         IDatabase redisDB = _connection.GetDatabase();
                                         var setEntriesBigger = redisDB.SortedSetRangeByRank(setKeyBigger, 0, -1, Order.Descending);
                                         var setEntriesSmaller = redisDB.SortedSetRangeByRank(setKeySmaller, 0, -1, Order.Descending);
 
                                         foreach (var entry in setEntriesBigger)
                                         {
-                                            User student = JsonSerializer.Deserialize<User>(entry);
-                                            if (student.ID == smallerId)
+                                            User user = JsonSerializer.Deserialize<User>(entry);
+                                            if (user.ID == smallerId)
                                             {
-                                                redisDB.SortedSetRemove(setKeyBigger, JsonSerializer.Serialize(student));
+                                                redisDB.SortedSetRemove(setKeyBigger, JsonSerializer.Serialize(user));
                                                 break;
                                             }
                                         }
 
                                         foreach (var entry in setEntriesSmaller)
                                         {
-                                            User student = JsonSerializer.Deserialize<User>(entry);
-                                            if (student.ID == biggerId)
+                                            User user = JsonSerializer.Deserialize<User>(entry);
+                                            if (user.ID == biggerId)
                                             {
-                                                redisDB.SortedSetRemove(setKeySmaller, JsonSerializer.Serialize(student));
+                                                redisDB.SortedSetRemove(setKeySmaller, JsonSerializer.Serialize(user));
                                                 break;
                                             }
                                         }

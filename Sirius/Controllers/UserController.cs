@@ -191,26 +191,19 @@ namespace Sirius.Controllers
         [HttpPost("Befriend/{senderID}/{receiverID}/{requestID}")]
         public async Task<ActionResult> Befriend(int senderID, int receiverID, string requestID)
         {
-            //int user2ID = await GetUserID(user2Username);
+            await DeleteFriendRequest(receiverID, requestID, senderID);
+            var res = _client.Cypher
+                    .Match("(user1:User)", "(user2:User)")
+                    .Where((User user1) => user1.ID == senderID)
+                    .AndWhere((User user2) => user2.ID == receiverID)
+                    .Merge("(user1)-[:FRIENDS]->(user2)");
 
-            //if (user2ID != -1)
-            //{
-                await DeleteFriendRequest(receiverID, requestID, senderID);
-                var res = _client.Cypher
-                        .Match("(user1:User)", "(user2:User)")
-                        .Where((User user1) => user1.ID == senderID)
-                        .AndWhere((User user2) => user2.ID == receiverID)
-                        .Merge("(user1)-[:FRIENDS]->(user2)");
+            await res.ExecuteWithoutResultsAsync();
 
-                await res.ExecuteWithoutResultsAsync();
-
-                if (res != null)
-                    return Ok();
-                else
-                    return BadRequest();
-            //}
-            //else
-            //    return BadRequest();
+            if (res != null)
+                return Ok();
+            else
+                return BadRequest();
         }
 
         [HttpDelete("Unfriend/{user1ID}/{user2ID}")]
@@ -230,32 +223,29 @@ namespace Sirius.Controllers
                 return BadRequest();
         }
 
-        [HttpPost("SendFriendRequest/{senderId}/{receiverUsername}")]
-        public async Task SendFriendRequest([FromBody] Request sender, int senderId, string receiverUsername)
+        [HttpPost("SendFriendRequest/{receiverUsername}")]
+        public async Task SendFriendRequest([FromBody] Request sender, string receiverUsername)
         {
             int receiverId = await GetUserID(receiverUsername);
             string channelName = $"messages:{receiverId}:friend_request";
 
             var values = new NameValueEntry[]
             {
-                new NameValueEntry("sender_id", senderId),
+                new NameValueEntry("sender_id", sender.ID),
                 new NameValueEntry("sender_username", sender.Username)
             };
 
             IDatabase redisDB = _redisConnection.GetDatabase();
             var messageId = await redisDB.StreamAddAsync(channelName, values);
 
-            //Dodatna funkcija
-            await redisDB.SetAddAsync("friend:" + senderId + ":request", receiverId);
+            await redisDB.SetAddAsync("friend:" + sender.ID + ":request", receiverId);
 
-            // objekat za notifikaciju
             FriendRequestNotificationDTO message = new FriendRequestNotificationDTO
             {
                 ReceiverId = receiverId,
                 RequestDTO = new RequestDTO { ID = messageId, Request = sender }
             };
 
-            //Push notifikacija
             var jsonMessage = JsonSerializer.Serialize(message);
             ISubscriber chatPubSub = _redisConnection.GetSubscriber();
             await chatPubSub.PublishAsync("friendship.requests", jsonMessage);

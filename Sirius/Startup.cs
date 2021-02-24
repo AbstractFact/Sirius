@@ -43,12 +43,23 @@ namespace Sirius
 
             services.AddCors(options =>
             {
+                //options.AddDefaultPolicy(builder =>
+                //{
+                //    builder.WithOrigins("https://example.com")
+                //        .AllowCredentials();
+                //});
 
                 options.AddPolicy("CORS", builder =>
                 {
                     builder.AllowAnyHeader()
                            .AllowAnyMethod()
-                           .AllowAnyOrigin();
+                           .SetIsOriginAllowed((host) => true)
+                           .AllowCredentials(); 
+
+                  //  builder.AllowAnyHeader()
+                  //.AllowAnyMethod()
+                  //.SetIsOriginAllowed((host) => true)
+                  //.AllowCredentials();
                 });
             });
 
