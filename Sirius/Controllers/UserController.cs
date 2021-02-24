@@ -224,24 +224,24 @@ namespace Sirius.Controllers
         }
 
         [HttpPost("SendFriendRequest/{receiverUsername}")]
-        public async Task<ActionResult<string>> SendFriendRequest([FromBody] Request sender, string receiverUsername)
+        public async Task<ActionResult> SendFriendRequest([FromBody] Request sender, string receiverUsername)
         {
             int receiverId = await GetUserID(receiverUsername);
             if (receiverId == -1)
-                return BadRequest();
+                return NotFound();
 
             List<User> friends = await GetAllFriends(sender.ID);
-            if(friends.Count!=0)
-                if (friends.FirstOrDefault(fr => fr.ID == receiverId) != null)
-                    return BadRequest(new string ("You are already friends!"));
-
+            if (friends.Count != 0)
+                if (friends.FirstOrDefault(fr => fr.ID == receiverId) != null) 
+                    return BadRequest(); 
+             
             IEnumerable<RequestDTO> existingReqs = await GetFriendRequests(receiverId);
             if (existingReqs.FirstOrDefault(req => req.Request.ID == sender.ID) != null)
-                return BadRequest(new string("Request already sent!"));
+                return NoContent();
 
             IEnumerable<RequestDTO> receivedReqs = await GetFriendRequests(sender.ID);
             if (receivedReqs.FirstOrDefault(req => req.Request.ID == receiverId) != null)
-                return BadRequest(new string("You already have request from " +receiverUsername+"!"));
+                return NoContent();
 
 
             string channelName = $"messages:{receiverId}:friend_request";

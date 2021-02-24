@@ -136,17 +136,18 @@ export default class extends AbstractView {
             addFriendForm.reset();
             alert("Request sent!");
         } 
+        else if (response.status==404)
+        {
+            alert("User does not exist!");
+        }
         else if (response.status==400)
         {
-            //console.log(response.json());
-            response.json().then(res=>console.log(res));
-            //console.log(a);
-            alert("User does not exist!");
+            alert("User is already your friend!");
         }
         else
         {
             addFriendForm.reset();
-            alert("Request already sent!");
+            alert("Request already sent, or you already have request from specified user!");
         }  
     }
 

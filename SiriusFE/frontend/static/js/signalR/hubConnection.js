@@ -8,10 +8,10 @@ export default class Connection
     createConnection()
     {
         return new signalR.HubConnectionBuilder()
-                        .withUrl("https://localhost:44365/sirius")
-                        .configureLogging(signalR.LogLevel.Information)
-                        .build();
-    }
+            .withUrl("https://localhost:44365/sirius")
+            .configureLogging(signalR.LogLevel.Information)
+            .build();
+}
     
     async start()
     {

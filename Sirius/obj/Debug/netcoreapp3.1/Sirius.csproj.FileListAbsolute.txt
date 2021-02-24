@@ -57,7 +57,6 @@ C:\Users\jovan\source\repos\SiriusGIT\Sirius\bin\Debug\netcoreapp3.1\Sirius.pdb
 C:\Users\jovan\source\repos\SiriusGIT\Sirius\bin\Debug\netcoreapp3.1\Neo4j.Driver.dll
 C:\Users\jovan\source\repos\SiriusGIT\Sirius\bin\Debug\netcoreapp3.1\Neo4jClient.dll
 C:\Users\jovan\source\repos\SiriusGIT\Sirius\bin\Debug\netcoreapp3.1\Newtonsoft.Json.dll
-C:\Users\jovan\source\repos\SiriusGIT\Sirius\obj\Debug\netcoreapp3.1\Sirius.csprojAssemblyReference.cache
 C:\Users\jovan\source\repos\SiriusGIT\Sirius\obj\Debug\netcoreapp3.1\Sirius.AssemblyInfoInputs.cache
 C:\Users\jovan\source\repos\SiriusGIT\Sirius\obj\Debug\netcoreapp3.1\Sirius.AssemblyInfo.cs
 C:\Users\jovan\source\repos\SiriusGIT\Sirius\obj\Debug\netcoreapp3.1\Sirius.csproj.CoreCompileInputs.cache
