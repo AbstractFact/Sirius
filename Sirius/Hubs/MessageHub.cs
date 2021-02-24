@@ -9,6 +9,16 @@ namespace Sirius.Hubs
 {
     public class MessageHub : Hub
     {
+        public async Task SendMessage(string mess)
+        {
+            await Clients.All.SendAsync("ReceiveMessage", mess);
+        }
+
+        public async Task StartReceivingRequests(int receiverID)
+        {
+            await Groups.AddToGroupAsync(Context.ConnectionId, $"channel:{receiverID}");
+        }
+
         public void sendToAll(Message mess)
         {
             Clients.All.SendAsync("sendToAll", mess);

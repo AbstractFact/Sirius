@@ -9,10 +9,37 @@ import Favourites from "./views/Favourites.js";
 import FavouritesView from "./views/FavouritesView.js";
 import Login from "./views/Login.js";
 import Signup from "./views/Signup.js";
+import Connection from "./signalR/hubConnection.js"; 
 
 var view;
+var connection;
 
-if(localStorage.logged==0)
+async function init ()
+{
+    if(localStorage.signalRConnection)
+    {
+        console.log("uslo u then");
+        //if(localStorage.signalRConnection.length!=0)
+        connection = new Connection();
+        connection.copy(JSON.parse(localStorage.signalRConnection));
+        //connection=JSON.parse(localStorage.signalRConnection);
+        //console.log(localStorage.signalRConnection);
+        console.log(connection);
+    } 
+    else
+    {
+        console.log("uslo u else");
+        const conn = new Connection();
+        await conn.getConnection();
+        conn.listen();
+        connection = conn;
+        console.log(connection);
+        localStorage.signalRConnection=JSON.stringify(connection);
+        //console.log(localStorage.signalRConnection);
+    } 
+}
+
+if(localStorage.logged==0 || !localStorage.logged)
 {
     var html=document.body.querySelector(".topnav").innerHTML;
     html+=
@@ -86,7 +113,11 @@ const router = async () => {
 
 window.addEventListener("popstate", router);
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+    console.log("1");
+    await init();
+    console.log("2");
+
     document.body.addEventListener("click", e => {
         if (e.target.matches("[data-link]")) {
             e.preventDefault();
@@ -95,7 +126,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (e.target.matches("[loginbtn]")) {
             e.preventDefault();
-            handleLogin();
+            handleLogin(connection);
         }
 
         if (e.target.matches("[signupbtn]")) {
@@ -155,9 +186,30 @@ document.addEventListener("DOMContentLoaded", () => {
             handleAddRole();
         }
 
-        if (e.target.matches("[addFriendBtn]")) {
+        if (e.target.matches("[sendFriendRequestBtn]")) {
             e.preventDefault();
-            handleAddFriend();
+            handleSendFriendRequest();
+        }
+
+        if (e.target.matches("[confirmRequestBtn]")) {
+            e.preventDefault();
+            var array = e.target.id.split(" ");
+            const requestID=array[0];
+            const senderID=array[1];
+            handleConfirmRequest(requestID, senderID);
+        }
+
+        if (e.target.matches("[removeRequestBtn]")) {
+            e.preventDefault();
+            var array = e.target.id.substring(1).split(" ");
+            const requestID=array[0];
+            const senderID=array[1];
+            handleRemoveRequest(requestID, senderID);
+        }
+
+        if (e.target.matches("[test]")) {
+            e.preventDefault();
+            view.test(connection);
         }
 
         if(window.location.href=="http://localhost:5060/myserieslist")
@@ -206,8 +258,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 if (e.target.id=="R"+id) {
                     e.preventDefault();
-                    view.Unfriend(id);
-                    location.reload();
+                    handleUnfriend(id);
                 };
             });
         }
@@ -216,9 +267,9 @@ document.addEventListener("DOMContentLoaded", () => {
     router();
 });
 
-async function handleLogin()
+async function handleLogin(connection)
 {
-    await view.login();
+    await view.login(connection);
     if(localStorage.logged!=0)
     {
         navigateTo("/");
@@ -284,10 +335,22 @@ async function handleAddRole()
     location.reload();
 }
 
-async function handleAddFriend()
+async function handleSendFriendRequest()
 {
-    await view.Befriend();
-    //location.reload();
+    await view.SendFriendRequest();
+    location.reload();
+}
+
+async function handleConfirmRequest(requestID, senderID)
+{
+    await view.ConfirmRequest(requestID, senderID);
+    location.reload();
+}
+
+async function handleRemoveRequest(requestID, senderID)
+{
+    await view.RemoveRequest(requestID, senderID);
+    location.reload();
 }
 
 async function handleEditEntry(id)
@@ -299,6 +362,12 @@ async function handleEditEntry(id)
 async function handleDeleteEntry(id)
 {
     await view.DeleteEntry(id);
+    location.reload();
+}
+
+async function handleUnfriend(id)
+{
+    await view.Unfriend(id);
     location.reload();
 }
 

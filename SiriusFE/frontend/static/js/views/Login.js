@@ -1,3 +1,4 @@
+import Connection from "../signalR/hubConnection.js";
 import AbstractView from "./AbstractView.js";
 
 export default class extends AbstractView {
@@ -31,7 +32,7 @@ export default class extends AbstractView {
         return html;
     }
 
-    async login()
+    async login(connection)
     {
         const loginForm = document.querySelector('#login-form');
         const username = loginForm['login-username'].value;
@@ -59,6 +60,22 @@ export default class extends AbstractView {
             localStorage.logged=1;
             localStorage.username=username;
 
+            // try {
+            //     await connection.invoke("StartReceivingRequests", parseInt(localStorage.userid));
+            // } catch (err) {
+            //     console.error(err);
+            // }
+
+            const msg = "poruka";
+            connection.sendMessage(msg);
+
+            // try {
+            //     console.log(connection);
+            //     await connection.invoke("SendMessage", msg);
+            // } catch (err) {
+            //     console.error(err);
+            // }
+            
             alert("Welcome back to Sirius "+username); 
         }                                                   
     }     
