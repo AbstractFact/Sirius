@@ -177,7 +177,7 @@ namespace Sirius.Controllers
         public async Task<List<User>> GetAllFriends(int userID)
         {
             var res = await _client.Cypher
-                        .OptionalMatch("(user:User)-[FRIENDS]-(friend:User)")
+                        .Match("(user:User)-[FRIENDS]-(friend:User)")
                         .Where((User user) => user.ID == userID)
                         .Return(friend => friend.As<User>())
                         .ResultsAsync;
@@ -224,9 +224,26 @@ namespace Sirius.Controllers
         }
 
         [HttpPost("SendFriendRequest/{receiverUsername}")]
-        public async Task SendFriendRequest([FromBody] Request sender, string receiverUsername)
+        public async Task<ActionResult<string>> SendFriendRequest([FromBody] Request sender, string receiverUsername)
         {
             int receiverId = await GetUserID(receiverUsername);
+            if (receiverId == -1)
+                return BadRequest();
+
+            List<User> friends = await GetAllFriends(sender.ID);
+            if(friends.Count!=0)
+                if (friends.FirstOrDefault(fr => fr.ID == receiverId) != null)
+                    return BadRequest(new string ("You are already friends!"));
+
+            IEnumerable<RequestDTO> existingReqs = await GetFriendRequests(receiverId);
+            if (existingReqs.FirstOrDefault(req => req.Request.ID == sender.ID) != null)
+                return BadRequest(new string("Request already sent!"));
+
+            IEnumerable<RequestDTO> receivedReqs = await GetFriendRequests(sender.ID);
+            if (receivedReqs.FirstOrDefault(req => req.Request.ID == receiverId) != null)
+                return BadRequest(new string("You already have request from " +receiverUsername+"!"));
+
+
             string channelName = $"messages:{receiverId}:friend_request";
 
             var values = new NameValueEntry[]
@@ -249,6 +266,8 @@ namespace Sirius.Controllers
             var jsonMessage = JsonSerializer.Serialize(message);
             ISubscriber chatPubSub = _redisConnection.GetSubscriber();
             await chatPubSub.PublishAsync("friendship.requests", jsonMessage);
+
+            return Ok();
         }
 
 

@@ -115,7 +115,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         if (e.target.matches("[loginbtn]")) {
             e.preventDefault();
-            handleLogin(connection);
+            handleLogin();
         }
 
         if (e.target.matches("[signupbtn]")) {
@@ -196,12 +196,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             handleRemoveRequest(requestID, senderID);
         }
 
-        if (e.target.matches("[test]")) {
-            e.preventDefault();
-            view.test(connection);
-        }
-
-        if(window.location.href=="http://localhost:5060/myserieslist")
+        if(window.location.href=="http://localhost:5001/myserieslist")
         {
             const entries = view.GetEntries();
             entries.forEach(entrie => {
@@ -219,7 +214,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             });
         }
 
-        if(window.location.href.includes("http://localhost:5060/series/"))
+        if(window.location.href.includes("http://localhost:5001/series/"))
         {
             const roles = view.GetRoles();
             roles.forEach(role => {
@@ -256,9 +251,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     router();
 });
 
-async function handleLogin(connection)
+async function handleLogin()
 {
-    await view.login(connection);
+    await view.login();
     if(localStorage.logged!=0)
     {
         navigateTo("/");
@@ -327,7 +322,6 @@ async function handleAddRole()
 async function handleSendFriendRequest()
 {
     await view.SendFriendRequest();
-    location.reload();
 }
 
 async function handleConfirmRequest(requestID, senderID)

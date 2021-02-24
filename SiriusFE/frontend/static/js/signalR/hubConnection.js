@@ -28,7 +28,11 @@ export default class Connection
     {
         this.connection.on("ReceiveFriendRequests", (message) =>
         {
-            console.log("stigla:" + message); 
+            const msg = JSON.parse(JSON.stringify(message));
+            alert("Friend request from: " + msg.requestDTO.request.username); 
+            if(window.location.href=="http://localhost:5001/friends")
+                window.location.reload();
+
         });
         
         this.connection.on("ReceiveMessage", (message) =>

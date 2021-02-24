@@ -110,20 +110,10 @@ export default class extends AbstractView {
                     </div>
                 </div>
                 <button type="submit" class="btn btn-primary" style="width:30%" sendFriendRequestBtn>Send Friend Request</button>
-                </form>
-                <button test>Test</button>`;
+                </form>`;
         }
 
         return html;
-    }
-
-    async test(connection)
-    {
-        try {
-            await connection.invoke("SendMessage", "message");
-        } catch (err) {
-            console.error(err);
-        }
     }
 
     GetFriends()
@@ -142,10 +132,22 @@ export default class extends AbstractView {
             body: JSON.stringify({ "id": parseInt(localStorage.userid), "username": localStorage.username })
         });
 
-        if (response.ok) {
+        if (response.status==200) {
             addFriendForm.reset();
             alert("Request sent!");
-        }   
+        } 
+        else if (response.status==400)
+        {
+            //console.log(response.json());
+            response.json().then(res=>console.log(res));
+            //console.log(a);
+            alert("User does not exist!");
+        }
+        else
+        {
+            addFriendForm.reset();
+            alert("Request already sent!");
+        }  
     }
 
     async ConfirmRequest(requestID, senderID)

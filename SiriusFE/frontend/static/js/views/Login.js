@@ -32,7 +32,7 @@ export default class extends AbstractView {
         return html;
     }
 
-    async login(connection)
+    async login()
     {
         const loginForm = document.querySelector('#login-form');
         const username = loginForm['login-username'].value;

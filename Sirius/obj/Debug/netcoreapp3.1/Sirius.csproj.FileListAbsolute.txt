@@ -139,3 +139,4 @@ C:\Users\ivana\Documents\Napredne baze podataka\Projekat1\Sirius\obj\Debug\netco
 C:\Users\ivana\Documents\Napredne baze podataka\Projekat1\Sirius\obj\Debug\netcoreapp3.1\Sirius.RazorTargetAssemblyInfo.cache
 C:\Users\ivana\Documents\Napredne baze podataka\Projekat1\Sirius\obj\Debug\netcoreapp3.1\Sirius.csproj.CopyComplete
 C:\Users\ivana\Documents\Napredne baze podataka\Projekat1\Sirius\obj\Debug\netcoreapp3.1\Sirius.genruntimeconfig.cache
+C:\Users\ivana\Documents\Napredne baze podataka\Projekat1\Sirius\obj\Debug\netcoreapp3.1\Sirius.csprojAssemblyReference.cache
