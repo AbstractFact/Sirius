@@ -12,31 +12,23 @@ import Signup from "./views/Signup.js";
 import Connection from "./signalR/hubConnection.js"; 
 
 var view;
-var connection;
 
-async function init ()
+const connection = new Connection();
+
+async function connect()
 {
-    if(localStorage.signalRConnection)
+    if(localStorage.logged==1)
     {
-        console.log("uslo u then");
-        //if(localStorage.signalRConnection.length!=0)
-        connection = new Connection();
-        connection.copy(JSON.parse(localStorage.signalRConnection));
-        //connection=JSON.parse(localStorage.signalRConnection);
-        //console.log(localStorage.signalRConnection);
-        console.log(connection);
-    } 
-    else
-    {
-        console.log("uslo u else");
-        const conn = new Connection();
-        await conn.getConnection();
-        conn.listen();
-        connection = conn;
-        console.log(connection);
-        localStorage.signalRConnection=JSON.stringify(connection);
-        //console.log(localStorage.signalRConnection);
-    } 
+        await connection.start();
+        connection.listen();
+        //await connection.sendMessage("msg");
+        try {
+            await connection.register(parseInt(localStorage.userid));
+        } catch (err) {
+            console.error(err);
+        }
+    }
+   
 }
 
 if(localStorage.logged==0 || !localStorage.logged)
@@ -114,10 +106,7 @@ const router = async () => {
 window.addEventListener("popstate", router);
 
 document.addEventListener("DOMContentLoaded", async () => {
-    console.log("1");
-    await init();
-    console.log("2");
-
+    connect();
     document.body.addEventListener("click", e => {
         if (e.target.matches("[data-link]")) {
             e.preventDefault();
