@@ -6,8 +6,9 @@ using Microsoft.Extensions.Hosting;
 using Neo4jClient;
 using System;
 using System.Text.Json;
-using Sirius.Services;
+using Sirius.Services.Redis;
 using Sirius.Hubs;
+using Sirius.Services;
 
 namespace Sirius
 {
@@ -30,6 +31,7 @@ namespace Sirius
             services.AddSingleton<IGraphClient>(neo4jclient);
 
             services.AddSingleton<IRedisService, RedisService>();
+            services.AddSingleton<UserService>();
 
             services.AddMvc().AddJsonOptions(options =>
             {

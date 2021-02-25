@@ -39,6 +39,14 @@ export default class Connection
         {
             console.log("stigla poruka:" + message); 
         });
+
+        this.connection.on("FriendRequestAccepted", (message) =>
+        {
+            alert(message); 
+            if(window.location.href=="http://localhost:5001/friends")
+                window.location.reload();
+
+        });
     }
 
     sendMessage(mess)

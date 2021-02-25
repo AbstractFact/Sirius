@@ -90,9 +90,8 @@ export default class extends AbstractView {
                         <div class="form-group col-md-8">
                             <label for="inputStatus">Status</label>
                             <select id="inputStatus" class="form-control">
-                                <option selected>Select Status</option>
+                                <option selected>Plan to Watch</option>
                                 <option>Watching</option>
-                                <option>Plan to Watch</option>
                                 <option>On Hold</option>
                                 <option>Dropped</option>
                                 <option>Completed</option>

@@ -110,15 +110,15 @@ export default class extends AbstractView {
         const row = document.getElementById(id);
         const serid = row.querySelector('.serid').id;
         const status = row.querySelector('#inputStatus').value;
-        const stars = row.querySelector('#inputStars').value;  
+        const stars = parseInt(row.querySelector('#inputStars').value);  
         const comment = row.querySelector('#inputComment').value;
         const fav = row.querySelector('#inputFav').checked;
 
-        const response = await fetch("https://localhost:44365/UserSeriesList/"+id+"/"+serid+"/"+fav, { method: "PUT",
+        const response = await fetch("https://localhost:44365/UserSeriesList/"+id+"/"+serid, { method: "PUT",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify([status, stars, comment])
+                body: JSON.stringify({"status":status, "stars":stars, "comment":comment, "favourite":fav})
         });
 
         if (response.ok){

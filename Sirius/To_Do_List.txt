@@ -1,6 +1,5 @@
 Neo4J:
 
--Prikazivanje komentara na strani serije
 -Isticanje informacija o reziseru
 -Proveriti funkciju za generisanje ID-jeva (MaxID)
 

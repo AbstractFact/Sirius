@@ -1,17 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using Neo4jClient;
-using System;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Sirius.Entities;
-using Neo4jClient.Cypher;
-using Sirius.Services;
-using StackExchange.Redis;
 using Sirius.DTOs;
-using System.Text.Json;
+using Sirius.Services;
 
 namespace Sirius.Controllers
 {
@@ -19,44 +12,17 @@ namespace Sirius.Controllers
     [Route("[controller]")]
     public class UserController : ControllerBase
     {
-        private readonly ILogger<SeriesController> _logger;
-        private readonly IGraphClient _client;
-        private readonly IConnectionMultiplexer _redisConnection;
-        private int maxID;
+        private UserService service;
 
-        public UserController(ILogger<SeriesController> logger, IGraphClient client, IRedisService builder)
+        public UserController(UserService _service)
         {
-            _logger = logger;
-            _client = client;
-            _redisConnection = builder.Connection;
-
-            maxID = 0;
-        }
-
-        private async Task<int> MaxID()
-        {
-            var query = await _client.Cypher
-                        .Match("(u:User)")
-                        .Return<int>(u => u.As<User>().ID)
-                        .OrderByDescending("u.ID")
-                        //.Return<int>("ID(s)")
-                        //.OrderByDescending("ID(s)")
-                        .ResultsAsync;
-
-            return query.FirstOrDefault();
+            service = _service;
         }
 
         [HttpGet]
         public async Task<ActionResult> GetAll()
         {
-            var res = await _client.Cypher
-                        .OptionalMatch("(user:User)-[FRIENDS]-(friend:User)")
-                        .Return((user, friend) => new
-                        {
-                            User = user.As<User>(),
-                            Friends = friend.CollectAs<User>()
-                        }).ResultsAsync;
-
+            var res = await service.GetAll();
             if (res != null)
                 return Ok(res);
             else
@@ -64,49 +30,21 @@ namespace Sirius.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<User> Get(int id)
+        public async Task<ActionResult<User>> Get(int id)
         {
-            //await _redis_client.Set($"{id}","How many claps per person should this article get?");
-            //var definitely = await _redis_client.Get($"{id}");
-            //return definitely;
-
-            var res = await _client.Cypher
-                        .Match("(user:User)")
-                        .Where((User user) => user.ID == id)
-                        .Return(user => user.As<User>())
-                        .ResultsAsync;
-
-            return res.FirstOrDefault();
-        }
-
-        [HttpGet("GetUserID/{username}")]
-        public async Task<int> GetUserID(string username)
-        {
-
-            var res = await _client.Cypher
-                        .Match("(user:User)")
-                        .Where((User user) => user.Username == username)
-                        .Return(user => user.As<User>())
-                        .ResultsAsync;
-
-            if (res.Count() != 0)
-                return res.FirstOrDefault().ID;
+            User res = await service.Get(id);
+            if (res != null)
+                return Ok(res);
             else
-                return -1;
+                return BadRequest();
         }
 
         [HttpPost("Login")]
         public async Task<ActionResult<User>> Login([FromBody] User user)
         {
-            var res = await _client.Cypher
-                        .Match("(u:User)")
-                        .Where((User u) => u.Username == user.Username)
-                        .AndWhere((User u) => u.Password == user.Password)
-                        .Return(u => u.As<User>())
-                        .ResultsAsync;
-
-            if (res.Count() != 0)
-                return Ok(res.FirstOrDefault());
+            User res = await service.Login(user);
+            if (res != null)
+                return Ok(res);
             else
                 return BadRequest();
         }
@@ -114,43 +52,17 @@ namespace Sirius.Controllers
         [HttpPost]
         public async Task<ActionResult<int>> Post([FromBody] User u)
         {
-            maxID = await MaxID();
-
-            int id = await GetUserID(u.Username);
-
-            if (id == -1)
-            {
-                var newUser = new User { ID = maxID + 1, Username = u.Username, Password = u.Password };
-
-                var res = _client.Cypher.Create("(user:User $newUser)")
-                                        .WithParam("newUser", newUser);
-
-                await res.ExecuteWithoutResultsAsync();
-
-                if (res != null)
-                {
-                    id = await GetUserID(u.Username);
-                    return Ok(id);
-                }
-                else
-                    return BadRequest();
-            }
+            int userID = await service.Post(u);
+            if (userID != -1)
+                return Ok(userID);
             else
                 return BadRequest();
         }
 
-
         [HttpPut("{id}")]
         public async Task<ActionResult> Put([FromBody] User user, int id)
         {
-            var res = _client.Cypher
-                              .Match("(u:User)")
-                              .Where((Series u) => u.ID == id)
-                              .Set("u = $user")
-                              .WithParam("user", user);
-
-            await res.ExecuteWithoutResultsAsync();
-
+            User res = await service.Put(user, id);
             if (res != null)
                 return Ok();
             else
@@ -160,46 +72,27 @@ namespace Sirius.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
-            var res = _client.Cypher
-                              .Match("(u:User)")
-                              .Where((User u) => u.ID == id)
-                              .Delete("u");
-
-            await res.ExecuteWithoutResultsAsync();
-
-            if (res != null)
+            int res = await service.Delete(id);
+            if(res!=-1)
                 return Ok();
             else
                 return BadRequest();
         }
 
         [HttpGet("GetAllFriends/{userID}")]
-        public async Task<List<User>> GetAllFriends(int userID)
+        public async Task<ActionResult<List<User>>> GetAllFriends(int userID)
         {
-            var res = await _client.Cypher
-                        .Match("(user:User)-[FRIENDS]-(friend:User)")
-                        .Where((User user) => user.ID == userID)
-                        .Return(friend => friend.As<User>())
-                        .ResultsAsync;
-
+            List<User> res = await service.GetAllFriends(userID);
             if (res != null)
-                return res.ToList();
+                return Ok(res);
             else
-                return null;
+                return BadRequest();
         }
 
         [HttpPost("Befriend/{senderID}/{receiverID}/{requestID}")]
         public async Task<ActionResult> Befriend(int senderID, int receiverID, string requestID)
         {
-            await DeleteFriendRequest(receiverID, requestID, senderID);
-            var res = _client.Cypher
-                    .Match("(user1:User)", "(user2:User)")
-                    .Where((User user1) => user1.ID == senderID)
-                    .AndWhere((User user2) => user2.ID == receiverID)
-                    .Merge("(user1)-[:FRIENDS]->(user2)");
-
-            await res.ExecuteWithoutResultsAsync();
-
+            var res = await service.Befriend(senderID, receiverID, requestID);
             if (res != null)
                 return Ok();
             else
@@ -209,14 +102,7 @@ namespace Sirius.Controllers
         [HttpDelete("Unfriend/{user1ID}/{user2ID}")]
         public async Task<ActionResult> Unfriend(int user1ID, int user2ID)
         {
-            var res = _client.Cypher
-                    .Match("(user1:User)-[f:FRIENDS]-(user2:User)")
-                    .Where((User user1) => user1.ID == user1ID)
-                    .AndWhere((User user2) => user2.ID == user2ID)
-                    .Delete("f");
-
-            await res.ExecuteWithoutResultsAsync();
-
+            var res = await service.Unfriend(user1ID, user2ID);
             if (res != null)
                 return Ok();
             else
@@ -226,88 +112,46 @@ namespace Sirius.Controllers
         [HttpPost("SendFriendRequest/{receiverUsername}")]
         public async Task<ActionResult> SendFriendRequest([FromBody] Request sender, string receiverUsername)
         {
-            int receiverId = await GetUserID(receiverUsername);
+            int receiverId = await service.GetUserID(receiverUsername);
             if (receiverId == -1)
                 return NotFound();
 
-            List<User> friends = await GetAllFriends(sender.ID);
+            List<User> friends = await service.GetAllFriends(sender.ID);
             if (friends.Count != 0)
-                if (friends.FirstOrDefault(fr => fr.ID == receiverId) != null) 
-                    return BadRequest(); 
-             
-            IEnumerable<RequestDTO> existingReqs = await GetFriendRequests(receiverId);
+                if (friends.FirstOrDefault(fr => fr.ID == receiverId) != null)
+                    return BadRequest();
+
+            IEnumerable<RequestDTO> existingReqs = await service.GetFriendRequests(receiverId);
             if (existingReqs.FirstOrDefault(req => req.Request.ID == sender.ID) != null)
                 return NoContent();
 
-            IEnumerable<RequestDTO> receivedReqs = await GetFriendRequests(sender.ID);
+            IEnumerable<RequestDTO> receivedReqs = await service.GetFriendRequests(sender.ID);
             if (receivedReqs.FirstOrDefault(req => req.Request.ID == receiverId) != null)
                 return NoContent();
 
-
-            string channelName = $"messages:{receiverId}:friend_request";
-
-            var values = new NameValueEntry[]
-            {
-                new NameValueEntry("sender_id", sender.ID),
-                new NameValueEntry("sender_username", sender.Username)
-            };
-
-            IDatabase redisDB = _redisConnection.GetDatabase();
-            var messageId = await redisDB.StreamAddAsync(channelName, values);
-
-            await redisDB.SetAddAsync("friend:" + sender.ID + ":request", receiverId);
-
-            FriendRequestNotificationDTO message = new FriendRequestNotificationDTO
-            {
-                ReceiverId = receiverId,
-                RequestDTO = new RequestDTO { ID = messageId, Request = sender }
-            };
-
-            var jsonMessage = JsonSerializer.Serialize(message);
-            ISubscriber chatPubSub = _redisConnection.GetSubscriber();
-            await chatPubSub.PublishAsync("friendship.requests", jsonMessage);
-
+            bool res = await service.SendFriendRequest(sender, receiverId);
             return Ok();
         }
 
 
         [HttpGet("GetFriendRequests/{receiverId}")]
-        public async Task<IEnumerable<RequestDTO>> GetFriendRequests(int receiverId)
+        public async Task<ActionResult<IEnumerable<RequestDTO>>> GetFriendRequests(int receiverId)
         {
-            string channelName = $"messages:{receiverId}:friend_request";
-            IDatabase redisDB = _redisConnection.GetDatabase();
-
-            var requests = await redisDB.StreamReadAsync(channelName, "0-0");
-
-            IList<RequestDTO> result = new List<RequestDTO>();
-
-            foreach (var request in requests)
-            {
-                result.Add(
-                    new RequestDTO
-                    {
-                        ID = request.Id,
-                        Request = new Request
-                        {
-                            ID = int.Parse(request.Values.FirstOrDefault(value => value.Name == "sender_id").Value),
-                            Username = request.Values.FirstOrDefault(value => value.Name == "sender_username").Value
-                        }
-
-                    }
-                );
-            }
-
-            return result;
+            IEnumerable<RequestDTO> res = await service.GetFriendRequests(receiverId);
+            if (res != null)
+                return Ok(res);
+            else
+                return BadRequest();
         }
 
         [HttpDelete("DeleteFriendRequest/{receiverId}/{requestId}/{senderId}")]
-        public async Task DeleteFriendRequest(int receiverId, string requestId, int senderId)
+        public async Task<ActionResult> DeleteFriendRequest(int receiverId, string requestId, int senderId)
         {
-            string channelName = $"messages:{receiverId}:friend_request";
-
-            IDatabase redisDB = _redisConnection.GetDatabase();
-            long deletedMessages = await redisDB.StreamDeleteAsync(channelName, new RedisValue[] { new RedisValue(requestId) });
-            await redisDB.SetRemoveAsync("friend:" + senderId + ":request", receiverId);
+            bool res = await service.DeleteFriendRequest(receiverId, requestId, senderId);
+            if (res)
+                return Ok();
+            else
+                return BadRequest();
         }
 
     }

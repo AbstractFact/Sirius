@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Sirius.Entities;
 using Neo4jClient.Cypher;
+using Sirius.DTOs;
 
 namespace Sirius.Controllers
 {
@@ -207,8 +208,8 @@ namespace Sirius.Controllers
                 return BadRequest();
         }
 
-        [HttpPut("{id}/{seriesID}/{favourite}")]
-        public async Task<ActionResult> Put([FromBody] List<string> data, int id, int seriesID, bool favourite)
+        [HttpPut("{id}/{seriesID}")]
+        public async Task<ActionResult> Put([FromBody] FavouriteSeriesEditDTO data, int id, int seriesID)
         {
             var res = _client.Cypher
                         .Match("(u:User)-[l:LISTED]-(s:Series)")
@@ -217,17 +218,19 @@ namespace Sirius.Controllers
                         .Set("l.Stars = $stars")
                         .Set("l.Comment = $comment")
                         .Set("l.Favourite = $favourite")
-                        .WithParam("status", data[0])
-                        .WithParam("stars", int.Parse(data[1]))
-                        .WithParam("comment", data[2])
-                        .WithParam("favourite", favourite);
+                        .WithParam("status", data.Status)
+                        .WithParam("stars", data.Stars)
+                        .WithParam("comment", data.Comment)
+                        .WithParam("favourite", data.Favourite);
 
             await res.ExecuteWithoutResultsAsync();
 
-            float avgrtng = await GetSeriesAvgRating(seriesID);
-
-            await UpdateRating(seriesID, avgrtng);
-
+            if(data.Stars!=0)
+            {
+                float avgrtng = await GetSeriesAvgRating(seriesID);
+                await UpdateRating(seriesID, avgrtng);
+            }
+          
             if (res != null)
                 return Ok();
             else
@@ -257,10 +260,13 @@ namespace Sirius.Controllers
                             .Match("(u:User)-[l:LISTED]-(s:Series)")
                             .Where((Series s) => s.ID == seriesID)
                             .AndWhere((UserSeriesList l) => l.Stars != 0)
-                            .Return((l) => Return.As<float>("avg(l.Stars)"))
+                            .Return((l) => Return.As<string>("avg(l.Stars)"))
                             .ResultsAsync;
 
-            return res.FirstOrDefault();
+            if (res.FirstOrDefault() != "null")
+                return float.Parse(res.FirstOrDefault());
+            else
+                return 0;
         }
 
         [HttpDelete("{id}")]
