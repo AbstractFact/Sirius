@@ -96,7 +96,9 @@ namespace Sirius.Controllers
             List<Object> res = new List<Object>();
             foreach(User fr in friends)
             {
-                var rs = await _client.Cypher
+                if(fr!=null)
+                {
+                    var rs = await _client.Cypher
                         .Match("(u:User)-[l:LISTED]-(s:Series)")
                         .Where((User u) => u.ID == fr.ID)
                         .AndWhere((UserSeriesList l) => l.Favourite == true)
@@ -107,10 +109,11 @@ namespace Sirius.Controllers
                         })
                         .ResultsAsync;
 
-                rs.ToList().ForEach(rec =>
-                {
-                    res.Add(rec);
-                });
+                    rs.ToList().ForEach(rec =>
+                    {
+                        res.Add(rec);
+                    });
+                }  
             };
 
             if (res != null)

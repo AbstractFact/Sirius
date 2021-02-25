@@ -5,4 +5,5 @@ Neo4J:
 
 Redis:
 
--
+-Probati recommendation bez stream-a preko neke druge strukture (friend request)
+-Koriscenje stream-a za prikaz svih serija sortiranih po datumu ubacivanja?

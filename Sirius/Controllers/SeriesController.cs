@@ -8,6 +8,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Sirius.Entities;
 using Neo4jClient.Cypher;
+using Sirius.Services.Redis;
+using Microsoft.AspNetCore.SignalR;
+using Sirius.Hubs;
+using StackExchange.Redis;
+using System.Text.Json;
+using Sirius.DTOs;
 
 namespace Sirius.Controllers
 {
@@ -15,15 +21,17 @@ namespace Sirius.Controllers
     [Route("[controller]")]
     public class SeriesController : ControllerBase
     {
-        private readonly ILogger<SeriesController> _logger;
         private readonly IGraphClient _client;
         private int maxID;
+        private readonly IHubContext<MessageHub> _hub;
+        private readonly IConnectionMultiplexer _redisConnection;
 
-        public SeriesController(ILogger<SeriesController> logger, IGraphClient client)
+        public SeriesController( IGraphClient client, IRedisService builder, IHubContext<MessageHub> hub)
         {
-            _logger = logger;
             _client = client;
             maxID = 0;
+            _redisConnection = builder.Connection;
+            _hub = hub;
         }
 
         private async Task<int> MaxID()
@@ -77,6 +85,38 @@ namespace Sirius.Controllers
                         .WithParam("newSeries", newSeries);
 
             await res.ExecuteWithoutResultsAsync();
+
+           
+
+            
+
+            //string channelName = $"messages:{userID}:recommendations";
+            //var values = new NameValueEntry[]
+            //    {
+            //    new NameValueEntry("series_id", s.ID),
+            //    new NameValueEntry("series_title", s.Title)
+            //    };
+
+            //IDatabase redisDB = _redisConnection.GetDatabase();
+            //var messageId = await redisDB.StreamAddAsync(channelName, values);
+
+            //NewSeriesNotificationDTO message = new NewSeriesNotificationDTO
+            //{
+            //    ID = s.ID,
+            //    SeriesID = s.ID,
+            //    Title = s.Title,
+            //    Genre = s.Genre
+            //};
+
+
+            //var jsonMessage = JsonSerializer.Serialize(message);
+            //ISubscriber chatPubSub = _redisConnection.GetSubscriber();
+            //await chatPubSub.PublishAsync("genre.recommendations", jsonMessage);
+
+
+
+
+
 
             if (res != null)
                 return Ok();

@@ -115,7 +115,7 @@ namespace Sirius.Services
                 return null;
         }
 
-        public async Task<User> Login([FromBody] User user)
+        public async Task<User> Login(User user)
         {
             try
             {
@@ -134,7 +134,7 @@ namespace Sirius.Services
             }
         }
 
-        public async Task<int> Post([FromBody] User u)
+        public async Task<int> Post(User u)
         {
             maxID = await MaxID();
             int id = await GetUserID(u.Username);
@@ -156,7 +156,7 @@ namespace Sirius.Services
                 return -1;
         }
 
-        public async Task<User> Put([FromBody] User user, int id)
+        public async Task<User> Put(User user, int id)
         {
             try
             {
