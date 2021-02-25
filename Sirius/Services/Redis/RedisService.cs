@@ -3,7 +3,6 @@ using System.Text.Json;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Configuration;
 using Sirius.DTOs;
-using Sirius.Entities;
 using Sirius.Hubs;
 using StackExchange.Redis;
 

@@ -38,7 +38,6 @@ export default class extends AbstractView {
         const username = loginForm['login-username'].value;
         const password = loginForm['login-password'].value;
 
-
         const response =  await fetch("https://localhost:44365/User/Login", { method: "POST",
             headers: {
             "Content-Type": "application/json"

@@ -32,6 +32,10 @@ namespace Sirius
 
             services.AddSingleton<IRedisService, RedisService>();
             services.AddSingleton<UserService>();
+            services.AddSingleton<ActorService>();
+            services.AddSingleton<SeriesService>();
+            services.AddSingleton<RoleService>();
+            services.AddSingleton<UserSeriesListService>();
 
             services.AddMvc().AddJsonOptions(options =>
             {

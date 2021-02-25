@@ -1,13 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using Neo4jClient;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using Sirius.Entities;
-using Neo4jClient.Cypher;
+using Sirius.Services;
 
 namespace Sirius.Controllers
 {
@@ -15,38 +9,17 @@ namespace Sirius.Controllers
     [Route("[controller]")]
     public class ActorController : ControllerBase
     {
-        private readonly ILogger<SeriesController> _logger;
-        private readonly IGraphClient _client;
-        private int maxID;
+        private ActorService service;
 
-        public ActorController(ILogger<SeriesController> logger, IGraphClient client)
+        public ActorController(ActorService _service)
         {
-            _logger = logger;
-            _client = client;
-            maxID = 0;
-        }
-
-        private async Task<int> MaxID()
-        {
-            var query = await _client.Cypher
-                        .Match("(a:Actor)")
-                        .Return<int>(a => a.As<Actor>().ID)
-                        .OrderByDescending("a.ID")
-                        //.Return<int>("ID(s)")
-                        //.OrderByDescending("ID(s)")
-                        .ResultsAsync;
-
-            return query.FirstOrDefault();
+            service = _service;
         }
 
         [HttpGet]
         public async Task<ActionResult> GetAll()
         {
-            var res = await _client.Cypher
-                        .Match("(actor:Actor)")
-                        .Return(actor => actor.As<Actor>())
-                        .ResultsAsync;
-
+            var res = await service.GetAll();
             if (res != null)
                 return Ok(res);
             else
@@ -56,14 +29,9 @@ namespace Sirius.Controllers
         [HttpGet("GetActor/{actorID}")]
         public async Task<ActionResult> GetActor(int actorID)
         {
-            var res = await _client.Cypher
-                        .Match("(a:Actor)")
-                        .Where((Actor a) => a.ID == actorID)
-                        .Return(a => a.As<Actor>())
-                        .ResultsAsync;
-
+            Actor res = await service.GetActor(actorID);
             if (res != null)
-                return Ok(res.FirstOrDefault());
+                return Ok(res);
             else
                 return BadRequest();
         }
@@ -71,16 +39,9 @@ namespace Sirius.Controllers
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] Actor a)
         {
-            maxID = await MaxID();
+            bool res = await service.Post(a);
 
-            var newActor = new Actor { ID = maxID + 1, Name = a.Name, Sex=a.Sex, Birthplace = a.Birthplace, Birthday = a.Birthday, Biography = a.Biography };
-            var res = _client.Cypher
-                        .Create("(actor:Actor $newActor)")
-                        .WithParam("newActor", newActor);
-
-            await res.ExecuteWithoutResultsAsync();
-
-            if (res != null)
+            if (res)
                 return Ok();
             else
                 return BadRequest();
@@ -90,15 +51,9 @@ namespace Sirius.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult> Put([FromBody] Actor actor, int id)
         {
-            var res = _client.Cypher
-                              .Match("(a:Actor)")
-                              .Where((Actor a) => a.ID == id)
-                              .Set("a = $actor")
-                              .WithParam("actor", actor);
+            bool res = await service.Put(actor, id);
 
-            await res.ExecuteWithoutResultsAsync();
-
-            if (res != null)
+            if (res)
                 return Ok();
             else
                 return BadRequest();
@@ -107,14 +62,8 @@ namespace Sirius.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
-            var res = _client.Cypher
-                              .Match("(a:Actor)")
-                              .Where((Actor a) => a.ID == id)
-                              .DetachDelete("a");
-
-            await res.ExecuteWithoutResultsAsync();
-
-            if (res != null)
+            bool res = await service.Delete(id);
+            if (res)
                 return Ok();
             else
                 return BadRequest();
