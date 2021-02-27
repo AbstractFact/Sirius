@@ -66,10 +66,9 @@ export default class extends AbstractView {
                     </div>
                 </div>
                 <div class="form-group col-md-6">
-                    <label for="inputGenre">Genre</label>
+                    <label for="inputGenre">Select Genre</label>
                     <select id="inputGenre" class="form-control">
-                        <option selected>Select Genre</option>
-                        <option>Drama</option>
+                        <option selected>Drama</option>
                         <option>Comedy</option>
                         <option>Crime</option>
                         <option>Fantasy</option>

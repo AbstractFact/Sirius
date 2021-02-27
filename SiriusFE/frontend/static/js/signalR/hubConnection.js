@@ -50,8 +50,10 @@ export default class Connection
 
         this.connection.on("ReceiveRecommendations", (message) =>
         {
-            alert(message); 
-
+            const msg = JSON.parse(JSON.stringify(message));
+            alert("Series recommendation: " + msg.title); 
+            if(window.location.href=="http://localhost:5001/myserieslist")
+                window.location.reload();
         });
     }
 

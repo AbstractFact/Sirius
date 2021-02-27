@@ -101,9 +101,9 @@ namespace Sirius.Services
 
                     RecommendationDTO message = new RecommendationDTO
                     {
-                        SeriesID = s.ID,
-                        Title = s.Title,
-                        Genre = s.Genre
+                        SeriesID = newSeries.ID,
+                        Title = newSeries.Title,
+                        Genre = newSeries.Genre
                     };
 
                     var msgForSet = JsonSerializer.Serialize(message);
@@ -152,6 +152,22 @@ namespace Sirius.Services
         {
             try
             {
+                Series s = await GetSeries(id);
+                RecommendationDTO message = new RecommendationDTO
+                {
+                    SeriesID = s.ID,
+                    Title = s.Title,
+                    Genre = s.Genre
+                };
+
+                IDatabase redisDB = _redisConnection.GetDatabase();
+                var result = await redisDB.SetMembersAsync("genre:" + s.Genre + ":subsriber");
+
+                foreach (var r in result)
+                {
+                    await redisDB.SetRemoveAsync("user:" + Convert.ToInt32(r) + ":recommendations", JsonSerializer.Serialize(message));
+                }
+
                 var res = _client.Cypher
                              .Match("(s:Series)")
                              .Where((Series s) => s.ID == id)

@@ -69,7 +69,7 @@ export default class extends AbstractView {
                         <tr>
                         <th scope="col">#</th>
                         <th scope="col">Username</th>
-                        <th scope="col">Recommendations</th>
+                        <th scope="col">Favourite series</th>
                         <th scope="col"></th>
                         </tr>
                     </thead>
@@ -100,7 +100,7 @@ export default class extends AbstractView {
                 </tbody>
                 </table>
                 <p>
-                    <a href="/favourites" data-link>View all recommended series</a>
+                    <a href="/favourites" data-link>View all friends favourites</a>
                 </p>
                 <form id="addfriend-form" style="width:40%">
                 <div class="form-group col-md-8">

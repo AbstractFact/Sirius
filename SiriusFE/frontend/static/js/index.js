@@ -201,6 +201,16 @@ document.addEventListener("DOMContentLoaded", async () => {
             view.Subscribe(connection);
         }
 
+        if (e.target.matches("[btnAcceptRecommendation]")) {
+            e.preventDefault();
+            view.AcceptRecommendation(e.target.id);
+        }
+
+        if (e.target.matches("[btnRemoveRecommendation]")) {
+            e.preventDefault();
+            view.DeleteRecommendation(e.target.id);
+        }
+
         if(window.location.href=="http://localhost:5001/myserieslist")
         {
             const entries = view.GetEntries();

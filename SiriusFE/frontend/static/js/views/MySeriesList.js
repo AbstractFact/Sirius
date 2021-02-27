@@ -15,30 +15,70 @@ export default class extends AbstractView {
 
         if(localStorage.userid!=0)
         {
-            html=`
-                <h3>Subscription settings</h3>
-                <div>
-                    <input type="checkbox" id="Drama">
-                    <label>Drama</label>
-                </div>
-                <div>
-                    <input type="checkbox" id="Comedy">
-                    <label>Comedy</label>
-                </div>
-                <div>
-                    <input type="checkbox" id="Crime">
-                    <label>Crime</label>
-                </div>
-                <div>
-                    <input type="checkbox" id="Fantasy">
-                    <label>Fantasy</label>
-                </div>
-                <div>
-                    <input type="checkbox" id="Sci-fi">
-                    <label>Sci-fi</label>
-                </div>
-                <button class="btn btn-success" style="width:10%" btnSaveSubscriptionChanges>Save changes</button>
-                `;
+            await fetch("https://localhost:44365/User/GetUserSubsciptions/"+localStorage.userid, {method: "GET"})
+            .then(p => p.json().then(data => {
+                const array = ["Drama", "Comedy", "Crime", "Fantasy", "Sci-fi"];
+                html=`
+                    <h2>Subscription settings</h2>`;
+
+                array.forEach(el => {
+                    html+=`<div>`;
+                    if(data.find(e=>e==el))
+                        html+=`<input type="checkbox" id="${el}" checked>`;
+                    else
+                        html+=`<input type="checkbox" id="${el}">`;
+
+                    html+=
+                    `<label>${el}</label>
+                    </div>`;
+                });
+            
+                html+=`<button class="btn btn-success" style="width:10%" btnSaveSubscriptionChanges>Save changes</button>`;
+            }));
+
+            await fetch("https://localhost:44365/User/GetUserRecommendations/"+localStorage.userid, {method: "GET"})
+            .then(p => p.json().then(data => {
+                if(data.length!=0)
+                {
+                    i=0;
+                    html+=`
+                    <h2>Recommendations</h2>
+                    <br/>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Title</th>
+                            <th scope="col">Genre</th>
+                            <th scope="col"></th>
+                            <th scope="col"></th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+
+                        data.forEach(d => {
+                            const seriesID = d["seriesID"];
+                            const title = d["title"];
+                            const genre = d["genre"];
+                            html+=`
+                                <tr id="$seriesID">
+                                <th scope="row">${++i}</th>
+                                <td><a href="/series/${seriesID}" class="serid" id="${seriesID}" data-link>${title}</a></td>
+                                <td>${genre}</td>
+                                <td>
+                                    <button type="submit" class="btn btn-primary" style="width:40%" id="${seriesID} ${title} ${genre}" btnAcceptRecommendation>Add To List</button>
+                                </td>
+                                <td>
+                                    <button type="submit" class="btn btn-danger" style="width:40%" id="R${seriesID} ${title} ${genre}" btnRemoveRecommendation>Remove</button>
+                                </td>
+                                </tr>`;
+                        });
+                    
+                        html+=`</tbody>
+                        </table>`;
+                }
+
+            }));
 
             await fetch("https://localhost:44365/UserSeriesList/GetUserSeriesList/"+localStorage.userid, {method: "GET"})
             .then(p => p.json().then(data => {
@@ -229,17 +269,44 @@ export default class extends AbstractView {
         });
     }
 
-    async DeleteRecommendation()
+    async DeleteRecommendation(id)
     {
-        fetch("https://localhost:44365/User/DeleteRecommendation/"+localStorage.userid, { method: "DELETE",
+        const params = id.substring(1).split(" ");
+        const seriesID = parseInt(params[0]);
+        const title = params[1];
+        const genre = params[2];
+        await fetch("https://localhost:44365/User/DeleteRecommendation/"+localStorage.userid, { method: "DELETE",
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({"seriesID":status, "title":stars, "comment":comment, "genre":fav})
+        body: JSON.stringify({"seriesID":seriesID, "title":title, "genre":genre})
         }).then(p => {
             if (p.ok) {
-                alert("You are unsubscribed from Drama!");
+                alert("Recommendation deleted!");
+                window.location.reload();
             }
         });
     }
+
+    async AcceptRecommendation(id)
+    {
+        const params = id.split(" ");
+        const seriesID = parseInt(params[0]);
+        const title = params[1];
+        const genre = params[2];
+        await fetch("https://localhost:44365/User/AcceptRecommendation/"+localStorage.userid, { method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({"seriesID":seriesID, "title":title, "genre":genre})
+        }).then(p => {
+            if (p.ok) {
+                alert("Series added to list!");
+                window.location.reload();
+            }
+        });
+        
+
+    }
+
 }

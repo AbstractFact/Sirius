@@ -341,6 +341,7 @@ namespace Sirius.Services
             {
                 IDatabase redisDB = _redisConnection.GetDatabase();
                 await redisDB.SetAddAsync("genre:" + genre + ":subsriber", userID);
+                await redisDB.SetAddAsync("user:" + userID + ":subsciptions", genre);
 
                 return true;
             }
@@ -356,6 +357,7 @@ namespace Sirius.Services
             {
                 IDatabase redisDB = _redisConnection.GetDatabase();
                 await redisDB.SetRemoveAsync("genre:" + genre + ":subsriber", userID);
+                await redisDB.SetRemoveAsync("user:" + userID + ":subsciptions", genre);
 
                 return true;
             }
@@ -365,18 +367,59 @@ namespace Sirius.Services
             }
         }
 
-        public async Task<bool> DeleteRecommendation(int userID, string message)
+        public async Task<bool> DeleteRecommendation(int userID, RecommendationDTO message)
         {
             try
             {
                 IDatabase redisDB = _redisConnection.GetDatabase();
-                await redisDB.SetRemoveAsync("user:" + userID + ":recommendations", message);
+                await redisDB.SetRemoveAsync("user:" + userID + ":recommendations", JsonSerializer.Serialize(message));
 
                 return true;
             }
             catch (Exception e)
             {
                 return false;
+            }
+        }
+
+        public async Task<List<string>> GetUserSubsciptions(int userID)
+        {
+            try
+            {
+                IDatabase redisDB = _redisConnection.GetDatabase();
+                var result = await redisDB.SetMembersAsync("user:" + userID + ":subsciptions");
+
+                List<string> arr = new List<string>();
+
+                foreach (var res in result)
+                    arr.Add(Convert.ToString(res));
+
+                return arr;
+
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+        }
+
+        public async Task<List<RecommendationDTO>> GetUserRecommendations(int userID)
+        {
+            try
+            {
+                IDatabase redisDB = _redisConnection.GetDatabase();
+                var result = await redisDB.SetMembersAsync("user:" + userID + ":recommendations");
+
+                List<RecommendationDTO> arr = new List<RecommendationDTO>();
+
+                foreach (var res in result)
+                    arr.Add(JsonSerializer.Deserialize<RecommendationDTO>(res));
+
+                return arr;
+            }
+            catch (Exception e)
+            {
+                return null;
             }
         }
     }

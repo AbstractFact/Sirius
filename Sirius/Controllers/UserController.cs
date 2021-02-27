@@ -13,10 +13,12 @@ namespace Sirius.Controllers
     public class UserController : ControllerBase
     {
         private UserService service;
+        private UserSeriesListService userListService;
 
-        public UserController(UserService _service)
+        public UserController(UserService _service, UserSeriesListService _userListService)
         {
             service = _service;
+            userListService = _userListService;
         }
 
         [HttpGet]
@@ -186,12 +188,47 @@ namespace Sirius.Controllers
         }
 
         [HttpDelete("DeleteRecommendation/{userID}")]
-        public async Task<ActionResult> DeleteRecommendation([FromBody] string message, int userID)
+        public async Task<ActionResult> DeleteRecommendation([FromBody] RecommendationDTO message, int userID)
         {
             bool res = await service.DeleteRecommendation(userID, message);
 
             if (res)
                 return Ok();
+            else
+                return BadRequest();
+        }
+
+        [HttpPost("AcceptRecommendation/{userID}")]
+        public async Task<ActionResult> AcceptRecommendation([FromBody] RecommendationDTO message, int userID)
+        {
+            bool res1 = await userListService.AddSeriesToList("Plan to Watch", false, userID, message.SeriesID);
+            bool res2= await service.DeleteRecommendation(userID, message);
+
+            if (res1 && res2)
+                return Ok();
+            else
+                return BadRequest();
+        }
+
+        [HttpGet("GetUserSubsciptions/{userID}")]
+        public async Task<ActionResult<List<string>>> GetUserSubsciptions(int userID)
+        {
+            List<string> res = await service.GetUserSubsciptions(userID);
+
+            if (res!=null)
+                return Ok(res);
+            else
+                return BadRequest();
+        }
+
+
+        [HttpGet("GetUserRecommendations/{userID}")]
+        public async Task<ActionResult<List<RecommendationDTO>>> GetUserRecommendations(int userID)
+        {
+            List<RecommendationDTO> res = await service.GetUserRecommendations(userID);
+
+            if (res != null)
+                return Ok(res);
             else
                 return BadRequest();
         }
