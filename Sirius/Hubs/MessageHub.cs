@@ -21,6 +21,11 @@ namespace Sirius.Hubs
             await Groups.AddToGroupAsync(Context.ConnectionId, $"channel:{genre}");
         }
 
+        public async Task StopReceivingRecommendations(string genre)
+        {
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"channel:{genre}");
+        }
+
         public void sendToAll(Message mess)
         {
             Clients.All.SendAsync("sendToAll", mess);

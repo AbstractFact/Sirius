@@ -333,8 +333,51 @@ namespace Sirius.Services
             {
                 return false;
             }
-        
+        }
 
+        public async Task<bool> SubsribeToGenre(int userID, string genre)
+        {
+            try
+            {
+                IDatabase redisDB = _redisConnection.GetDatabase();
+                await redisDB.SetAddAsync("genre:" + genre + ":subsriber", userID);
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> UnsubscribeFromGenre(int userID, string genre)
+        {
+            try
+            {
+                IDatabase redisDB = _redisConnection.GetDatabase();
+                await redisDB.SetRemoveAsync("genre:" + genre + ":subsriber", userID);
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> DeleteRecommendation(int userID, string message)
+        {
+            try
+            {
+                IDatabase redisDB = _redisConnection.GetDatabase();
+                await redisDB.SetRemoveAsync("user:" + userID + ":recommendations", message);
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
         }
     }
 

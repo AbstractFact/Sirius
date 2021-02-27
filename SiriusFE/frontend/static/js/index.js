@@ -196,6 +196,11 @@ document.addEventListener("DOMContentLoaded", async () => {
             handleRemoveRequest(requestID, senderID);
         }
 
+        if (e.target.matches("[btnSaveSubscriptionChanges]")) {
+            e.preventDefault();
+            view.Subscribe(connection);
+        }
+
         if(window.location.href=="http://localhost:5001/myserieslist")
         {
             const entries = view.GetEntries();

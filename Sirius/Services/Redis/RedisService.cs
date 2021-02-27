@@ -92,7 +92,7 @@ namespace Sirius.Services.Redis
 
                             redisPubSub.Subscribe("genre.recommendations").OnMessage(message =>
                             {
-                                NewSeriesNotificationDTO deserializedMessage = JsonSerializer.Deserialize<NewSeriesNotificationDTO>(message.Message);
+                                RecommendationDTO deserializedMessage = JsonSerializer.Deserialize<RecommendationDTO>(message.Message);
                                 string groupName = $"channel:{deserializedMessage.Genre}";
                                 _ = _hub.Clients.Group(groupName).SendAsync("ReceiveRecommendations", deserializedMessage);
                             });

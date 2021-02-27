@@ -47,6 +47,12 @@ export default class Connection
                 window.location.reload();
 
         });
+
+        this.connection.on("ReceiveRecommendations", (message) =>
+        {
+            alert(message); 
+
+        });
     }
 
     sendMessage(mess)
@@ -59,6 +65,14 @@ export default class Connection
         this.connection.invoke("StartReceivingRequests", userID);
     }
 
-    
+    subscribe(genre)
+    {
+        this.connection.invoke("StartReceivingRecommendations", genre);
+    }
+
+    unsubscribe(genre)
+    {
+        this.connection.invoke("StopReceivingRecommendations", genre);
+    }    
 }
 

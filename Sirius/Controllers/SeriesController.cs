@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Sirius.Entities;
 using Sirius.Services;
+using Sirius.DTOs;
 
 namespace Sirius.Controllers
 {

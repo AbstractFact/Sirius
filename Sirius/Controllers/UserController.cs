@@ -154,5 +154,47 @@ namespace Sirius.Controllers
                 return BadRequest();
         }
 
+        [HttpPost("Subsribe/{userID}")]
+        public async Task<ActionResult> Subsribe([FromBody] SubscribeDTO list, int userID)
+        {
+            bool res=true;
+            foreach(string el in list.SubList)
+            {
+                res = res && (await service.SubsribeToGenre(userID, el));
+            }
+
+            foreach (string el in list.UnsubList)
+            {
+                res = res && (await service.UnsubscribeFromGenre(userID, el));
+            }
+
+            if (res)
+                return Ok();
+            else
+                return BadRequest();
+        }
+
+        [HttpPost("UnsubscribeFromGenre/{userID}/{genre}")]
+        public async Task<ActionResult> UnsubscribeFromGenre(int userID, string genre)
+        {
+            bool res = await service.UnsubscribeFromGenre(userID, genre);
+
+            if (res)
+                return Ok();
+            else
+                return BadRequest();
+        }
+
+        [HttpDelete("DeleteRecommendation/{userID}")]
+        public async Task<ActionResult> DeleteRecommendation([FromBody] string message, int userID)
+        {
+            bool res = await service.DeleteRecommendation(userID, message);
+
+            if (res)
+                return Ok();
+            else
+                return BadRequest();
+        }
+
     }
 }

@@ -1,11 +1,14 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using Neo4jClient;
+using Sirius.DTOs;
 using Sirius.Entities;
 using Sirius.Hubs;
 using Sirius.Services.Redis;
 using StackExchange.Redis;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Sirius.Services
@@ -93,37 +96,26 @@ namespace Sirius.Services
 
                     await res.ExecuteWithoutResultsAsync();
 
+                    IDatabase redisDB = _redisConnection.GetDatabase();
+                    var result = await redisDB.SetMembersAsync("genre:" + s.Genre + ":subsriber");
 
+                    RecommendationDTO message = new RecommendationDTO
+                    {
+                        SeriesID = s.ID,
+                        Title = s.Title,
+                        Genre = s.Genre
+                    };
 
+                    var msgForSet = JsonSerializer.Serialize(message);
 
+                    foreach (var r in result)
+                    {
+                        await redisDB.SetAddAsync("user:" + Convert.ToInt32(r) + ":recommendations", msgForSet);
+                    }
 
-                    //string channelName = $"messages:{userID}:recommendations";
-                    //var values = new NameValueEntry[]
-                    //    {
-                    //    new NameValueEntry("series_id", s.ID),
-                    //    new NameValueEntry("series_title", s.Title)
-                    //    };
-
-                    //IDatabase redisDB = _redisConnection.GetDatabase();
-                    //var messageId = await redisDB.StreamAddAsync(channelName, values);
-
-                    //NewSeriesNotificationDTO message = new NewSeriesNotificationDTO
-                    //{
-                    //    ID = s.ID,
-                    //    SeriesID = s.ID,
-                    //    Title = s.Title,
-                    //    Genre = s.Genre
-                    //};
-
-
-                    //var jsonMessage = JsonSerializer.Serialize(message);
-                    //ISubscriber chatPubSub = _redisConnection.GetSubscriber();
-                    //await chatPubSub.PublishAsync("genre.recommendations", jsonMessage);
-
-
-
-
-
+                    var jsonMessage = JsonSerializer.Serialize(message);
+                    ISubscriber chatPubSub = _redisConnection.GetSubscriber();
+                    await chatPubSub.PublishAsync("genre.recommendations", jsonMessage);
 
                     return true;
 
@@ -174,6 +166,6 @@ namespace Sirius.Services
             {
                 return false;
             }
-        }
+        } 
     }
 }
