@@ -52,11 +52,11 @@ namespace Sirius.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<int>> Post([FromBody] User u)
+        public async Task<ActionResult<User>> Post([FromBody] User u)
         {
-            int userID = await service.Post(u);
-            if (userID != -1)
-                return Ok(userID);
+            User user = await service.Post(u);
+            if (user != null)
+                return Ok(user);
             else
                 return BadRequest();
         }
@@ -202,9 +202,11 @@ namespace Sirius.Controllers
         public async Task<ActionResult> AcceptRecommendation([FromBody] RecommendationDTO message, int userID)
         {
             bool res1 = await userListService.AddSeriesToList("Plan to Watch", false, userID, message.SeriesID);
-            bool res2= await service.DeleteRecommendation(userID, message);
+            bool res2 = false;
+            if(res1)
+                res2 = await service.DeleteRecommendation(userID, message);
 
-            if (res1 && res2)
+            if (res2)
                 return Ok();
             else
                 return BadRequest();

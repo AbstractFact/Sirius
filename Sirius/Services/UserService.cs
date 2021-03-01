@@ -133,26 +133,30 @@ namespace Sirius.Services
             }
         }
 
-        public async Task<int> Post(User u)
+        public async Task<User> Post(User u)
         {
             maxID = await MaxID();
             int id = await GetUserID(u.Username);
 
             if (id == -1 && maxID!=-1)
             {
-                var newUser = new User { ID = maxID + 1, Username = u.Username, Password = u.Password };
-                var res = _client.Cypher.Create("(user:User $newUser)")
-                                        .WithParam("newUser", newUser);
+                try
+                {
+                    var newUser = new User { ID = maxID + 1, Username = u.Username, Password = u.Password };
+                    var res = _client.Cypher.Create("(user:User $newUser)")
+                                            .WithParam("newUser", newUser);
 
-                await res.ExecuteWithoutResultsAsync();
+                    await res.ExecuteWithoutResultsAsync();
 
-                if (res != null)
-                    return await GetUserID(u.Username);
-                else
-                    return -1;
+                    return newUser;
+                }
+                catch(Exception e)
+                {
+                    return null;
+                }
             }
             else
-                return -1;
+                return null;
         }
 
         public async Task<User> Put(User user, int id)

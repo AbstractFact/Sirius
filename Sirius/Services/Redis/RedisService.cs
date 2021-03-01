@@ -35,53 +35,6 @@ namespace Sirius.Services.Redis
                         {
                             _connection = ConnectionMultiplexer.Connect(ConnectionString);
                             var redisPubSub = _connection.GetSubscriber();
-                            //redisPubSub.Subscribe("sirius.messages").OnMessage(message =>
-                            //{
-                            //    Message deserializedMessage = JsonSerializer.Deserialize<Message>(message.Message);
-                            //    string groupName = $"channel:{deserializedMessage.ReceiverId}";
-                            //    _ = _hub.Clients.Group(groupName).SendAsync("ReceiveMessage", deserializedMessage);
-                            //});
-
-                            //var subPatternChannel = new RedisChannel("__keyevent@0__:*", RedisChannel.PatternMode.Pattern);
-                            //redisPubSub.Subscribe(subPatternChannel).OnMessage(message =>
-                            //{
-                            //    string str = message.Channel;
-                            //    if (str == "__keyevent@0__:expired" || str == "__keyevent@0__:del")
-                            //    {
-                            //        string keyName = message.Message;
-                            //        string[] keyNameParts = keyName.Split(':');
-                            //        if (keyNameParts.Length == 4 && keyNameParts[0] == "messages" && keyNameParts[3] == "sirius")
-                            //        {
-                            //            int biggerId = int.Parse(keyNameParts[1]), smallerId = int.Parse(keyNameParts[2]);
-                            //            string setKeyBigger = $"user:{biggerId}:chats";
-                            //            string setKeySmaller = $"user:{smallerId}:chats";
-                            //            IDatabase redisDB = _connection.GetDatabase();
-                            //            var setEntriesBigger = redisDB.SortedSetRangeByRank(setKeyBigger, 0, -1, Order.Descending);
-                            //            var setEntriesSmaller = redisDB.SortedSetRangeByRank(setKeySmaller, 0, -1, Order.Descending);
-
-                            //            foreach (var entry in setEntriesBigger)
-                            //            {
-                            //                User user = JsonSerializer.Deserialize<User>(entry);
-                            //                if (user.ID == smallerId)
-                            //                {
-                            //                    redisDB.SortedSetRemove(setKeyBigger, JsonSerializer.Serialize(user));
-                            //                    break;
-                            //                }
-                            //            }
-
-                            //            foreach (var entry in setEntriesSmaller)
-                            //            {
-                            //                User user = JsonSerializer.Deserialize<User>(entry);
-                            //                if (user.ID == biggerId)
-                            //                {
-                            //                    redisDB.SortedSetRemove(setKeySmaller, JsonSerializer.Serialize(user));
-                            //                    break;
-                            //                }
-                            //            }
-                            //        }
-
-                            //    }
-                            //});
 
                             redisPubSub.Subscribe("friendship.requests").OnMessage(message =>
                             {

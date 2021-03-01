@@ -46,9 +46,10 @@ export default class extends AbstractView {
                         ${actor.biography}
                     </p>
 
-                    <br/>
+                    <br/>`;
                     
-                    <form id="addactor-form" style="width:50%;">
+                    if(localStorage.username=="Admin" && localStorage.logged==1)
+                    html+=`<form id="addactor-form" style="width:50%;">
                     <div class="form-group col-md-10">
                         <div class="form-group col-md-10">
                         <label for="inputName">Name</label>

@@ -194,13 +194,11 @@ namespace Sirius.Services
 
                 if (await redisDB.KeyExistsAsync("best:rated:series"))
                 {
-                    var result = redisDB.SortedSetScan("best:rated:series");
+                    var result = redisDB.SortedSetRangeByRank(key: "best:rated:series", start: 0, stop: -1, order: Order.Descending);
                     await redisDB.KeyExpireAsync("best:rated:series", new TimeSpan(0, 0, 15));
 
                     foreach (var res in result)
-                        arr.Add(JsonSerializer.Deserialize<TopRatedDTO>(res.Element));
-
-                    arr = arr.OrderByDescending(order => order.Rating).ToList();
+                        arr.Add(JsonSerializer.Deserialize<TopRatedDTO>(res));
                 }
                 else
                 {

@@ -38,7 +38,7 @@ export default class extends AbstractView {
                             <td>${series.genre}</td>
                             <td>${series.plot}</td>
                             <td>${series.seasons}</td>
-                            <td>`+ +(Math.round(series.rating + "e+1") + "e-1")+`</td>
+                            <td>${(series.rating === 0)? "Not rated" : +(Math.round(series.rating + "e+1") + "e-1")}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -48,8 +48,10 @@ export default class extends AbstractView {
                     </p>
                     <br/>
 
-                    <div style="display:block">
-                    <form id="addseries-form" style="width:50%; float:left;">
+                    <div style="display:block">`;
+
+                    if(localStorage.username=="Admin" && localStorage.logged==1)
+                    html+=`<form id="addseries-form" style="width:50%; float:left;">
                     <div class="form-group col-md-8">
                         <div class="form-group col-md-8">
                         <label for="inputTitle">Title</label>
@@ -86,8 +88,12 @@ export default class extends AbstractView {
                     </form>`;
 
                     if(localStorage.logged!=0)
-                        html+=`<form id="addseriestolist-form" style="width:50%; float:right;">
-                        <div class="form-group col-md-8">
+                    {
+                        if(localStorage.username!="Admin")
+                            html+=`<form id="addseriestolist-form" style="width:50%;">`;
+                        else
+                            html+=`<form id="addseriestolist-form" style="width:50%; float:right;">`;
+                        html+=`<div class="form-group col-md-8">
                             <label for="inputStatus">Status</label>
                             <select id="inputStatus" class="form-control">
                                 <option selected>Plan to Watch</option>
@@ -100,9 +106,10 @@ export default class extends AbstractView {
                             <label for="inputFav"> Favourite</label><br>
                         </div>
                         <button type="submit" class="btn btn-primary" style="width:30%" addSeriesToListBtn>Add Series to List</button>
-                        </form></div>`; 
+                        </form></div><br/>`; 
+                    }
                     else
-                        html+=`</div>`;    
+                        html+=`</div><br/>`;    
         }));
 
 
@@ -110,8 +117,10 @@ export default class extends AbstractView {
         .then(p => p.json().then(d => {
                 i=0;
 
+                if(localStorage.username=="Admin" && localStorage.logged==1)
+                    html+=`
+                    <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>`;
                 html+=`
-                <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
                 <div style="display:block">
                     <h2>Cast</h2>
                     <br/>
@@ -120,10 +129,11 @@ export default class extends AbstractView {
                             <tr>
                             <th scope="col">#</th>
                             <th scope="col">Role</th>
-                            <th scope="col">Actor</th>
-                            <th scope="col"></th>
-                            <th scope="col"></th>
-                            </tr>
+                            <th scope="col">Actor</th>`;
+                            if(localStorage.username=="Admin" && localStorage.logged==1)
+                                html+=`<th scope="col"></th>
+                                <th scope="col"></th>`;
+                            html+=`</tr>
                         </thead>
                         <tbody>`;
 
@@ -137,42 +147,56 @@ export default class extends AbstractView {
 
                     html+=`
                     <tr id="${role.id}">
-                        <th scope="row">${++i}</th>
-                        <td><input type="text" class="form-control" id="editRole" value="${role.inrole}"></td>
-                        <td><a href="/actors/${role.actor.id}" data-link>${role.actor.name}</a></td>
-                        <td>
+                        <th scope="row">${++i}</th>`;
+
+                        if(localStorage.username=="Admin" && localStorage.logged==1)
+                            html+=`
+                            <td><input type="text" class="form-control" id="editRole" value="${role.inrole}"></td>`;
+                        else
+                            html+=`
+                            <td>${role.inrole}</td>`;
+
+                        html+=`
+                        <td><a href="/actors/${role.actor.id}" data-link>${role.actor.name}</a></td>`;
+
+                        if(localStorage.username=="Admin" && localStorage.logged==1)
+                        html+=`<td>
                             <button type="submit" class="btn btn-primary" style="width:60%" id="${role.id}">Save Changes</button>
                         </td>
                         <td>
                             <button type="submit" class="btn btn-danger" style="width:100%" id="R${role.id}">X</button>
-                        </td>
-                    </tr>`;
+                        </td>`;
+                        html+=`</tr>`;
                 });
         }));
 
-            html+=`</div></tbody></table>
-            <form id="addrole-form" style="width:40%">
-            <div class="form-group col-md-8">
-                <label for="inputActor">Actors</label>
-                <select id="inputActor" class="form-control">
-                    <option selected>Select Actor</option>`;
-                    
-                    
-            await fetch("https://localhost:44365/Actor", {method: "GET"})
-                .then(p => p.json().then(data => {
-                    data.forEach(d => {
-                        const actor = new Actor(d["id"], d["name"], d["sex"], d["birthplace"], d["birthday"], d["biography"]);
+            html+=`</div></tbody></table>`;
 
-                        html+=`<option value="${actor.id}">${actor.name}, ${actor.birthplace}</option>`;
-                    });
-            }));
+            if(localStorage.username=="Admin" && localStorage.logged==1)
+            {
+                html+=`<form id="addrole-form" style="width:40%">
+                <div class="form-group col-md-8">
+                    <label for="inputActor">Actors</label>
+                    <select id="inputActor" class="form-control">
+                        <option selected>Select Actor</option>`;
+                        
+                        
+                await fetch("https://localhost:44365/Actor", {method: "GET"})
+                    .then(p => p.json().then(data => {
+                        data.forEach(d => {
+                            const actor = new Actor(d["id"], d["name"], d["sex"], d["birthplace"], d["birthday"], d["biography"]);
 
-            html+=`</select>
-            <label for="inputRole">Role</label>
-            <input type="text" class="form-control" id="inputRole" placeholder="Enter role">
-            </div>
-            <button type="submit" class="btn btn-primary" style="width:30%" addRoleBtn>Add Role</button>
-            </form>`;
+                            html+=`<option value="${actor.id}">${actor.name}, ${actor.birthplace}</option>`;
+                        });
+                }));
+
+                html+=`</select>
+                <label for="inputRole">Role</label>
+                <input type="text" class="form-control" id="inputRole" placeholder="Enter role">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width:30%" addRoleBtn>Add Role</button>
+                </form>`;
+            }
 
         return html;
     }

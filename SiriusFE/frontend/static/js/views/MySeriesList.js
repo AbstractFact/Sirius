@@ -304,6 +304,9 @@ export default class extends AbstractView {
                 alert("Series added to list!");
                 window.location.reload();
             }
+            else{
+                alert("Series is already in your list!");
+            }
         });
         
 

@@ -35,7 +35,7 @@ export default class extends AbstractView {
                 <td><a href="/series/${d.seriesID}" data-link>${d.title}</a></td>
                 <td>${d.year}</td>
                 <td>${d.genre}</td>
-                <td>${d.rating}</td>
+                <td>${(d.rating === 0)? "Not rated" : d.rating}</td>
                 <td>${d.popularity}</td>
                 </tr>`;
             });

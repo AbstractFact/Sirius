@@ -169,13 +169,11 @@ namespace Sirius.Services
 
                 if (await redisDB.KeyExistsAsync("most:popular:series"))
                 {
-                    var result = redisDB.SortedSetScan("most:popular:series");
+                    var result = redisDB.SortedSetRangeByRank(key: "most:popular:series", start: 0, stop: -1, order: Order.Descending);
                     await redisDB.KeyExpireAsync("most:popular:series", new TimeSpan(0,0,15));
 
                     foreach (var res in result)
-                        arr.Add(JsonSerializer.Deserialize<TopPopularDTO>(res.Element));
-
-                    arr = arr.OrderByDescending(order => order.Popularity).ToList();
+                        arr.Add(JsonSerializer.Deserialize<TopPopularDTO>(res));
                 }
                 else
                 {

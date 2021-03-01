@@ -43,7 +43,7 @@ export default class extends AbstractView {
                     <td>${series.genre}</td>
                     <td>${series.plot}</td>
                     <td>${series.seasons}</td>
-                    <td>`+ +(Math.round(series.rating + "e+1") + "e-1")+`</td>
+                    <td>${(series.rating === 0)? "Not rated" : +(Math.round(series.rating + "e+1") + "e-1")}</td>
                     </tr>`;
             });
         }));
@@ -52,9 +52,10 @@ export default class extends AbstractView {
             </tbody>
             </table>
 
-            <br/>
+            <br/>`;
 
-            <form id="addseries-form" style="width:50%">
+            if(localStorage.username=="Admin" && localStorage.logged==1)
+            html+=`<form id="addseries-form" style="width:50%">
                 <div class="form-group col-md-10">
                     <div class="form-group col-md-10">
                     <label for="inputTitle">Title</label>
