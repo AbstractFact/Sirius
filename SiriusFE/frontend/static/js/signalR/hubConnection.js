@@ -34,11 +34,6 @@ export default class Connection
                 window.location.reload();
 
         });
-        
-        this.connection.on("ReceiveMessage", (message) =>
-        {
-            console.log("stigla poruka:" + message); 
-        });
 
         this.connection.on("FriendRequestAccepted", (message) =>
         {
@@ -55,11 +50,6 @@ export default class Connection
             if(window.location.href=="http://localhost:5001/myserieslist")
                 window.location.reload();
         });
-    }
-
-    sendMessage(mess)
-    {
-        this.connection.invoke('SendMessage', mess).catch(err => console.error(err));
     }
 
     register(userID)

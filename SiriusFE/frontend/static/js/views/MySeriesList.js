@@ -257,14 +257,14 @@ export default class extends AbstractView {
             await connection.unsubscribe("Sci-fi");
         } 
       
-        fetch("https://localhost:44365/User/Subsribe/"+localStorage.userid, { method: "POST",
+        await fetch("https://localhost:44365/User/Subsribe/"+localStorage.userid, { method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
         body: JSON.stringify({"subList":subscribe, "unsubList":unsubscribe})
         }).then(p => {
             if (p.ok) {
-                alert("Changes saved!");
+                console.log("Changes saved!");
             }
         });
     }

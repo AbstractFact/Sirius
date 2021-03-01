@@ -21,9 +21,8 @@ async function connect()
     {
         await connection.start();
         connection.listen();
-        //await connection.sendMessage("msg");
         try {
-            await connection.register(parseInt(localStorage.userid));
+            await connection.register(parseInt(localStorage.userid));   
         } catch (err) {
             console.error(err);
         }
@@ -101,6 +100,11 @@ const router = async () => {
     view = new match.route.view(getParams(match));
 
     document.querySelector("#app").innerHTML = await view.getHtml();
+    if(window.location.href.includes("myserieslist"))
+    {
+        handleSubscribe(connection);
+        console.log("uslo");
+    }
 };
 
 window.addEventListener("popstate", router);
@@ -198,7 +202,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         if (e.target.matches("[btnSaveSubscriptionChanges]")) {
             e.preventDefault();
-            view.Subscribe(connection);
+            handleSubscribe(connection);
         }
 
         if (e.target.matches("[btnAcceptRecommendation]")) {
@@ -367,6 +371,11 @@ async function handleUnfriend(id)
 {
     await view.Unfriend(id);
     location.reload();
+}
+
+async function handleSubscribe(connection)
+{
+    await view.Subscribe(connection);
 }
 
 function logout()
