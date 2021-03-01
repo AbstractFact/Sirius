@@ -58,6 +58,17 @@ namespace Sirius.Controllers
                 return BadRequest();
         }
 
+        [HttpGet("GetMostPopularSeries")]
+        public async Task<ActionResult> GetMostPopularSeries()
+        {
+            var res = await service.GetMostPopularSeries();
+
+            if (res != null)
+                return Ok(res);
+            else
+                return BadRequest();
+        }
+
         [HttpGet("GetListed/{id}")]
         public async Task<ActionResult> GetListed(int id)
         {

@@ -182,6 +182,55 @@ namespace Sirius.Services
             {
                 return false;
             }
-        } 
+        }
+
+        public async Task<List<TopRatedDTO>> GetBestRatedSeries()
+        {
+            try
+            {
+                IDatabase redisDB = _redisConnection.GetDatabase();
+
+                List<TopRatedDTO> arr = new List<TopRatedDTO>();
+
+                if (await redisDB.KeyExistsAsync("best:rated:series"))
+                {
+                    var result = redisDB.SortedSetScan("best:rated:series");
+                    await redisDB.KeyExpireAsync("best:rated:series", new TimeSpan(0, 0, 15));
+
+                    foreach (var res in result)
+                        arr.Add(JsonSerializer.Deserialize<TopRatedDTO>(res.Element));
+
+                    arr = arr.OrderByDescending(order => order.Rating).ToList();
+                }
+                else
+                {
+                    var res = await _client.Cypher
+                          .Match("(s:Series)")
+                          .Where((Series s) => s.Rating > 0.0f)
+                          .Return(s => new TopRatedDTO
+                          {
+                              SeriesID = s.As<Series>().ID,
+                              Title = s.As<Series>().Title,
+                              Year = s.As<Series>().Year,
+                              Genre = s.As<Series>().Genre,
+                              Rating = s.As<Series>().Rating
+                          })
+                          .OrderBy("s.Rating DESC").Limit(10)
+                          .ResultsAsync;
+
+
+                    foreach (TopRatedDTO el in res)
+                        await redisDB.SortedSetAddAsync("best:rated:series", JsonSerializer.Serialize(el), el.Rating);
+
+                    arr = res.ToList();
+                }
+
+                return arr;
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+        }
     }
 }

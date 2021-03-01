@@ -2,9 +2,12 @@
 using Neo4jClient.Cypher;
 using Sirius.DTOs;
 using Sirius.Entities;
+using Sirius.Services.Redis;
+using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Sirius.Services
@@ -12,11 +15,13 @@ namespace Sirius.Services
     public class UserSeriesListService
     {
         private readonly IGraphClient _client;
+        private readonly IConnectionMultiplexer _redisConnection;
         private int maxID;
 
-        public UserSeriesListService(IGraphClient client)
+        public UserSeriesListService(IGraphClient client, IRedisService builder)
         {
             _client = client;
+            _redisConnection = builder.Connection;
             maxID = 0;
         }
 
@@ -152,6 +157,55 @@ namespace Sirius.Services
                 return null;
             }
           
+        }
+
+        public async Task<List<TopPopularDTO>> GetMostPopularSeries()
+        {
+            try
+            {
+                IDatabase redisDB = _redisConnection.GetDatabase();
+
+                List<TopPopularDTO> arr = new List<TopPopularDTO>();
+
+                if (await redisDB.KeyExistsAsync("most:popular:series"))
+                {
+                    var result = redisDB.SortedSetScan("most:popular:series");
+                    await redisDB.KeyExpireAsync("most:popular:series", new TimeSpan(0,0,15));
+
+                    foreach (var res in result)
+                        arr.Add(JsonSerializer.Deserialize<TopPopularDTO>(res.Element));
+
+                    arr = arr.OrderByDescending(order => order.Popularity).ToList();
+                }
+                else
+                {
+                    var res = await _client.Cypher
+                          .Match("(u:User)-[l:LISTED]-(s:Series)")
+                          .Return((s, l) => new TopPopularDTO
+                          {
+                              SeriesID = s.As<Series>().ID,
+                              Title = s.As<Series>().Title,
+                              Year = s.As<Series>().Year,
+                              Genre = s.As<Series>().Genre,
+                              Rating = s.As<Series>().Rating,
+                              Popularity = (int) l.Count()
+                          })
+                          .OrderBy("COUNT(l) DESC").Limit(10)
+                          .ResultsAsync;
+
+
+                    foreach (TopPopularDTO el in res)
+                        await redisDB.SortedSetAddAsync("most:popular:series", JsonSerializer.Serialize(el), el.Popularity);
+
+                    arr = res.ToList();
+                }
+
+                return arr;
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
         }
 
         public async Task<Object> GetListed(int id)

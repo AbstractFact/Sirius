@@ -103,7 +103,6 @@ const router = async () => {
     if(window.location.href.includes("myserieslist"))
     {
         handleSubscribe(connection);
-        console.log("uslo");
     }
 };
 
@@ -202,7 +201,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         if (e.target.matches("[btnSaveSubscriptionChanges]")) {
             e.preventDefault();
-            handleSubscribe(connection);
+            handleSubscribeClick(connection);
         }
 
         if (e.target.matches("[btnAcceptRecommendation]")) {
@@ -376,6 +375,12 @@ async function handleUnfriend(id)
 async function handleSubscribe(connection)
 {
     await view.Subscribe(connection);
+}
+
+async function handleSubscribeClick(connection)
+{
+    await view.Subscribe(connection);
+    alert("Changes saved!");
 }
 
 function logout()

@@ -43,38 +43,6 @@ namespace Sirius.Controllers
         {
             bool res = await service.Post(s);
 
-           
-
-            
-
-            //string channelName = $"messages:{userID}:recommendations";
-            //var values = new NameValueEntry[]
-            //    {
-            //    new NameValueEntry("series_id", s.ID),
-            //    new NameValueEntry("series_title", s.Title)
-            //    };
-
-            //IDatabase redisDB = _redisConnection.GetDatabase();
-            //var messageId = await redisDB.StreamAddAsync(channelName, values);
-
-            //NewSeriesNotificationDTO message = new NewSeriesNotificationDTO
-            //{
-            //    ID = s.ID,
-            //    SeriesID = s.ID,
-            //    Title = s.Title,
-            //    Genre = s.Genre
-            //};
-
-
-            //var jsonMessage = JsonSerializer.Serialize(message);
-            //ISubscriber chatPubSub = _redisConnection.GetSubscriber();
-            //await chatPubSub.PublishAsync("genre.recommendations", jsonMessage);
-
-
-
-
-
-
             if (res)
                 return Ok();
             else
@@ -101,6 +69,17 @@ namespace Sirius.Controllers
 
             if (res)
                 return Ok();
+            else
+                return BadRequest();
+        }
+
+        [HttpGet("GetBestRatedSeries")]
+        public async Task<ActionResult> GetBestRatedSeries()
+        {
+            var res = await service.GetBestRatedSeries();
+
+            if (res != null)
+                return Ok(res);
             else
                 return BadRequest();
         }
