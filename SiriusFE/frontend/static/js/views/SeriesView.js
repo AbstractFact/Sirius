@@ -2,12 +2,15 @@ import AbstractView from "./AbstractView.js";
 import {Series} from "../models/Series.js";
 import {Actor} from "../models/Actor.js";
 import {Role} from "../models/Role.js";
+import {Award} from "../models/Award.js"
+import {Awarded} from "../models/Awarded.js"
 
 export default class extends AbstractView {
     constructor(params) {
         super(params);
         this.postId = params.id;
         this.roles = new Array();
+        this.awards = new Array();
         this.setTitle("Viewing Series");
     }
 
@@ -193,10 +196,98 @@ export default class extends AbstractView {
                 <input type="text" class="form-control" id="inputRole" placeholder="Enter role">
                 </div>
                 <button type="submit" class="btn btn-primary" style="width:30%" addRoleBtn>Add Role</button>
+                </form>
+                <br/>`;
+            }
+
+            await fetch("https://localhost:44365/Awarded/GetSeriesAwards/"+this.postId, {method: "GET"})
+            .then(p => p.json().then(d => {
+                i=0;
+
+                html+=`
+                <div style="display:block">
+                    <h2>Awards</h2>
+                    <br/>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Year</th>`;
+                            if(localStorage.username=="Admin" && localStorage.logged==1)
+                                html+=`
+                                <th scope="col"></th>
+                                <th scope="col"></th>`;
+                html+=`
+                        </tr>
+                        </thead>
+                        <tbody>`;
+
+                d.forEach(data => {
+
+                    const award = new Awarded(data["id"], data["award"], data["series"], data["year"]);
+
+                    this.awards.push(award);
+
+                    html+=`
+                    <tr id="${award.id}">
+                        <th scope="row">${++i}</th>
+                        <td>${award.award.name}</td>`;
+
+                    if(localStorage.username=="Admin" && localStorage.logged==1)
+                        html+=`
+                        <td><input type="number" class="form-control" id="editYear1" value="${award.year}" style="width:50%"></td>`;
+                    else
+                        html+=`
+                        <td>${award.year}</td>`;
+
+                    if(localStorage.username=="Admin" && localStorage.logged==1)
+                        html+=`
+                        <td>
+                            <button type="submit" class="btn btn-primary" style="width:60%" id="${award.id}">Save Changes</button>
+                        </td>
+                        <td>
+                            <button type="submit" class="btn btn-danger" style="width:100%" id="R${award.id}">X</button>
+                        </td>`;
+
+                    html+=`</tr>`;
+                });
+        }));
+
+            html+=`</div></tbody></table>`;
+
+            if(localStorage.username=="Admin" && localStorage.logged==1)
+            {
+                html+=`<form id="addaward-form" style="width:40%">
+                <div class="form-group col-md-8">
+                    <label for="inputAward">Awards</label>
+                    <select id="inputAward" class="form-control">
+                        <option selected>Select Award</option>`;
+                        
+                        
+                await fetch("https://localhost:44365/Award", {method: "GET"})
+                    .then(p => p.json().then(data => {
+                        data.forEach(d => {
+                            const awa = new Award(d["id"], d["name"], d["description"]);
+
+                            html+=`<option value="${awa.id}">${awa.name}</option>`;
+                        });
+                }));
+
+                html+=`</select>
+                <label for="inputYear1">Year</label>
+                <input type="number" class="form-control" id="inputYear1" style="width:40%">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width:30%" giveAwardBtn>Add Award</button>
                 </form>`;
             }
 
         return html;
+    }
+
+    GetRoles()
+    {
+        return this.roles;
     }
 
     GetRoles()
@@ -287,5 +378,42 @@ export default class extends AbstractView {
     DeleteRole(id)
     {
         fetch("https://localhost:44365/Role/"+id, { method: "DELETE"});
+    }
+
+    async GiveAward()
+    {
+        const addawardform = document.querySelector("#addaward-form");
+        const awardid = addawardform["inputAward"].value;
+        const year = addawardform["inputYear1"].value;
+
+        const response = await fetch("https://localhost:44365/Awarded/AddAwardSeries/"+awardid+"/"+year+"/"+this.postId, { method: "POST"});
+
+        if(response.ok)
+        {
+            alert("Award added!");
+        };
+    }
+
+    async ChangeAward(id)
+    {
+        const row = document.getElementById(id);
+        const year = row.querySelector('#editYear').value;
+
+        const response = await fetch("https://localhost:44365/Awarded/"+id, { method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(year)
+        });
+
+        if(response.ok)
+        {
+            alert("Award edited!");
+        };
+    }
+
+    RemoveAward(id)
+    {
+        fetch("https://localhost:44365/Awarded/"+id, { method: "DELETE"});
     }
 }

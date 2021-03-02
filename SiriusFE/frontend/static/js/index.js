@@ -249,6 +249,21 @@ document.addEventListener("DOMContentLoaded", async () => {
             handleDeleteAward();
         }
 
+        if (e.target.matches("[giveAwardBtn]")) {
+            e.preventDefault();
+            handleGiveAward();
+        }
+
+        if (e.target.matches("[changeAwardBtn]")) {
+            e.preventDefault();
+            handleChangeAward();
+        }
+
+        if (e.target.matches("[removeAwardBtn]")) {
+            e.preventDefault();
+            handleRemoveAward();
+        }
+
         if(window.location.href=="http://localhost:5001/myserieslist")
         {
             const entries = view.GetEntries();
@@ -469,6 +484,26 @@ async function handleDeleteAward()
     await view.DeleteAward();
     navigateTo("/awards");
 }
+
+
+async function handleGiveAward()
+{
+    await view.GiveAward();
+    window.location.reload();
+}
+
+async function handleChangeAward()
+{
+    await view.ChangeAward();
+    window.location.reload();
+}
+
+async function handleRemoveAward()
+{
+    await view.RemoveAward();
+    window.location.reload();
+}
+
 
 async function fillEditProfileForm()
 {

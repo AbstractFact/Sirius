@@ -31,12 +31,12 @@ export default class extends AbstractView {
                     
                 if(localStorage.username=="Admin" && localStorage.logged==1)
                 html+=`<form id="editAward-form" style="width:50%;">
-                <div class="form-group col-md-10">
-                    <div class="form-group col-md-10">
+                <div class="form-group col-md-14">
+                    <div class="form-group col-md-12">
                     <label for="inputName">Name</label>
                     <input type="text" class="form-control" id="inputName" value="${award.name}">
                     </div>
-                    <div class="form-group col-md-4">
+                    <div class="form-group col-md-12">
                     <label for="inputDescription">Description</label>
                     <textarea type="text" class="form-control" id="inputDescription">${award.description}</textarea>
                     </div>
@@ -67,15 +67,14 @@ export default class extends AbstractView {
 
                 d.forEach(data => {
 
-                    const award = new Award(data["award"]["id"], data["award"]["name"], data["award"]["description"]);
                     const series = new Series(data["series"]["id"], data["series"]["title"], data["series"]["year"], data["series"]["genre"], data["series"]["plot"], data["series"]["seasons"], data["series"]["rating"]);
-                    const awarded = new Awarded(data["id"], award, series, data["year"]);
+                    //const awarded = new Awarded(data["id"], award, series, data["year"]);
 
                     html+=`
                         <tr>
                         <th scope="row">${++i}</th>
                         <td><a href="/series/${series.id}" data-link>${series.title}</a></td>
-                        <td>${awarded.year}</td>
+                        <td>${data["year"]}</td>
                         </tr>`;
                 });
 

@@ -2,10 +2,12 @@ Neo4J:
 
 -Isticanje informacija o reziseru
 -Proveriti funkciju za generisanje ID-jeva (MaxID)
--Nagrade za serije i glumce
 -Dodati filtere
 
 Redis:
 
 -Probati recommendation bez stream-a preko neke druge strukture (friend request)
 -Koriscenje stream-a za prikaz svih serija sortiranih po datumu ubacivanja?
+
+
+-srediti dugmice za izmenu nagrade dodeljene seriji

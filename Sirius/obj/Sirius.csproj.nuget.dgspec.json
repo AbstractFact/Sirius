@@ -1,20 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\ivana\\Documents\\Napredne baze podataka\\Projekat1\\Sirius\\Sirius.csproj": {}
+    "C:\\Users\\jovan\\source\\repos\\SiriusGIT\\Sirius\\Sirius.csproj": {}
   },
   "projects": {
-    "C:\\Users\\ivana\\Documents\\Napredne baze podataka\\Projekat1\\Sirius\\Sirius.csproj": {
+    "C:\\Users\\jovan\\source\\repos\\SiriusGIT\\Sirius\\Sirius.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\ivana\\Documents\\Napredne baze podataka\\Projekat1\\Sirius\\Sirius.csproj",
+        "projectUniqueName": "C:\\Users\\jovan\\source\\repos\\SiriusGIT\\Sirius\\Sirius.csproj",
         "projectName": "Sirius",
-        "projectPath": "C:\\Users\\ivana\\Documents\\Napredne baze podataka\\Projekat1\\Sirius\\Sirius.csproj",
-        "packagesPath": "C:\\Users\\ivana\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\ivana\\Documents\\Napredne baze podataka\\Projekat1\\Sirius\\obj\\",
+        "projectPath": "C:\\Users\\jovan\\source\\repos\\SiriusGIT\\Sirius\\Sirius.csproj",
+        "packagesPath": "C:\\Users\\jovan\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\jovan\\source\\repos\\SiriusGIT\\Sirius\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+        ],
         "configFilePaths": [
-          "C:\\Users\\ivana\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\jovan\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -71,7 +74,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.101\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.103\\RuntimeIdentifierGraph.json"
         }
       }
     }
