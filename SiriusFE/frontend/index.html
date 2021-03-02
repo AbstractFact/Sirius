@@ -8,6 +8,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
     <script src="../static/js/signalR/signalr.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <link rel="stylesheet" href="/static/css/index.css">
 </head>
 <body>
@@ -15,6 +16,7 @@
         <a href="/" class="nav__link" data-link>Home</a>
         <a href="/series" class="nav__link" data-link>All Series</a>
         <a href="/actors" class="nav__link" data-link>All Actors</a>
+        <a href="/awards" class="nav__link" data-link>All Awards</a>
 
     </nav>
     <div>        
@@ -26,3 +28,41 @@
     
 </body>
 </html>
+
+<div class="modal" id="profile-form" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">My Profile</h4>
+        </div>
+        <div class="modal-body">
+            <div class="container">
+                <div class="inputitem">
+                    <label><b>Name:</b></label>
+                    <input type="text" style="width:100%;" placeholder="Enter Name" id="edit-name" required>
+                </div>
+                <div class="inputitem">
+                    <label><b>Email:</b></label>
+                    <input type="text" style="width:100%;" placeholder="Enter Email" id="edit-email" required>
+                </div>
+                <div class="inputitem">
+                    <label><b>Username:</b></label>
+                    <input type="text" style="width:100%;" placeholder="Enter Username" id="edit-username" required>
+                </div>
+                <div class="inputitem">
+                    <label><b>Password:</b></label>
+                    <input type="text" style="width:100%;" placeholder="Enter Password" id="edit-password" required>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <div class="container">
+                <button class="btn btn-secondary close" style="align-self:column;" type="button" closeEditForm>Close</button>
+            </div>
+            <div class="container">
+                <button class="btn btn-primary" style="align-self:column;" type="button" editprofilebtn>Save changes</button>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>

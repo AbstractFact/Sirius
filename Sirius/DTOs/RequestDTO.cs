@@ -5,6 +5,6 @@ namespace Sirius.DTOs
     public class RequestDTO
     {
         public string ID { get; set; }
-        public Request Request { get; set; }
+        public SendFriendRequestDTO Request { get; set; }
     }
 }

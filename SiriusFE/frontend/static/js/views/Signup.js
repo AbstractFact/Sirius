@@ -13,19 +13,31 @@ export default class extends AbstractView {
         var html;
 
         html=`
-        <form id="signup-form" method="post">
+        <div class="container">
+        <form id="signup-form" method="post" style="align:center;">
             <div class="container">
                 <div class="inputitem">
-                    <label for="uname"><b>Username</b></label>
-                    <input type="text" placeholder="Enter Username" name="uname" id="login-username" required>
+                    <label for="name"><b>Name:</b></label>
+                    <input type="text" style="width:100%;" placeholder="Enter Name" name="name" id="login-name" required>
                 </div>
                 <div class="inputitem">
-                    <label for="psw"><b>Password</b></label>
-                    <input type="password" placeholder="Enter Password" name="psw" id="login-password" required>
+                    <label for="email"><b>Email:</b></label>
+                    <input type="text" style="width:100%;" placeholder="Enter Email" name="email" id="login-email" required>
                 </div>
-                <button class="inputitem" type="submit" signupbtn>Signup</button>
+                <div class="inputitem">
+                    <label for="uname"><b>Username:</b></label>
+                    <input type="text" style="width:100%;" placeholder="Enter Username" name="uname" id="login-username" required>
+                </div>
+                <div class="inputitem">
+                    <label for="psw"><b>Password:</b></label>
+                    <input type="password" style="width:100%;" placeholder="Enter Password" name="psw" id="login-password" required>
+                </div>
+                </div>
+            <div class="container">
+                <button class="inputitem" style="align-self:column;" type="submit" signupbtn>Signup</button>
             </div>
-        </form>`;
+        </form>
+        </div>`;
         
         return html;
     }
@@ -34,13 +46,15 @@ export default class extends AbstractView {
     {
         const signupForm = document.querySelector('#signup-form');
         const username = signupForm['login-username'].value;
-        const password = signupForm['login-password'].value;  
+        const password = signupForm['login-password'].value; 
+        const name = signupForm['login-name'].value; 
+        const email = signupForm['login-email'].value;
 
         const response =  await fetch("https://localhost:44365/User", { method: "POST",
             headers: {
             "Content-Type": "application/json"
             },
-            body: JSON.stringify({ "username": username, "password": password })
+            body: JSON.stringify({ "name": name, "email": email, "username": username, "password": password })
         });
 
         if (!response.ok) {

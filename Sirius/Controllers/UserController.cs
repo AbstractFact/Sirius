@@ -62,11 +62,11 @@ namespace Sirius.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> Put([FromBody] User user, int id)
+        public async Task<ActionResult<User>> Put([FromBody] User user, int id)
         {
             User res = await service.Put(user, id);
             if (res != null)
-                return Ok();
+                return Ok(res);
             else
                 return BadRequest();
         }
@@ -112,7 +112,7 @@ namespace Sirius.Controllers
         }
 
         [HttpPost("SendFriendRequest/{receiverUsername}")]
-        public async Task<ActionResult> SendFriendRequest([FromBody] Request sender, string receiverUsername)
+        public async Task<ActionResult> SendFriendRequest([FromBody] SendFriendRequestDTO sender, string receiverUsername)
         {
             int receiverId = await service.GetUserID(receiverUsername);
             if (receiverId == -1)

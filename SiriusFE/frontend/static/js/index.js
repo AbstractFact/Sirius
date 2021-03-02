@@ -7,6 +7,8 @@ import MySeriesList from "./views/MySeriesList.js";
 import Friends from "./views/Friends.js";
 import Favourites from "./views/Favourites.js";
 import FavouritesView from "./views/FavouritesView.js";
+import Awards from "./views/Awards.js";
+import AwardView from "./views/AwardView.js";
 import Login from "./views/Login.js";
 import Signup from "./views/Signup.js";
 import Connection from "./signalR/hubConnection.js"; 
@@ -44,7 +46,9 @@ else
     html+=
     `<a href="/myserieslist" id="mylist" class="nav__link" data-link>My Series List</a>
     <a href="/friends" id="friends" class="nav__link" data-link>Friends</a>
-    <a href="/" id="logout" class="nav__link" logout>Logout</a>`;
+    <a href="/" id="logout" class="nav__link" logout>Logout</a>
+    <a href="#profile-form" id="profile" class="nav__link" style="float:right" data-toggle="modal" data-target="#profile-form" profile>${localStorage.username}</a>`;
+    
     document.body.querySelector(".topnav").innerHTML=html;
 }
 
@@ -75,6 +79,8 @@ const router = async () => {
         { path: "/friends", view: Friends },
         { path: "/favourites", view: Favourites },
         { path: "/favourites/:id", view: FavouritesView },
+        { path: "/awards", view: Awards },
+        { path: "/awards/:id", view: AwardView },
         { path: "/login", view: Login },
         { path: "/signup", view: Signup }
     ];
@@ -211,6 +217,36 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (e.target.matches("[btnRemoveRecommendation]")) {
             e.preventDefault();
             view.DeleteRecommendation(e.target.id);
+        }
+
+        if (e.target.matches("[profile]")) {
+            e.preventDefault();
+            handleFillProfileForm();
+        }
+
+        if (e.target.matches("[editprofilebtn]")) {
+            e.preventDefault();
+            handleEditProfile();
+        }
+
+        if (e.target.matches("[closeEditForm]")) {
+            e.preventDefault();
+            jQuery("#profile-form").modal('hide');
+        }
+
+        if (e.target.matches("[addAwardBtn]")) {
+            e.preventDefault();
+            handleAddAward();
+        }
+
+        if (e.target.matches("[editAwardBtn]")) {
+            e.preventDefault();
+            handleEditAward();
+        }
+
+        if (e.target.matches("[deleteAwardBtn]")) {
+            e.preventDefault();
+            handleDeleteAward();
         }
 
         if(window.location.href=="http://localhost:5001/myserieslist")
@@ -380,6 +416,77 @@ async function handleSubscribeClick(connection)
 {
     await view.Subscribe(connection);
     alert("Changes saved!");
+}
+
+async function handleFillProfileForm()
+{
+    await fillEditProfileForm();
+}
+
+async function handleEditProfile()
+{
+    const name = document.querySelector('#edit-name').value;
+    const email = document.querySelector('#edit-email').value;
+    const username = document.querySelector('#edit-username').value;
+    const password = document.querySelector('#edit-password').value;
+
+    const response =  await fetch("https://localhost:44365/User/"+localStorage.userid, { method: "PUT",
+        headers: {
+        "Content-Type": "application/json"
+        },
+        body: JSON.stringify({"id":parseInt(localStorage.userid), "name": name, "email": email, "username": username, "password": password })
+    });
+
+    if (!response.ok) {
+        alert("Error!");
+    }
+    else
+    {
+        const json = await response.json();
+
+        localStorage.userid=json["id"];
+        localStorage.username=username;
+
+        alert("Changes saved!"); 
+        jQuery("#profile-form").modal('hide');
+    }     
+}
+
+async function handleAddAward()
+{
+    await view.AddAward();
+    window.location.reload();
+}
+
+async function handleEditAward()
+{
+    await view.EditAward();
+    window.location.reload();
+}
+
+async function handleDeleteAward()
+{
+    await view.DeleteAward();
+    navigateTo("/awards");
+}
+
+async function fillEditProfileForm()
+{
+    const response =  await fetch("https://localhost:44365/User/"+localStorage.userid, { method: "GET"});
+    if (response.ok) {
+        const data = await response.json();
+        document.querySelector('#edit-name').value = data.name;
+        document.querySelector('#edit-email').value = data.email;
+        document.querySelector('#edit-username').value = data.username;
+        document.querySelector('#edit-username').disabled = true;
+        document.querySelector('#edit-password').value = data.password;
+
+        jQuery("#profile-form").modal('toggle');
+    }
+    else
+    {
+        alert("Error"); 
+    }         
 }
 
 function logout()

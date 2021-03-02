@@ -22,7 +22,6 @@ export default class extends AbstractView {
                 <th scope="col">Title</th>
                 <th scope="col">Year</th>
                 <th scope="col">Genre</th>
-                <th scope="col">Plot</th>
                 <th scope="col">Seasons</th>
                 <th scope="col">Rating</th>
                 </tr>
@@ -41,7 +40,6 @@ export default class extends AbstractView {
                     <td><a href="/series/${series.id}" data-link>${series.title}</a></td>
                     <td>${series.year}</td>
                     <td>${series.genre}</td>
-                    <td>${series.plot}</td>
                     <td>${series.seasons}</td>
                     <td>${(series.rating === 0)? "Not rated" : +(Math.round(series.rating + "e+1") + "e-1")}</td>
                     </tr>`;

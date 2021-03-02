@@ -107,3 +107,11 @@ span.psw {
     width:fit-content;
     display: inline-block;
 }
+
+.container {
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    width: fit-content;
+    height: fit-content;
+}

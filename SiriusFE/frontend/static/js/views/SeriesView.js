@@ -27,7 +27,6 @@ export default class extends AbstractView {
                             <tr>
                             <th scope="col">Year</th>
                             <th scope="col">Genre</th>
-                            <th scope="col">Plot</th>
                             <th scope="col">Seasons</th>
                             <th scope="col">Rating</th>
                             </tr>
@@ -36,7 +35,6 @@ export default class extends AbstractView {
                             <tr>
                             <td>${series.year}</td>
                             <td>${series.genre}</td>
-                            <td>${series.plot}</td>
                             <td>${series.seasons}</td>
                             <td>${(series.rating === 0)? "Not rated" : +(Math.round(series.rating + "e+1") + "e-1")}</td>
                             </tr>
@@ -116,7 +114,7 @@ export default class extends AbstractView {
         await fetch("https://localhost:44365/Role/GetSeriesRoles/"+this.postId, {method: "GET"})
         .then(p => p.json().then(d => {
                 i=0;
-
+                
                 if(localStorage.username=="Admin" && localStorage.logged==1)
                     html+=`
                     <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>`;

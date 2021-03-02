@@ -142,7 +142,7 @@ namespace Sirius.Services
             {
                 try
                 {
-                    var newUser = new User { ID = maxID + 1, Username = u.Username, Password = u.Password };
+                    var newUser = new User { ID = maxID + 1, Name = u.Name, Email = u.Email, Username = u.Username, Password = u.Password };
                     var res = _client.Cypher.Create("(user:User $newUser)")
                                             .WithParam("newUser", newUser);
 
@@ -259,7 +259,7 @@ namespace Sirius.Services
             }  
         }
 
-        public async Task<bool> SendFriendRequest(Request sender, int receiverId)
+        public async Task<bool> SendFriendRequest(SendFriendRequestDTO sender, int receiverId)
         {
             string channelName = $"messages:{receiverId}:friend_request";
 
@@ -309,7 +309,7 @@ namespace Sirius.Services
                     new RequestDTO
                     {
                         ID = request.Id,
-                        Request = new Request
+                        Request = new SendFriendRequestDTO
                         {
                             ID = int.Parse(request.Values.FirstOrDefault(value => value.Name == "sender_id").Value),
                             Username = request.Values.FirstOrDefault(value => value.Name == "sender_username").Value
