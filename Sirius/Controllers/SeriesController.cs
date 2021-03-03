@@ -11,10 +11,12 @@ namespace Sirius.Controllers
     public class SeriesController : ControllerBase
     {
         private SeriesService service;
+        private DirectedService directedService;
 
-        public SeriesController(SeriesService _service)
+        public SeriesController(SeriesService _service, DirectedService _directedService)
         {
             service = _service;
+            directedService = _directedService;
         }
 
         [HttpGet]
@@ -38,10 +40,13 @@ namespace Sirius.Controllers
                 return BadRequest();
         }
 
-        [HttpPost]
-        public async Task<ActionResult> Post([FromBody] Series s)
+        [HttpPost("{directorID}")]
+        public async Task<ActionResult> Post([FromBody] Series s, int directorID)
         {
-            bool res = await service.Post(s);
+            int seriesID = await service.Post(s);
+            bool res = false;
+            if(seriesID!=-1)
+                res = await directedService.AddDirected(directorID, seriesID);
 
             if (res)
                 return Ok();

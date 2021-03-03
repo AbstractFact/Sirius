@@ -30,7 +30,7 @@ export default class extends AbstractView {
                     <tbody>`;
 
             data.forEach(d => {
-                    const director = new Person(d["id"], d["name"], d["sex"], d["birthplace"], d["birthday"], d["biography"]);
+                    const director = new Person(d["director"]["id"], d["director"]["name"], d["director"]["sex"], d["director"]["birthplace"], d["director"]["birthday"], d["director"]["biography"]);
 
                     html+=`
                     <tr>

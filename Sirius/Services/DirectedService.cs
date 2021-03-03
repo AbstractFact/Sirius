@@ -30,7 +30,7 @@ namespace Sirius.Services
             return query.FirstOrDefault();
         }
 
-        public async Task<Object> GetSeriesDirector(int seriesID)
+        public async Task<Object> GetSeriesWithDirector(int seriesID)
         {
             try
             {
@@ -45,7 +45,7 @@ namespace Sirius.Services
                        })
                        .ResultsAsync;
 
-                return res;
+                return res.FirstOrDefault();
             }
             catch (Exception e)
             {
@@ -63,7 +63,7 @@ namespace Sirius.Services
                        .Return((p, d, s) => new
                        {
                            d.As<Directed>().ID,
-                           Actor = p.As<Person>(),
+                           Director = p.As<Person>(),
                            Series = s.As<Series>(),
                        })
                        .ResultsAsync;
@@ -86,7 +86,7 @@ namespace Sirius.Services
                         .Return((p, d, s) => new
                         {
                             d.As<Directed>().ID,
-                            Actor = p.As<Person>(),
+                            Director = p.As<Person>(),
                             Series = s.CollectAs<Series>(),
                         })
                         .ResultsAsync;

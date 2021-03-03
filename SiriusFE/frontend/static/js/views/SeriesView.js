@@ -17,10 +17,9 @@ export default class extends AbstractView {
     {
         var html,i;
 
-        await fetch("https://localhost:44365/Series/GetSeries/"+this.postId, {method: "GET"})
+        await fetch("https://localhost:44365/Directed/GetSeriesWithDirector/"+this.postId, {method: "GET"})
         .then(p => p.json().then(d => {
-                
-                const series = new Series(d["id"], d["title"], d["year"], d["genre"], d["plot"], d["seasons"], d["rating"]);
+                const series = new Series(d["series"]["id"], d["series"]["title"], d["series"]["year"], d["series"]["genre"], d["series"]["plot"], d["series"]["seasons"], d["series"]["rating"]);
                 html=`
                     <h1>Series: ${series.title}</h1>
                     <br/>
@@ -29,6 +28,7 @@ export default class extends AbstractView {
                             <tr>
                             <th scope="col">Year</th>
                             <th scope="col">Genre</th>
+                            <th scope="col">Director</th>
                             <th scope="col">Seasons</th>
                             <th scope="col">Rating</th>
                             </tr>
@@ -37,6 +37,7 @@ export default class extends AbstractView {
                             <tr>
                             <td>${series.year}</td>
                             <td>${series.genre}</td>
+                            <td><a href="/directors/${d["director"]["id"]}" data-link>${d["director"]["name"]}</a></td>
                             <td>${series.seasons}</td>
                             <td>${(series.rating === 0)? "Not rated" : +(Math.round(series.rating + "e+1") + "e-1")}</td>
                             </tr>
@@ -53,7 +54,7 @@ export default class extends AbstractView {
                     if(localStorage.username=="Admin" && localStorage.logged==1)
                     html+=`<form id="addseries-form" style="width:50%; float:left;">
                     <div class="form-group col-md-8">
-                        <div class="form-group col-md-8">
+                        <div class="form-group col-md-10">
                         <label for="inputTitle">Title</label>
                         <input type="text" class="form-control" id="inputTitle" value="${series.title}">
                         </div>

@@ -3,6 +3,7 @@ import AbstractView from "./AbstractView.js";
 import {Series} from "../models/Series.js";
 import {Person} from "../models/Person.js";
 import {Role} from "../models/Role.js";
+import {Directed} from "../models/Directed.js";
 
 export default class extends AbstractView {
     constructor(params) {
@@ -20,7 +21,7 @@ export default class extends AbstractView {
             const actor = new Person(d["id"], d["name"], d["sex"], d["birthplace"], d["birthday"], d["biography"]);
 
             html=`
-                <h1>Actor: ${actor.name}</h1>
+                <h1>${actor.name}</h1>
                 <br/>
                 <table class="table table-striped">
                     <thead>
@@ -85,9 +86,12 @@ export default class extends AbstractView {
 
         await fetch("https://localhost:44365/Role/GetActorRoles/"+this.postId, {method: "GET"})
         .then(p => p.json().then(d => {
+            if(d.length!=0)
+            {
                 i=0;
 
                 html+=`
+                    </br>
                     <h2>Roles</h1>
                     <br/>
                     <table class="table table-striped">
@@ -115,6 +119,48 @@ export default class extends AbstractView {
                 });
 
                 html+=`</tbody></table>`;
+            }     
+        }));
+
+        await fetch("https://localhost:44365/Directed/GetDirectorSeries/"+this.postId, {method: "GET"})
+        .then(p => p.json().then(d => {
+            if(d.length!=0)
+            {
+                i=0;
+                html+=`
+                    </br>
+                    <h2>Directed series</h1>
+                    <br/>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Series</th>
+                            <th scope="col">Genre</th>
+                            <th scope="col">Year</th>
+                            <th scope="col">Rating</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+
+                d.forEach(data => {
+
+                    const director = new Person(data["director"]["id"], data["director"]["name"], data["director"]["birthplace"], data["director"]["birthday"], data["director"]["biography"]);
+                    const series = new Series(data["series"]["id"], data["series"]["title"], data["series"]["year"], data["series"]["genre"], data["series"]["plot"], data["series"]["seasons"], data["series"]["rating"]);
+                    const role = new Directed(data["id"], director, series);
+
+                    html+=`
+                        <tr>
+                        <th scope="row">${++i}</th>
+                        <td><a href="/series/${series.id}" data-link>${role.series.title}</a></td>
+                        <td>${series.genre}</td>
+                        <td>${series.year}</td>
+                        <td>${(series.rating === 0)? "Not rated" : series.rating}</td>
+                        </tr>`;
+                });
+
+                html+=`</tbody></table>`;
+            }
         }));
 
         return html;

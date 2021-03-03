@@ -37,6 +37,7 @@ namespace Sirius
             services.AddSingleton<AwardService>();
             services.AddSingleton<RoleService>();
             services.AddSingleton<AwardedService>();
+            services.AddSingleton<DirectedService>();
             services.AddSingleton<UserSeriesListService>();
 
             services.AddMvc().AddJsonOptions(options =>

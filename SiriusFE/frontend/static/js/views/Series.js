@@ -1,5 +1,6 @@
 import AbstractView from "./AbstractView.js";
 import {Series} from "../models/Series.js";
+import {Person} from "../models/Person.js";
 
 export default class extends AbstractView {
     constructor(params) 
@@ -74,6 +75,21 @@ export default class extends AbstractView {
                         <option>Sci-fi</option>
                     </select>
                 </div>
+                <div class="form-group col-md-6">
+                    <label for="inputDirector">Director</label>
+                    <select id="inputDirector" class="form-control">`;
+                
+                        await fetch("https://localhost:44365/Person", {method: "GET"})
+                        .then(p => p.json().then(data => {
+                            data.forEach(d => {
+                                const director = new Person(d["id"], d["name"], d["sex"], d["birthplace"], d["birthday"], d["biography"]);
+    
+                                html+=`<option value="${director.id}">${director.name}, ${director.birthplace}</option>`;
+                            });
+                    }));
+
+                html+=`</select>
+                </div>
                 <div class="form-row">
                     <div class="form-group">
                         <label for="inputPlot">Plot</label>
@@ -98,8 +114,9 @@ export default class extends AbstractView {
         const genre = addSeriesForm['inputGenre'].value;
         const plot = addSeriesForm['inputPlot'].value;  
         const seasons = parseInt(addSeriesForm['inputSeasons'].value);
+        const directorID = addSeriesForm["inputDirector"].value;
 
-        const response =  await  fetch("https://localhost:44365/Series", { method: "POST",
+        const response =  await  fetch("https://localhost:44365/Series/"+parseInt(directorID), { method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },

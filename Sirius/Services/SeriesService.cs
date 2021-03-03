@@ -81,7 +81,7 @@ namespace Sirius.Services
             }
         }
 
-        public async Task<bool> Post(Series s)
+        public async Task<int> Post(Series s)
         {
             maxID = await MaxID();
 
@@ -117,16 +117,16 @@ namespace Sirius.Services
                     ISubscriber chatPubSub = _redisConnection.GetSubscriber();
                     await chatPubSub.PublishAsync("genre.recommendations", jsonMessage);
 
-                    return true;
+                    return newSeries.ID;
 
                 }
                 catch (Exception e)
                 {
-                    return false;
+                    return -1;
                 }
 
             }
-            else return false;
+            else return -1;
         }
 
         public async Task<bool> Put(Series series, int id)
