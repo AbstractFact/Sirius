@@ -4,18 +4,18 @@ import {Person} from "../models/Person.js";
 export default class extends AbstractView {
     constructor(params) {
         super(params);
-        this.setTitle("All Actors");
+        this.setTitle("All Directors");
     }
 
     async getHtml() 
     {
         var html,i;
 
-        await fetch("https://localhost:44365/Person/GetAllActors", {method: "GET"})
+        await fetch("https://localhost:44365/Person/GetAllDirectors", {method: "GET"})
         .then(p => p.json().then(data => {
             i=0;
             html=`
-                <h1>All Actors</h1>
+                <h1>All Directors</h1>
                 <br/>
                 <table class="table table-striped">
                     <thead>
@@ -30,15 +30,15 @@ export default class extends AbstractView {
                     <tbody>`;
 
             data.forEach(d => {
-                    const actor = new Person(d["actor"]["id"], d["actor"]["name"], d["actor"]["sex"], d["actor"]["birthplace"], d["actor"]["birthday"], d["actor"]["biography"]);
+                    const director = new Person(d["id"], d["name"], d["sex"], d["birthplace"], d["birthday"], d["biography"]);
 
                     html+=`
                     <tr>
                         <th scope="row">${++i}</th>
-                        <td><a href="/actors/${actor.id}" data-link>${actor.name}</a></td>
-                        <td>${actor.sex}</td>
-                        <td>${actor.birthplace}</td>
-                        <td>${actor.birthday}</td>
+                        <td><a href="/directors/${director.id}" data-link>${director.name}</a></td>
+                        <td>${director.sex}</td>
+                        <td>${director.birthplace}</td>
+                        <td>${director.birthday}</td>
                     </tr>`;
             });
 

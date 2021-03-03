@@ -7,11 +7,11 @@ namespace Sirius.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class ActorController : ControllerBase
+    public class PersonController : ControllerBase
     {
-        private ActorService service;
+        private PersonService service;
 
-        public ActorController(ActorService _service)
+        public PersonController(PersonService _service)
         {
             service = _service;
         }
@@ -26,10 +26,30 @@ namespace Sirius.Controllers
                 return BadRequest();
         }
 
-        [HttpGet("GetActor/{actorID}")]
-        public async Task<ActionResult> GetActor(int actorID)
+        [HttpGet("GetAllActors")]
+        public async Task<ActionResult> GetAllActors()
         {
-            Actor res = await service.GetActor(actorID);
+            var res = await service.GetAllActors();
+            if (res != null)
+                return Ok(res);
+            else
+                return BadRequest();
+        }
+
+        [HttpGet("GetAllDirectors")]
+        public async Task<ActionResult> GetAllDirectors()
+        {
+            var res = await service.GetAllDirectors();
+            if (res != null)
+                return Ok(res);
+            else
+                return BadRequest();
+        }
+
+        [HttpGet("GetPerson/{personID}")]
+        public async Task<ActionResult> GetPerson(int personID)
+        {
+            Person res = await service.GetPerson(personID);
             if (res != null)
                 return Ok(res);
             else
@@ -37,9 +57,9 @@ namespace Sirius.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> Post([FromBody] Actor a)
+        public async Task<ActionResult> Post([FromBody] Person p)
         {
-            bool res = await service.Post(a);
+            bool res = await service.Post(p);
 
             if (res)
                 return Ok();
@@ -49,9 +69,9 @@ namespace Sirius.Controllers
 
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> Put([FromBody] Actor actor, int id)
+        public async Task<ActionResult> Put([FromBody] Person person, int id)
         {
-            bool res = await service.Put(actor, id);
+            bool res = await service.Put(person, id);
 
             if (res)
                 return Ok();

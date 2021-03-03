@@ -5,7 +5,6 @@ export default class extends AbstractView {
     constructor(params) {
         super(params);
         this.setTitle("Friends");
-        this.friends=new Array();
     }
 
     async getHtml() 
@@ -81,7 +80,6 @@ export default class extends AbstractView {
                         if(d!=null)
                         {
                         const friend = new User(d["id"], d["username"], d["password"]);
-                        this.friends.push(friend);
 
                         html+=`
                             <tr id="${friend.id}">
@@ -89,7 +87,7 @@ export default class extends AbstractView {
                             <td>${friend.username}</td>
                             <td><a href="/favourites/${friend.id}" data-link>View</a></td>
                             <td>
-                                <button type="submit" class="btn btn-danger" style="width:50%" id="R${friend.id}">Unfriend</button>
+                                <button type="submit" class="btn btn-danger" style="width:50%" id="RF ${friend.id}">Unfriend</button>
                             </td>
                             </tr>`;
                         }
@@ -114,11 +112,6 @@ export default class extends AbstractView {
         }
 
         return html;
-    }
-
-    GetFriends()
-    {
-        return this.friends;
     }
 
     async SendFriendRequest()

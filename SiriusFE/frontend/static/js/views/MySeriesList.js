@@ -6,7 +6,6 @@ export default class extends AbstractView {
     constructor(params) {
         super(params);
         this.setTitle("My Series List");
-        this.entries=new Array();
     }
 
     async getHtml() 
@@ -114,7 +113,6 @@ export default class extends AbstractView {
                         const checked= favourite?`checked`:``;
 
                         const entry = new MySeriesList(d["id"], series, status, stars, comment, favourite);
-                        this.entries.push(entry);
 
                         html+=`
                             <tr id="${entry.id}">
@@ -150,10 +148,10 @@ export default class extends AbstractView {
                                 <input type="checkbox" id="inputFav" name="fav" ${checked}>
                             </td>
                             <td>
-                                <button type="submit" class="btn btn-primary" style="width:60%" id="${entry.id}">Save Changes</button>
+                                <button type="submit" class="btn btn-primary" style="width:60%" id="SS ${entry.id}">Save Changes</button>
                             </td>
                             <td>
-                                <button type="submit" class="btn btn-danger" style="width:100%" id="R${entry.id}">X</button>
+                                <button type="submit" class="btn btn-danger" style="width:100%" id="RS ${entry.id}">X</button>
                             </td>
                             </tr>`;
                     });
@@ -164,11 +162,6 @@ export default class extends AbstractView {
         }
 
         return html;
-    }
-
-    GetEntries()
-    {
-        return this.entries;
     }
 
     async EditEntry(id)

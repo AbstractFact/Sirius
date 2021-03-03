@@ -1,23 +1,23 @@
 
 import AbstractView from "./AbstractView.js";
 import {Series} from "../models/Series.js";
-import {Actor} from "../models/Actor.js";
+import {Person} from "../models/Person.js";
 import {Role} from "../models/Role.js";
 
 export default class extends AbstractView {
     constructor(params) {
         super(params);
         this.postId = params.id;
-        this.setTitle("Viewing Actor");
+        this.setTitle("Viewing Person");
     }
 
     async getHtml() 
     {
         var html,i;
 
-        await fetch("https://localhost:44365/Actor/GetActor/"+this.postId, {method: "GET"})
+        await fetch("https://localhost:44365/Person/GetPerson/"+this.postId, {method: "GET"})
         .then(p => p.json().then(d => {
-            const actor = new Actor(d["id"], d["name"], d["sex"], d["birthplace"], d["birthday"], d["biography"]);
+            const actor = new Person(d["id"], d["name"], d["sex"], d["birthplace"], d["birthday"], d["biography"]);
 
             html=`
                 <h1>Actor: ${actor.name}</h1>
@@ -78,8 +78,8 @@ export default class extends AbstractView {
                         <textarea type="text" class="form-control" id="inputBiography">${actor.biography}</textarea>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary" style="width:20%;" editActorBtn>Edit Actor</button>
-                    <button type="submit" class="btn btn-danger" style="width:20%; float:right;" deleteActorBtn>Delete Actor</button>
+                    <button type="submit" class="btn btn-primary" style="width:20%;" editPersonBtn>Edit Person</button>
+                    <button type="submit" class="btn btn-danger" style="width:20%; float:right;" deletePersonBtn>Delete Person</button>
                     </form>`;
         }));
 
@@ -102,7 +102,7 @@ export default class extends AbstractView {
 
                 d.forEach(data => {
 
-                    const actor = new Actor(data["actor"]["id"], data["actor"]["name"], data["actor"]["birthplace"], data["actor"]["birthday"], data["actor"]["biography"]);
+                    const actor = new Person(data["actor"]["id"], data["actor"]["name"], data["actor"]["birthplace"], data["actor"]["birthday"], data["actor"]["biography"]);
                     const series = new Series(data["series"]["id"], data["series"]["title"], data["series"]["year"], data["series"]["genre"], data["series"]["plot"], data["series"]["seasons"], data["series"]["rating"]);
                     const role = new Role(data["id"], actor, series, data["inRole"]);
 
@@ -120,7 +120,7 @@ export default class extends AbstractView {
         return html;
     }
 
-    async EditActor()
+    async EditPerson()
     {
         const addActorForm = document.querySelector('#addactor-form');
         const name = addActorForm['inputName'].value;
@@ -129,7 +129,7 @@ export default class extends AbstractView {
         const birthday = addActorForm['inputBirthday'].value;
         const biography = addActorForm['inputBiography'].value; 
 
-        const response =  await fetch("https://localhost:44365/Actor/"+this.postId, { method: "PUT",
+        const response =  await fetch("https://localhost:44365/Person/"+this.postId, { method: "PUT",
             headers: {
                 "Content-Type": "application/json"
             },
@@ -142,9 +142,9 @@ export default class extends AbstractView {
         }
     }
 
-    async DeleteActor()
+    async DeletePerson()
     {      
-        const response = await fetch("https://localhost:44365/Actor/"+this.postId, { method: "DELETE"});
+        const response = await fetch("https://localhost:44365/Person/"+this.postId, { method: "DELETE"});
 
         if (response.ok) 
         {

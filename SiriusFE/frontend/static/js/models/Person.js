@@ -1,4 +1,4 @@
-export class Actor {
+export class Person {
     constructor(id, name, sex, birthplace, birthday, biography) {
         this.id = id;
         this.name = name;

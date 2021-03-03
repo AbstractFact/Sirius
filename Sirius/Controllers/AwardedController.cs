@@ -56,8 +56,8 @@ namespace Sirius.Controllers
         }
 
 
-        [HttpPut("{id}")]
-        public async Task<ActionResult> Put(int year, int id)
+        [HttpPut("{id}/{year}")]
+        public async Task<ActionResult> Put(int id, int year)
         {
             bool res = await service.Put(year, id);
             if (res)

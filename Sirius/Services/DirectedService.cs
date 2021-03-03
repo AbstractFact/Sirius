@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace Sirius.Services
 {
-    public class RoleService
+    public class DirectedService
     {
         private readonly IGraphClient _client;
         private int maxID;
 
-        public RoleService(IGraphClient client)
+        public DirectedService(IGraphClient client)
         {
             _client = client;
             maxID = 0;
@@ -20,53 +20,28 @@ namespace Sirius.Services
         private async Task<int> MaxID()
         {
             var query = await _client.Cypher
-                        .Match("(p:Person)-[r:IN_ROLE]-(s:Series)")
-                        .Return(r => r.As<Role>().ID)
-                        .OrderByDescending("r.ID")
-                        //.Return<int>("ID(r)")
-                        //.OrderByDescending("ID(r)")
+                        .Match("(p:Person)-[d:DIRECTED]-(s:Series)")
+                        .Return(d => d.As<Directed>().ID)
+                        .OrderByDescending("d.ID")
+                        //.Return<int>("ID(d)")
+                        //.OrderByDescending("ID(d)")
                         .ResultsAsync;
 
             return query.FirstOrDefault();
         }
 
-        public async Task<Object> GetSeriesRoles(int seriesID)
+        public async Task<Object> GetSeriesDirector(int seriesID)
         {
             try
             {
                 var res = await _client.Cypher
-                       .Match("(p:Person)-[r:IN_ROLE]-(s:Series)")
+                       .Match("(p:Person)-[d:DIRECTED]-(s:Series)")
                        .Where((Series s) => s.ID == seriesID)
-                       .Return((p, r, s) => new
+                       .Return((p, d, s) => new
                        {
-                           r.As<Role>().ID,
-                           Actor = p.As<Person>(),
+                           d.As<Directed>().ID,
+                           Director = p.As<Person>(),
                            Series = s.As<Series>(),
-                           r.As<Role>().InRole
-                       })
-                       .ResultsAsync;
-
-                return res;
-            }
-            catch(Exception e)
-            {
-                return null;
-            }
-        }
-
-        public async Task<Object> GetActorRoles(int actorID)
-        {
-            try
-            {
-                var res = await _client.Cypher
-                       .Match("(p:Person)-[r:IN_ROLE]-(s:Series)")
-                       .Where((Person p) => p.ID == actorID)
-                       .Return((p, r, s) => new
-                       {
-                           r.As<Role>().ID,
-                           Actor = p.As<Person>(),
-                           Series = s.As<Series>(),
-                           r.As<Role>().InRole
                        })
                        .ResultsAsync;
 
@@ -75,22 +50,44 @@ namespace Sirius.Services
             catch (Exception e)
             {
                 return null;
-            }  
+            }
         }
 
-        public async Task<Object> GetRole(int id)
+        public async Task<Object> GetDirectorSeries(int directorID)
         {
             try
             {
                 var res = await _client.Cypher
-                        .Match("(p:Person)-[r:IN_ROLE]-(s:Series)")
-                        .Where((Role r) => r.ID == id)
-                        .Return((p, r, s) => new
+                       .Match("(p:Person)-[d:DIRECTED]-(s:Series)")
+                       .Where((Person p) => p.ID == directorID)
+                       .Return((p, d, s) => new
+                       {
+                           d.As<Directed>().ID,
+                           Actor = p.As<Person>(),
+                           Series = s.As<Series>(),
+                       })
+                       .ResultsAsync;
+
+                return res;
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+        }
+
+        public async Task<Object> GetDirected(int id)
+        {
+            try
+            {
+                var res = await _client.Cypher
+                        .Match("(p:Person)-[d:DIRECTED]-(s:Series)")
+                        .Where((Directed d) => d.ID == id)
+                        .Return((p, d, s) => new
                         {
-                            r.As<Role>().ID,
+                            d.As<Directed>().ID,
                             Actor = p.As<Person>(),
                             Series = s.CollectAs<Series>(),
-                            r.As<Role>().InRole
                         })
                         .ResultsAsync;
 
@@ -99,9 +96,9 @@ namespace Sirius.Services
             catch (Exception e)
             {
                 return null;
-            }   
+            }
         }
-        public async Task<bool> AddRole(int actorID, string role, int seriesID)
+        public async Task<bool> AddDirected(int directorID, int seriesID)
         {
             try
             {
@@ -109,10 +106,9 @@ namespace Sirius.Services
 
                 var res = _client.Cypher
                         .Match("(person:Person)", "(series:Series)")
-                        .Where((Person person) => person.ID == actorID)
+                        .Where((Person person) => person.ID == directorID)
                         .AndWhere((Series series) => series.ID == seriesID)
-                        .Create("(person)-[:IN_ROLE { ID: $id, InRole: $role }]->(series)")
-                        .WithParam("role", role)
+                        .Create("(person)-[:DIRECTED]->(series)")
                         .WithParam("id", maxID + 1);
 
                 await res.ExecuteWithoutResultsAsync();
@@ -125,15 +121,15 @@ namespace Sirius.Services
             }
         }
 
-        public async Task<bool> Put(string role, int id)
+        public async Task<bool> Put(Directed directed, int id)
         {
             try
             {
                 var res = _client.Cypher
-                        .Match("(p:Person)-[r:IN_ROLE]-(s:Series)")
-                        .Where((Role r) => r.ID == id)
-                        .Set("r.InRole = $role")
-                        .WithParam("role", role);
+                        .Match("(p:Person)-[d:DIRECTED]-(s:Series)")
+                        .Where((Directed d) => d.ID == id)
+                        .Set("d = $directed")
+                        .WithParam("directed", directed);
 
                 await res.ExecuteWithoutResultsAsync();
 
@@ -147,12 +143,12 @@ namespace Sirius.Services
 
         public async Task<bool> Delete(int id)
         {
-            try 
+            try
             {
                 var res = _client.Cypher
-                             .Match("(p:Person)-[r:IN_ROLE]->(s:Series)")
-                             .Where((Role r) => r.ID == id)
-                             .Delete("r");
+                             .Match("(p:Person)-[d:DIRECTED]->(s:Series)")
+                             .Where((Directed d) => d.ID == id)
+                             .Delete("d");
 
                 await res.ExecuteWithoutResultsAsync();
 

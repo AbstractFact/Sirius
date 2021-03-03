@@ -1,24 +1,25 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using Sirius.Services;
+using Sirius.Entities;
 
 namespace Sirius.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class RoleController : ControllerBase
+    public class DirectedController : ControllerBase
     {
-        private RoleService service;
+        private DirectedService service;
 
-        public RoleController(RoleService _service)
+        public DirectedController(DirectedService _service)
         {
             service = _service;
         }
 
         [HttpGet("GetSeriesRoles/{seriesID}")]
-        public async Task<ActionResult> GetSeriesRoles(int seriesID)
+        public async Task<ActionResult> GetSeriesDirector(int seriesID)
         {
-            var res = await service.GetSeriesRoles(seriesID);
+            var res = await service.GetSeriesDirector(seriesID);
             if (res != null)
                 return Ok(res);
             else
@@ -26,9 +27,9 @@ namespace Sirius.Controllers
         }
 
         [HttpGet("GetActorRoles/{actorID}")]
-        public async Task<ActionResult> GetActorRoles(int actorID)
+        public async Task<ActionResult> GetDirectorSeries(int actorID)
         {
-            var res = await service.GetActorRoles(actorID);
+            var res = await service.GetDirectorSeries(actorID);
             if (res != null)
                 return Ok(res);
             else
@@ -36,19 +37,19 @@ namespace Sirius.Controllers
         }
 
         [HttpGet("GetRole/{id}")]
-        public async Task<ActionResult> GetRole(int id)
+        public async Task<ActionResult> GetDirected(int id)
         {
-            var res = await service.GetRole(id);
+            var res = await service.GetDirected(id);
             if (res != null)
                 return Ok(res);
             else
                 return BadRequest();
         }
 
-        [HttpPost("AddRole/{actorID}/{role}/{seriesID}")]
-        public async Task<ActionResult> AddRole(int actorID, string role, int seriesID)
+        [HttpPost("AddDirected/{actorID}/{seriesID}")]
+        public async Task<ActionResult> AddDirected(int actorID, int seriesID)
         {
-            bool res = await service.AddRole(actorID, role, seriesID);
+            bool res = await service.AddDirected(actorID, seriesID);
             if (res)
                 return Ok();
             else
@@ -56,10 +57,10 @@ namespace Sirius.Controllers
         }
 
 
-        [HttpPut("{id}/{role}")]
-        public async Task<ActionResult> Put(int id, string role)
+        [HttpPut("{id}")]
+        public async Task<ActionResult> Put([FromBody] Directed directed, int id)
         {
-            bool res = await service.Put(role, id);
+            bool res = await service.Put(directed, id);
             if (res)
                 return Ok();
             else

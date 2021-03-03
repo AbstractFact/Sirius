@@ -32,7 +32,7 @@ namespace Sirius
 
             services.AddSingleton<IRedisService, RedisService>();
             services.AddSingleton<UserService>();
-            services.AddSingleton<ActorService>();
+            services.AddSingleton<PersonService>();
             services.AddSingleton<SeriesService>();
             services.AddSingleton<AwardService>();
             services.AddSingleton<RoleService>();

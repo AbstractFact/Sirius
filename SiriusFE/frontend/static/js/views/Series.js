@@ -81,7 +81,7 @@ export default class extends AbstractView {
                     </div>
                     <div class="form-group col-md-2">
                         <label for="inputZip">Seasons</label>
-                        <input type="number" class="form-control" id="inputSeasons">
+                        <input type="number" class="form-control" id="inputSeasons" min=1 value=1>
                     </div>
                 </div>
                 <button type="submit" class="btn btn-primary" style="width:20%" addSeriesBtn>Add Series</button>

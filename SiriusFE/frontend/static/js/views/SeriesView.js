@@ -1,7 +1,8 @@
 import AbstractView from "./AbstractView.js";
 import {Series} from "../models/Series.js";
-import {Actor} from "../models/Actor.js";
+import {Person} from "../models/Person.js";
 import {Role} from "../models/Role.js";
+import {Directed} from "../models/Directed.js";
 import {Award} from "../models/Award.js"
 import {Awarded} from "../models/Awarded.js"
 
@@ -9,8 +10,6 @@ export default class extends AbstractView {
     constructor(params) {
         super(params);
         this.postId = params.id;
-        this.roles = new Array();
-        this.awards = new Array();
         this.setTitle("Viewing Series");
     }
 
@@ -140,11 +139,9 @@ export default class extends AbstractView {
 
                 d.forEach(data => {
 
-                    const actor = new Actor(data["actor"]["id"], data["actor"]["name"], data["actor"]["sex"], data["actor"]["birthplace"], data["actor"]["birthday"], data["actor"]["biography"]);
+                    const actor = new Person(data["actor"]["id"], data["actor"]["name"], data["actor"]["sex"], data["actor"]["birthplace"], data["actor"]["birthday"], data["actor"]["biography"]);
                     const series = new Series(data["series"]["id"], data["series"]["title"], data["series"]["year"], data["series"]["genre"], data["series"]["plot"], data["series"]["seasons"], data["series"]["rating"]);
                     const role = new Role(data["id"], actor, series, data["inRole"]);
-
-                    this.roles.push(role);
 
                     html+=`
                     <tr id="${role.id}">
@@ -162,10 +159,10 @@ export default class extends AbstractView {
 
                         if(localStorage.username=="Admin" && localStorage.logged==1)
                         html+=`<td>
-                            <button type="submit" class="btn btn-primary" style="width:60%" id="${role.id}">Save Changes</button>
+                            <button type="submit" class="btn btn-primary" style="width:60%" id="SR ${role.id}">Save Changes</button>
                         </td>
                         <td>
-                            <button type="submit" class="btn btn-danger" style="width:100%" id="R${role.id}">X</button>
+                            <button type="submit" class="btn btn-danger" style="width:100%" id="RR ${role.id}">X</button>
                         </td>`;
                         html+=`</tr>`;
                 });
@@ -182,10 +179,10 @@ export default class extends AbstractView {
                         <option selected>Select Actor</option>`;
                         
                         
-                await fetch("https://localhost:44365/Actor", {method: "GET"})
+                await fetch("https://localhost:44365/Person", {method: "GET"})
                     .then(p => p.json().then(data => {
                         data.forEach(d => {
-                            const actor = new Actor(d["id"], d["name"], d["sex"], d["birthplace"], d["birthday"], d["biography"]);
+                            const actor = new Person(d["id"], d["name"], d["sex"], d["birthplace"], d["birthday"], d["biography"]);
 
                             html+=`<option value="${actor.id}">${actor.name}, ${actor.birthplace}</option>`;
                         });
@@ -227,12 +224,10 @@ export default class extends AbstractView {
 
                     const award = new Awarded(data["id"], data["award"], data["series"], data["year"]);
 
-                    this.awards.push(award);
-
                     html+=`
                     <tr id="${award.id}">
                         <th scope="row">${++i}</th>
-                        <td>${award.award.name}</td>`;
+                        <td><a href="/awards/${award.award.id}" data-link>${award.award.name}</a></td>`;
 
                     if(localStorage.username=="Admin" && localStorage.logged==1)
                         html+=`
@@ -244,11 +239,11 @@ export default class extends AbstractView {
                     if(localStorage.username=="Admin" && localStorage.logged==1)
                         html+=`
                         <td>
-                            <button type="submit" class="btn btn-primary" style="width:60%" id="${award.id}">Save Changes</button>
+                            <button type="submit" class="btn btn-primary" style="width:60%" id="SA ${award.id}">Save Changes</button>
                         </td>
                         <td>
-                            <button type="submit" class="btn btn-danger" style="width:100%" id="R${award.id}">X</button>
-                        </td>`;
+                            <button type="submit" class="btn btn-danger" style="width:100%" id="RA ${award.id}">X</button>
+                        </td>`; 
 
                     html+=`</tr>`;
                 });
@@ -283,16 +278,6 @@ export default class extends AbstractView {
             }
 
         return html;
-    }
-
-    GetRoles()
-    {
-        return this.roles;
-    }
-
-    GetRoles()
-    {
-        return this.roles;
     }
 
     async EditSeries()
@@ -362,12 +347,7 @@ export default class extends AbstractView {
         const row = document.getElementById(id);
         const role = row.querySelector('#editRole').value;
 
-        const response = await fetch("https://localhost:44365/Role/"+id, { method: "PUT",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(role)
-        });
+        const response = await fetch("https://localhost:44365/Role/"+id+"/"+role, { method: "PUT"});
 
         if(response.ok)
         {
@@ -397,14 +377,9 @@ export default class extends AbstractView {
     async ChangeAward(id)
     {
         const row = document.getElementById(id);
-        const year = row.querySelector('#editYear').value;
+        const year = parseInt(row.querySelector('#editYear1').value);
 
-        const response = await fetch("https://localhost:44365/Awarded/"+id, { method: "PUT",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(year)
-        });
+        const response = await fetch("https://localhost:44365/Awarded/"+parseInt(id)+"/"+year, { method: "PUT"});
 
         if(response.ok)
         {

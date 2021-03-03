@@ -2,7 +2,8 @@ import Home from "./views/Home.js";
 import Series from "./views/Series.js";
 import SeriesView from "./views/SeriesView.js";
 import Actors from "./views/Actors.js";
-import ActorView from "./views/ActorView.js";
+import Directors from "./views/Directors.js";
+import PersonView from "./views/PersonView.js";
 import MySeriesList from "./views/MySeriesList.js";
 import Friends from "./views/Friends.js";
 import Favourites from "./views/Favourites.js";
@@ -74,7 +75,9 @@ const router = async () => {
         { path: "/series", view: Series },
         { path: "/series/:id", view: SeriesView },
         { path: "/actors", view: Actors },
-        { path: "/actors/:id", view: ActorView },
+        { path: "/actors/:id", view: PersonView },
+        { path: "/directors", view: Directors },
+        { path: "/directors/:id", view: PersonView },
         { path: "/myserieslist", view: MySeriesList },
         { path: "/friends", view: Friends },
         { path: "/favourites", view: Favourites },
@@ -157,19 +160,19 @@ document.addEventListener("DOMContentLoaded", async () => {
             handleAddSeriesToList();
         }
 
-        if (e.target.matches("[addActorBtn]")) {
+        if (e.target.matches("[addPersonBtn]")) {
             e.preventDefault();
-            handleAddActor();
+            handleAddPerson();
         }
 
-        if (e.target.matches("[editActorBtn]")) {
+        if (e.target.matches("[editPersonBtn]")) {
             e.preventDefault();
-            handleEditActor();
+            handleEditPerson();
         }
 
-        if (e.target.matches("[deleteActorBtn]")) {
+        if (e.target.matches("[deletePersonBtn]")) {
             e.preventDefault();
-            handleDeleteActor();
+            handleDeletePerson();
         }
 
         if (e.target.matches("[editMyListBtn]")) {
@@ -266,53 +269,49 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         if(window.location.href=="http://localhost:5001/myserieslist")
         {
-            const entries = view.GetEntries();
-            entries.forEach(entrie => {
-                const id = entrie.id;
+            if (e.target.id.includes("SS")) {
+                e.preventDefault();
+                handleEditEntry(e.target.id.split(" ")[1]);
+            };
 
-                if (e.target.id==id) {
-                    e.preventDefault();
-                    handleEditEntry(id);
-                };
-
-                if (e.target.id=="R"+id) {
-                    e.preventDefault();
-                    handleDeleteEntry(id);
-                };
-            });
+            if (e.target.id.includes("RS")) {
+                e.preventDefault();
+                handleDeleteEntry(e.target.id.split(" ")[1]);
+            };
         }
 
         if(window.location.href.includes("http://localhost:5001/series/"))
         {
-            const roles = view.GetRoles();
-            roles.forEach(role => {
-                const id = role.id;
+            if (e.target.id.includes("SR")) {
+                e.preventDefault();
+                view.EditRole(e.target.id.split(" ")[1]);
+                location.reload();
+            };
 
-                if (e.target.id==id) {
-                    e.preventDefault();
-                    view.EditRole(id);
-                    location.reload();
-                };
+            if (e.target.id.includes("RR")) {
+                e.preventDefault();
+                view.DeleteRole(e.target.id.split(" ")[1]);
+                location.reload();
+            };
 
-                if (e.target.id=="R"+id) {
-                    e.preventDefault();
-                    view.DeleteRole(id);
-                    location.reload();
-                };
-            });
+            if (e.target.id.includes("SA")) {
+                e.preventDefault();
+                handleChangeAward(e.target.id.split(" ")[1]);
+            };
+
+            if (e.target.id.includes("RA")) {
+                e.preventDefault();
+                handleRemoveAward(e.target.id.split(" ")[1]);
+            };
+
         }
 
         if(window.location.href.includes("http://localhost:5001/friends"))
         {
-            const friends = view.GetFriends();
-            friends.forEach(friend => {
-                const id = friend.id;
-
-                if (e.target.id=="R"+id) {
-                    e.preventDefault();
-                    handleUnfriend(id);
-                };
-            });
+            if (e.target.id.includes("RF")) {
+                e.preventDefault();
+                handleUnfriend(e.target.id.split(" ")[1]);
+            };
         }
     });
 
@@ -363,22 +362,22 @@ async function handleAddSeriesToList()
     navigateTo("/series");
 }
 
-async function handleAddActor()
+async function handleAddPerson()
 {
-    await view.AddActor();
+    await view.AddPerson();
     location.reload();
 }
 
-async function handleEditActor()
+async function handleEditPerson()
 {
-    await view.EditActor();
+    await view.EditPerson();
     location.reload();
 }
 
-async function handleDeleteActor()
+async function handleDeletePerson()
 {
-    await view.DeleteActor();
-    navigateTo("/actors");
+    await view.DeletePerson();
+    navigateTo("/");
 }
 
 async function handleAddRole()
@@ -485,25 +484,23 @@ async function handleDeleteAward()
     navigateTo("/awards");
 }
 
-
 async function handleGiveAward()
 {
     await view.GiveAward();
     window.location.reload();
 }
 
-async function handleChangeAward()
+async function handleChangeAward(id)
 {
-    await view.ChangeAward();
+    await view.ChangeAward(id);
     window.location.reload();
 }
 
-async function handleRemoveAward()
+async function handleRemoveAward(id)
 {
-    await view.RemoveAward();
+    await view.RemoveAward(id);
     window.location.reload();
 }
-
 
 async function fillEditProfileForm()
 {

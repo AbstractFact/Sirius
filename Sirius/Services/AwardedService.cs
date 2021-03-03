@@ -130,7 +130,7 @@ namespace Sirius.Services
                 var res = _client.Cypher
                         .Match("(a:Award)-[aw:AWARDED]-(s:Series)")
                         .Where((Awarded aw) => aw.ID == id)
-                        .Set("aw.Year = year")
+                        .Set("aw.Year = $year")
                         .WithParam("year", year);
 
                 await res.ExecuteWithoutResultsAsync();
