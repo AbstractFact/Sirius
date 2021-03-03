@@ -267,6 +267,11 @@ document.addEventListener("DOMContentLoaded", async () => {
             handleRemoveAward();
         }
 
+        if (e.target.matches("[filterBtn]")) {
+            e.preventDefault();
+            handleFilter();
+        }
+
         if(window.location.href=="http://localhost:5001/myserieslist")
         {
             if (e.target.id.includes("SS")) {
@@ -500,6 +505,11 @@ async function handleRemoveAward(id)
 {
     await view.RemoveAward(id);
     window.location.reload();
+}
+
+async function handleFilter()
+{
+    await view.Filter();
 }
 
 async function fillEditProfileForm()

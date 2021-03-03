@@ -1,6 +1,7 @@
 ﻿using Neo4jClient;
 using Sirius.Entities;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -135,6 +136,35 @@ namespace Sirius.Services
             catch (Exception e)
             {
                 return false;
+            }
+        }
+
+        public async Task<List<Award>> GetAwardsFiltered(string filter)
+        {
+            try
+            {
+                var res = new List<Award>();
+                if (filter != "All")
+                {
+                    res = (List<Award>)await _client.Cypher
+                     .Match("(a:Award)")
+                     .Where((Award a) => a.Name.Contains(filter))
+                     .Return(a => a.As<Award>())
+                     .ResultsAsync;
+                }
+                else
+                {
+                    res = (List<Award>)await _client.Cypher
+                     .Match("(a:Award)")
+                     .Return(a => a.As<Award>())
+                     .ResultsAsync;
+                }
+
+                return res;
+            }
+            catch (Exception e)
+            {
+                return null;
             }
         }
     }

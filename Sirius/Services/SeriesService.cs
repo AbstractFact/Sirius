@@ -230,5 +230,51 @@ namespace Sirius.Services
                 return null;
             }
         }
+
+        public async Task<List<Series>> GetSeriesFiltered(SeriesFilterDTO filter)
+        {
+            try
+            {
+                var res=new List<Series>();
+                if(filter.Title!="" && filter.Genre!="All")
+                {
+                    res = (List<Series>)await _client.Cypher
+                    .Match("(s:Series)")
+                    .Where((Series s) => s.Title == filter.Title)
+                    .AndWhere((Series s) => s.Genre == filter.Genre)
+                    .Return(s => s.As<Series>())
+                    .ResultsAsync;
+                }
+                else if (filter.Title != "" && filter.Genre == "All")
+                {
+                    res = (List<Series>)await _client.Cypher
+                   .Match("(s:Series)")
+                   .Where((Series s) => s.Title == filter.Title)
+                   .Return(s => s.As<Series>())
+                   .ResultsAsync;
+                }
+                else if (filter.Title == "" && filter.Genre != "All")
+                {
+                    res = (List<Series>)await _client.Cypher
+                   .Match("(s:Series)")
+                   .Where((Series s) => s.Genre == filter.Genre)
+                   .Return(s => s.As<Series>())
+                   .ResultsAsync;
+                }
+                else
+                {
+                    res = (List<Series>)await _client.Cypher
+                   .Match("(s:Series)")
+                   .Return(s => s.As<Series>())
+                   .ResultsAsync;
+                }
+
+                return res;
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+        }
     }
 }

@@ -19,7 +19,9 @@ namespace Sirius.Services
 
         private async Task<int> MaxID()
         {
-            var query = await _client.Cypher
+            try
+            {
+                var query = await _client.Cypher
                         .Match("(p:Person)-[d:DIRECTED]-(s:Series)")
                         .Return(d => d.As<Directed>().ID)
                         .OrderByDescending("d.ID")
@@ -28,6 +30,11 @@ namespace Sirius.Services
                         .ResultsAsync;
 
             return query.FirstOrDefault();
+            }
+            catch (Exception e)
+            {
+                return -1;
+            }
         }
 
         public async Task<Object> GetSeriesWithDirector(int seriesID)
@@ -100,25 +107,30 @@ namespace Sirius.Services
         }
         public async Task<bool> AddDirected(int directorID, int seriesID)
         {
-            try
+            maxID = await MaxID();
+
+            if (maxID != -1)
             {
-                maxID = await MaxID();
+                try
+                {
+                    var res = _client.Cypher
+                            .Match("(person:Person)", "(series:Series)")
+                            .Where((Person person) => person.ID == directorID)
+                            .AndWhere((Series series) => series.ID == seriesID)
+                            .Create("(person)-[:DIRECTED { ID: $id }]->(series)")
+                            .WithParam("id", maxID + 1);
 
-                var res = _client.Cypher
-                        .Match("(person:Person)", "(series:Series)")
-                        .Where((Person person) => person.ID == directorID)
-                        .AndWhere((Series series) => series.ID == seriesID)
-                        .Create("(person)-[:DIRECTED]->(series)")
-                        .WithParam("id", maxID + 1);
+                    await res.ExecuteWithoutResultsAsync();
 
-                await res.ExecuteWithoutResultsAsync();
-
-                return true;
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    return false;
+                }
             }
-            catch (Exception e)
-            {
+            else
                 return false;
-            }
         }
 
         public async Task<bool> Put(Directed directed, int id)

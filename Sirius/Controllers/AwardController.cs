@@ -68,6 +68,16 @@ namespace Sirius.Controllers
             else
                 return BadRequest();
         }
+
+        [HttpPost("GetAwardsFiltered/{name}")]
+        public async Task<ActionResult> GetAwardsFiltered(string name)
+        {
+            var res = await service.GetAwardsFiltered(name);
+            if (res != null)
+                return Ok(res);
+            else
+                return BadRequest();
+        }
     }
 }
 

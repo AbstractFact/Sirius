@@ -88,6 +88,16 @@ namespace Sirius.Controllers
             else
                 return BadRequest();
         }
+
+        [HttpPost("GetSeriesFiltered")]
+        public async Task<ActionResult> GetSeriesFiltered([FromBody] SeriesFilterDTO filter)
+        {
+            var res = await service.GetSeriesFiltered(filter);
+            if (res != null)
+                return Ok(res);
+            else
+                return BadRequest();
+        }
     }
 }
 

@@ -16,6 +16,30 @@ export default class extends AbstractView {
         html=`
         <h1>All Series</h1>
         <br/>
+        <div style="display:inline-block; width:100%;">
+        <form id="filter-form" style="width:100%">
+            <div style="display:inline-block; width:38%">
+                <div class="form-group col-md-10">
+                <label for="filterTitle">Title: </label>
+                <input type="text" style="width:70%" class="form-control" id="filterTitle" placeholder="Title">
+                </div>
+            </div>
+            <div style="display:inline-block; width:38%">
+                <label for="filterGenre">Genre: </label>
+                <select id="filterGenre" class="form-control">
+                        <option selected>All</option>
+                        <option>Drama</option>
+                        <option>Comedy</option>
+                        <option>Crime</option>
+                        <option>Fantasy</option>
+                        <option>Sci-fi</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:15%; float:right;" filterBtn>Filter</button>
+        </form>
+        </div>
+        </br>
+        </br>
         <table class="table table-striped">
             <thead>
                 <tr>
@@ -27,7 +51,7 @@ export default class extends AbstractView {
                 <th scope="col">Rating</th>
                 </tr>
             </thead>
-            <tbody>`;
+            <tbody id="tcontent">`;
 
         await fetch("https://localhost:44365/Series", {method: "GET"})
         .then(p => p.json().then(data => {
@@ -54,54 +78,56 @@ export default class extends AbstractView {
             <br/>`;
 
             if(localStorage.username=="Admin" && localStorage.logged==1)
-            html+=`<form id="addseries-form" style="width:50%">
-                <div class="form-group col-md-10">
+            {
+                html+=`<form id="addseries-form" style="width:50%">
                     <div class="form-group col-md-10">
-                    <label for="inputTitle">Title</label>
-                    <input type="text" class="form-control" id="inputTitle" placeholder="Title">
+                        <div class="form-group col-md-10">
+                        <label for="inputTitle">Title</label>
+                        <input type="text" class="form-control" id="inputTitle" placeholder="Title">
+                        </div>
+                        <div class="form-group col-md-3">
+                        <label for="inputYear">Year</label>
+                        <input type="number" class="form-control" id="inputYear" placeholder="Year">
+                        </div>
                     </div>
-                    <div class="form-group col-md-3">
-                    <label for="inputYear">Year</label>
-                    <input type="number" class="form-control" id="inputYear" placeholder="Year">
+                    <div class="form-group col-md-6">
+                        <label for="inputGenre">Select Genre</label>
+                        <select id="inputGenre" class="form-control">
+                            <option selected>Drama</option>
+                            <option>Comedy</option>
+                            <option>Crime</option>
+                            <option>Fantasy</option>
+                            <option>Sci-fi</option>
+                        </select>
                     </div>
-                </div>
-                <div class="form-group col-md-6">
-                    <label for="inputGenre">Select Genre</label>
-                    <select id="inputGenre" class="form-control">
-                        <option selected>Drama</option>
-                        <option>Comedy</option>
-                        <option>Crime</option>
-                        <option>Fantasy</option>
-                        <option>Sci-fi</option>
-                    </select>
-                </div>
-                <div class="form-group col-md-6">
-                    <label for="inputDirector">Director</label>
-                    <select id="inputDirector" class="form-control">`;
-                
-                        await fetch("https://localhost:44365/Person", {method: "GET"})
-                        .then(p => p.json().then(data => {
-                            data.forEach(d => {
-                                const director = new Person(d["id"], d["name"], d["sex"], d["birthplace"], d["birthday"], d["biography"]);
-    
-                                html+=`<option value="${director.id}">${director.name}, ${director.birthplace}</option>`;
-                            });
-                    }));
+                    <div class="form-group col-md-6">
+                        <label for="inputDirector">Director</label>
+                        <select id="inputDirector" class="form-control">`;
+                    
+                            await fetch("https://localhost:44365/Person", {method: "GET"})
+                            .then(p => p.json().then(data => {
+                                data.forEach(d => {
+                                    const director = new Person(d["id"], d["name"], d["sex"], d["birthplace"], d["birthday"], d["biography"]);
+        
+                                    html+=`<option value="${director.id}">${director.name}, ${director.birthplace}</option>`;
+                                });
+                        }));
 
-                html+=`</select>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="inputPlot">Plot</label>
-                        <textarea type="text" class="form-control" id="inputPlot" placeholder=""></textarea>
+                    html+=`</select>
                     </div>
-                    <div class="form-group col-md-2">
-                        <label for="inputZip">Seasons</label>
-                        <input type="number" class="form-control" id="inputSeasons" min=1 value=1>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="inputPlot">Plot</label>
+                            <textarea type="text" class="form-control" id="inputPlot" placeholder=""></textarea>
+                        </div>
+                        <div class="form-group col-md-2">
+                            <label for="inputZip">Seasons</label>
+                            <input type="number" class="form-control" id="inputSeasons" min=1 value=1>
+                        </div>
                     </div>
-                </div>
-                <button type="submit" class="btn btn-primary" style="width:20%" addSeriesBtn>Add Series</button>
-            </form>`;
+                    <button type="submit" class="btn btn-primary" style="width:20%" addSeriesBtn>Add Series</button>
+                </form>`;
+            }
 
         return html;
     }
@@ -127,6 +153,36 @@ export default class extends AbstractView {
             addSeriesForm.reset();
             alert("Series "+title+" added to database!");
         }   
+    }
+
+    async Filter()
+    {
+        const filterForm = document.querySelector('#filter-form');
+        const title = filterForm['filterTitle'].value;
+        const genre = filterForm['filterGenre'].value;
+        const table = document.body.querySelector("#tcontent");
+        table.innerHTML=``;
+        var i=0;
+
+        await fetch("https://localhost:44365/Series/GetSeriesFiltered", {method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ "title": title, "genre": genre })
+        })
+        .then(p => p.json().then(data => {
+            data.forEach(d => {
+                table.innerHTML+=`
+                <tr>
+                <th scope="row">${++i}</th>
+                <td><a href="/series/${d["id"]}" data-link>${d["title"]}</a></td>
+                <td>${d["year"]}</td>
+                <td>${d["genre"]}</td>
+                <td>${d["seasons"]}</td>
+                <td>${(d["rating"] === 0)? "Not rated" : +(Math.round(d["rating"] + "e+1") + "e-1")}</td>
+                </tr>`;
+            });
+        }));   
     }
 }
 

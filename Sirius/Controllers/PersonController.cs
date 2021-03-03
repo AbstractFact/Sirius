@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Sirius.Entities;
 using Sirius.Services;
+using Sirius.DTOs;
 
 namespace Sirius.Controllers
 {
@@ -85,6 +86,26 @@ namespace Sirius.Controllers
             bool res = await service.Delete(id);
             if (res)
                 return Ok();
+            else
+                return BadRequest();
+        }
+
+        [HttpPost("GetActorsFiltered")]
+        public async Task<ActionResult> GetActorsFiltered([FromBody] PersonFilterDTO filter)
+        {
+            var res = await service.GetActorsFiltered(filter);
+            if (res != null)
+                return Ok(res);
+            else
+                return BadRequest();
+        }
+
+        [HttpPost("GetDirectorsFiltered")]
+        public async Task<ActionResult> GetDirectorsFiltered([FromBody] PersonFilterDTO filter)
+        {
+            var res = await service.GetDirectorsFiltered(filter);
+            if (res != null)
+                return Ok(res);
             else
                 return BadRequest();
         }
