@@ -19,15 +19,22 @@ namespace Sirius.Services
 
         private async Task<int> MaxID()
         {
-            var query = await _client.Cypher
+            try
+            {
+                var query = await _client.Cypher
                         .Match("(a:Award)-[aw:AWARDED]-(s:Series)")
                         .Return(aw => aw.As<Awarded>().ID)
                         .OrderByDescending("aw.ID")
-                        //.Return<int>("ID(s)")
-                        //.OrderByDescending("ID(s)")
+                        //.Return<int>("ID(aw)")
+                        //.OrderByDescending("ID(aw)")
                         .ResultsAsync;
 
-            return query.FirstOrDefault();
+                return query.FirstOrDefault();
+            }
+            catch (Exception)
+            {
+                return -1;
+            }
         }
 
         public async Task<Object> GetSeriesAwards(int seriesID)
@@ -48,7 +55,7 @@ namespace Sirius.Services
 
                 return res;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return null;
             }
@@ -70,7 +77,7 @@ namespace Sirius.Services
 
                 return res;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return null;
             }
@@ -94,7 +101,7 @@ namespace Sirius.Services
 
                 return res;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return null;
             }
@@ -105,19 +112,25 @@ namespace Sirius.Services
             {
                 maxID = await MaxID();
 
-                var res = _client.Cypher
-                        .Match("(award:Award)", "(series:Series)")
-                        .Where((Award award) => award.ID == awardID)
-                        .AndWhere((Series series) => series.ID == seriesID)
-                        .Create("(award)-[:AWARDED { ID: $id, Year: $year }]->(series)")
-                        .WithParam("year", year)
-                        .WithParam("id", maxID + 1);
+                if (maxID != -1)
+                {
+                    var res = _client.Cypher
+                       .Match("(award:Award)", "(series:Series)")
+                       .Where((Award award) => award.ID == awardID)
+                       .AndWhere((Series series) => series.ID == seriesID)
+                       .Create("(award)-[:AWARDED { ID: $id, Year: $year }]->(series)")
+                       .WithParam("year", year)
+                       .WithParam("id", maxID + 1);
 
-                await res.ExecuteWithoutResultsAsync();
+                    await res.ExecuteWithoutResultsAsync();
 
-                return true;
+                    return true;
+                }
+                else
+                    return false;
+
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return false;
             }
@@ -137,7 +150,7 @@ namespace Sirius.Services
 
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return false;
             }
@@ -156,7 +169,7 @@ namespace Sirius.Services
 
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return false;
             }

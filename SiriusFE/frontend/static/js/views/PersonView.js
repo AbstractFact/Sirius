@@ -89,7 +89,6 @@ export default class extends AbstractView {
             if(d.length!=0)
             {
                 i=0;
-
                 html+=`
                     </br>
                     <h2>Roles</h1>
@@ -186,6 +185,10 @@ export default class extends AbstractView {
         {
             alert("Actor "+name+" edited!");
         }
+        else
+        {
+            alert("Error!");
+        }
     }
 
     async DeletePerson()
@@ -195,6 +198,10 @@ export default class extends AbstractView {
         if (response.ok) 
         {
             alert("Actor deleted!");
+        }
+        else
+        {
+            alert("Error!");
         }
     }
 }

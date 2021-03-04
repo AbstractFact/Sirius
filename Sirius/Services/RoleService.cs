@@ -19,15 +19,22 @@ namespace Sirius.Services
 
         private async Task<int> MaxID()
         {
-            var query = await _client.Cypher
-                        .Match("(p:Person)-[r:IN_ROLE]-(s:Series)")
-                        .Return(r => r.As<Role>().ID)
-                        .OrderByDescending("r.ID")
-                        //.Return<int>("ID(r)")
-                        //.OrderByDescending("ID(r)")
-                        .ResultsAsync;
+            try
+            {
+                var query = await _client.Cypher
+                       .Match("(p:Person)-[r:IN_ROLE]-(s:Series)")
+                       .Return(r => r.As<Role>().ID)
+                       .OrderByDescending("r.ID")
+                       //.Return<int>("ID(r)")
+                       //.OrderByDescending("ID(r)")
+                       .ResultsAsync;
 
-            return query.FirstOrDefault();
+                return query.FirstOrDefault();
+            }
+            catch(Exception)
+            {
+                return -1;
+            }  
         }
 
         public async Task<Object> GetSeriesRoles(int seriesID)
@@ -48,7 +55,7 @@ namespace Sirius.Services
 
                 return res;
             }
-            catch(Exception e)
+            catch(Exception)
             {
                 return null;
             }
@@ -72,7 +79,7 @@ namespace Sirius.Services
 
                 return res;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return null;
             }  
@@ -96,7 +103,7 @@ namespace Sirius.Services
 
                 return res;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return null;
             }   
@@ -107,19 +114,25 @@ namespace Sirius.Services
             {
                 maxID = await MaxID();
 
-                var res = _client.Cypher
-                        .Match("(person:Person)", "(series:Series)")
-                        .Where((Person person) => person.ID == actorID)
-                        .AndWhere((Series series) => series.ID == seriesID)
-                        .Create("(person)-[:IN_ROLE { ID: $id, InRole: $role }]->(series)")
-                        .WithParam("role", role)
-                        .WithParam("id", maxID + 1);
+                if (maxID != -1)
+                {
+                    var res = _client.Cypher
+                       .Match("(person:Person)", "(series:Series)")
+                       .Where((Person person) => person.ID == actorID)
+                       .AndWhere((Series series) => series.ID == seriesID)
+                       .Create("(person)-[:IN_ROLE { ID: $id, InRole: $role }]->(series)")
+                       .WithParam("role", role)
+                       .WithParam("id", maxID + 1);
 
-                await res.ExecuteWithoutResultsAsync();
+                    await res.ExecuteWithoutResultsAsync();
 
-                return true;
+                    return true;
+                }
+                else
+                    return false;
+               
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return false;
             }
@@ -139,7 +152,7 @@ namespace Sirius.Services
 
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return false;
             }
@@ -158,7 +171,7 @@ namespace Sirius.Services
 
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return false;
             }

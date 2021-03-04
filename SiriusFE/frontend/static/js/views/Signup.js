@@ -66,11 +66,9 @@ export default class extends AbstractView {
         else
         {
             const json = await response.json();
-
             localStorage.userid=json["id"];
             localStorage.logged=1;
             localStorage.username=username;
-
             alert("Welcome to Sirius "+username); 
         }   
     }

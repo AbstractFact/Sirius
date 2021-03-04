@@ -2,7 +2,6 @@ import AbstractView from "./AbstractView.js";
 import {Series} from "../models/Series.js";
 import {Person} from "../models/Person.js";
 import {Role} from "../models/Role.js";
-import {Directed} from "../models/Directed.js";
 import {Award} from "../models/Award.js"
 import {Awarded} from "../models/Awarded.js"
 
@@ -176,8 +175,7 @@ export default class extends AbstractView {
                 html+=`<form id="addrole-form" style="width:40%">
                 <div class="form-group col-md-8">
                     <label for="inputActor">Actors</label>
-                    <select id="inputActor" class="form-control">
-                        <option selected>Select Actor</option>`;
+                    <select id="inputActor" class="form-control">`;
                         
                         
                 await fetch("https://localhost:44365/Person", {method: "GET"})
@@ -257,8 +255,7 @@ export default class extends AbstractView {
                 html+=`<form id="addaward-form" style="width:40%">
                 <div class="form-group col-md-8">
                     <label for="inputAward">Awards</label>
-                    <select id="inputAward" class="form-control">
-                        <option selected>Select Award</option>`;
+                    <select id="inputAward" class="form-control">`;
                         
                         
                 await fetch("https://localhost:44365/Award", {method: "GET"})
@@ -302,6 +299,10 @@ export default class extends AbstractView {
         {
             alert("Series "+title+" edited!");
         }
+        else
+        {
+            alert("Error!");
+        }
     }
 
     async DeleteSeries()
@@ -310,6 +311,10 @@ export default class extends AbstractView {
 
         if (response.ok) {
             alert("Series " + "deleted!");
+        }
+        else
+        {
+            alert("Error!");
         }
     }
 
@@ -340,7 +345,11 @@ export default class extends AbstractView {
         if(response.ok)
         {
             alert("Role added!");
-        };
+        }
+        else
+        {
+            alert("Error!");
+        }
     }
 
     async EditRole(id)
@@ -353,7 +362,11 @@ export default class extends AbstractView {
         if(response.ok)
         {
             alert("Role edited!");
-        };
+        }
+        else
+        {
+            alert("Error!");
+        }
     }
 
     DeleteRole(id)
@@ -372,7 +385,11 @@ export default class extends AbstractView {
         if(response.ok)
         {
             alert("Award added!");
-        };
+        }
+        else
+        {
+            alert("Error!");
+        }
     }
 
     async ChangeAward(id)
@@ -385,11 +402,23 @@ export default class extends AbstractView {
         if(response.ok)
         {
             alert("Award edited!");
-        };
+        }
+        else
+        {
+            alert("Error!");
+        }
     }
 
     RemoveAward(id)
     {
-        fetch("https://localhost:44365/Awarded/"+id, { method: "DELETE"});
+        const response = fetch("https://localhost:44365/Awarded/"+id, { method: "DELETE"});
+        if(response.ok)
+        {
+            alert("Award edited!");
+        }
+        else
+        {
+            alert("Error!");
+        }
     }
 }

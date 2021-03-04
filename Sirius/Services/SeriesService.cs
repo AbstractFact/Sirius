@@ -40,7 +40,7 @@ namespace Sirius.Services
 
                 return query.FirstOrDefault();
             }
-            catch(Exception e)
+            catch(Exception)
             {
                 return -1;
             }   
@@ -57,7 +57,7 @@ namespace Sirius.Services
 
                 return res;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return null;
             }
@@ -75,7 +75,7 @@ namespace Sirius.Services
               
                return res.FirstOrDefault();
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return null;
             }
@@ -120,7 +120,7 @@ namespace Sirius.Services
                     return newSeries.ID;
 
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     return -1;
                 }
@@ -142,7 +142,7 @@ namespace Sirius.Services
                 await res.ExecuteWithoutResultsAsync();
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return false;
             }
@@ -178,7 +178,7 @@ namespace Sirius.Services
                 await res.ExecuteWithoutResultsAsync();
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return false;
             }
@@ -225,7 +225,7 @@ namespace Sirius.Services
 
                 return arr;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return null;
             }
@@ -240,7 +240,7 @@ namespace Sirius.Services
                 {
                     res = (List<Series>)await _client.Cypher
                     .Match("(s:Series)")
-                    .Where((Series s) => s.Title == filter.Title)
+                    .Where((Series s) => s.Title.Contains(filter.Title))
                     .AndWhere((Series s) => s.Genre == filter.Genre)
                     .Return(s => s.As<Series>())
                     .ResultsAsync;
@@ -249,7 +249,7 @@ namespace Sirius.Services
                 {
                     res = (List<Series>)await _client.Cypher
                    .Match("(s:Series)")
-                   .Where((Series s) => s.Title == filter.Title)
+                   .Where((Series s) => s.Title.Contains(filter.Title))
                    .Return(s => s.As<Series>())
                    .ResultsAsync;
                 }
@@ -271,7 +271,7 @@ namespace Sirius.Services
 
                 return res;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return null;
             }

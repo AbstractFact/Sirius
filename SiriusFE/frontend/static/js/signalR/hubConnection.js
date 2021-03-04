@@ -11,7 +11,7 @@ export default class Connection
             .withUrl("https://localhost:44365/sirius")
             .configureLogging(signalR.LogLevel.Information)
             .build();
-}
+    }
     
     async start()
     {

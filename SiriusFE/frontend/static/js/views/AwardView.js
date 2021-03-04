@@ -1,8 +1,6 @@
-
 import AbstractView from "./AbstractView.js";
 import {Series} from "../models/Series.js";
 import {Award} from "../models/Award.js";
-import {Awarded} from "../models/Awarded.js";
 
 export default class extends AbstractView {
     constructor(params) {
@@ -22,11 +20,9 @@ export default class extends AbstractView {
             html=`
                 <h1>Award: ${award.name}</h1>
                 <br/>
-                
                 <p>
                     ${award.description}
                 </p>
-
                 <br/>`;
                     
                 if(localStorage.username=="Admin" && localStorage.logged==1)
@@ -51,7 +47,6 @@ export default class extends AbstractView {
         await fetch("https://localhost:44365/Awarded/GetAwardedSeries/"+this.postId, {method: "GET"})
         .then(p => p.json().then(d => {
                 i=0;
-
                 html+=`
                     <h2>Awarded series</h1>
                     <br/>
@@ -68,7 +63,6 @@ export default class extends AbstractView {
                 d.forEach(data => {
 
                     const series = new Series(data["series"]["id"], data["series"]["title"], data["series"]["year"], data["series"]["genre"], data["series"]["plot"], data["series"]["seasons"], data["series"]["rating"]);
-                    //const awarded = new Awarded(data["id"], award, series, data["year"]);
 
                     html+=`
                         <tr>

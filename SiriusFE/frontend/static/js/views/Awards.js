@@ -27,7 +27,7 @@ export default class extends AbstractView {
                         </div>
                         <button type="submit" class="btn btn-primary" style="width:15%; float:right;" filterBtn>Filter</button>
                     </form>
-                    </div>
+                </div>
                 <table class="table table-striped">
                     <thead>
                         <tr>
@@ -52,7 +52,6 @@ export default class extends AbstractView {
             html+=`
                 </tbody>
                 </table>
-
                 <br/>`;
                 
                 if(localStorage.username=="Admin" && localStorage.logged==1)
@@ -103,11 +102,11 @@ export default class extends AbstractView {
         const filterForm = document.querySelector('#filter-form');
         const name = (filterForm['filterName'].value != "")? filterForm['filterName'].value : "All";
         const table = document.body.querySelector("#tcontent");
-        table.innerHTML=``;
-        var i=0;
-
+        
         await fetch("https://localhost:44365/Award/GetAwardsFiltered/"+name, {method: "POST"})
         .then(p => p.json().then(data => {
+            table.innerHTML=``;
+            var i=0;
             data.forEach(d => {
                 table.innerHTML+=`
                 <tr>
@@ -116,7 +115,6 @@ export default class extends AbstractView {
                 <td>${d["description"]}</td>
                 </tr>`;
             });
-        }));
-          
+        }));    
     }
 }

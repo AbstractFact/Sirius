@@ -31,7 +31,7 @@ namespace Sirius.Services
 
             return query.FirstOrDefault();
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return -1;
             }
@@ -54,7 +54,7 @@ namespace Sirius.Services
 
                 return res.FirstOrDefault();
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return null;
             }
@@ -77,7 +77,7 @@ namespace Sirius.Services
 
                 return res;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return null;
             }
@@ -100,7 +100,7 @@ namespace Sirius.Services
 
                 return res;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return null;
             }
@@ -124,7 +124,7 @@ namespace Sirius.Services
 
                     return true;
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     return false;
                 }
@@ -147,7 +147,7 @@ namespace Sirius.Services
 
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return false;
             }
@@ -166,7 +166,7 @@ namespace Sirius.Services
 
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return false;
             }

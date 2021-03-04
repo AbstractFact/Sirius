@@ -74,7 +74,6 @@ export default class extends AbstractView {
         html+=`
             </tbody>
             </table>
-
             <br/>`;
 
             if(localStorage.username=="Admin" && localStorage.logged==1)
@@ -152,7 +151,11 @@ export default class extends AbstractView {
         if (response.ok) {
             addSeriesForm.reset();
             alert("Series "+title+" added to database!");
-        }   
+        } 
+        else
+        {
+            alert("Error!");
+        }  
     }
 
     async Filter()
@@ -161,8 +164,6 @@ export default class extends AbstractView {
         const title = filterForm['filterTitle'].value;
         const genre = filterForm['filterGenre'].value;
         const table = document.body.querySelector("#tcontent");
-        table.innerHTML=``;
-        var i=0;
 
         await fetch("https://localhost:44365/Series/GetSeriesFiltered", {method: "POST",
             headers: {
@@ -171,6 +172,8 @@ export default class extends AbstractView {
             body: JSON.stringify({ "title": title, "genre": genre })
         })
         .then(p => p.json().then(data => {
+            table.innerHTML=``;
+            var i=0;
             data.forEach(d => {
                 table.innerHTML+=`
                 <tr>

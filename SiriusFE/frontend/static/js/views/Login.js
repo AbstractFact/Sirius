@@ -1,4 +1,3 @@
-import Connection from "../signalR/hubConnection.js";
 import AbstractView from "./AbstractView.js";
 
 export default class extends AbstractView {
@@ -19,12 +18,10 @@ export default class extends AbstractView {
                     <label for="uname"><b>Username</b></label>
                     <input type="text" placeholder="Enter Username" name="uname" id="login-username" required>
                 </div>
-
                 <div class="inputitem">
                     <label for="psw"><b>Password</b></label>
                     <input type="password" placeholder="Enter Password" name="psw" id="login-password" required>
                 </div>
-            
                 <button class="inputitem" type="submit" loginbtn>Login</button>
             </div>
         </form>`;
@@ -54,11 +51,9 @@ export default class extends AbstractView {
         else
         {
             const json = await response.json();
-
             localStorage.userid=json["id"];
             localStorage.logged=1;
             localStorage.username=username;
-            
             alert("Welcome back to Sirius "+username); 
         }                                                   
     }     

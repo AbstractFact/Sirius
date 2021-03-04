@@ -6,13 +6,13 @@ export default class extends AbstractView {
     {
         super(params);
         this.html=``;
-        this.setTitle("All Recommendations");
+        this.setTitle("All Friends Favourites");
     }
 
     async getHtml() 
     {
         this.html=`
-            <h1>All Recommendations</h1>
+            <h1>All Friends Favourites</h1>
             <br/>
             <table class="table table-striped">
                 <thead>

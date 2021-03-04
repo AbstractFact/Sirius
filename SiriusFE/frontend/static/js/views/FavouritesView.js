@@ -6,7 +6,7 @@ export default class extends AbstractView {
     {
         super(params);
         this.postId = params.id;
-        this.setTitle("Recomendations");
+        this.setTitle("Friend's favourites");
     }
 
     async getHtml() 
@@ -19,7 +19,7 @@ export default class extends AbstractView {
                 i=0;
                 const username = data[0]["username"];
                 html=`
-                    <h1>${username}'s Recomendations</h1>
+                    <h1>${username}'s favourites</h1>
                     <br/>
                     <table class="table table-striped">
                         <thead>

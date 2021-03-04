@@ -1,7 +1,6 @@
 Neo4J:
 
 -Proveriti funkciju za generisanje ID-jeva (MaxID). Probati sa lock
--Dodati filtere za prijetelje po username i za myserieslist po statusu i favourite
 
 Redis:
 

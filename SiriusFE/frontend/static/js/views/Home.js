@@ -44,9 +44,7 @@ export default class extends AbstractView {
         html+=`
         </tbody>
         </table>
-
         <br/>
-
         <h1>Best Rated Series</h1>
         <br/>
         <table class="table table-striped">
@@ -79,7 +77,6 @@ export default class extends AbstractView {
         html+=`
         </tbody>
         </table>
-
         <br/>`;
 
         if(localStorage.username=="Admin" && localStorage.logged==1)
@@ -94,8 +91,7 @@ export default class extends AbstractView {
                         <div class="form-group col-md-4">
                         <label for="inputSex">Sex</label>
                         <select id="inputSex" class="form-control">
-                            <option selected>Select Sex</option>
-                            <option>Male</option>
+                            <option selected>Male</option>
                             <option>Female</option>
                         </select>
                     </div>
@@ -140,6 +136,10 @@ export default class extends AbstractView {
         {
             addPersonForm.reset();
             alert("Person "+name+" added to database!");
+        }
+        else
+        {
+            alert("Error!");
         }
     }
 }

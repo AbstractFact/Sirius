@@ -64,7 +64,6 @@ export default class extends AbstractView {
             html+=`
                 </tbody>
                 </table>
-
                 <br/>`;
         }));
 
@@ -77,8 +76,6 @@ export default class extends AbstractView {
         const name = filterForm['filterName'].value;
         const sex = filterForm['filterSex'].value;
         const table = document.body.querySelector("#tcontent");
-        table.innerHTML=``;
-        var i=0;
 
         await fetch("https://localhost:44365/Person/GetActorsFiltered", {method: "POST",
             headers: {
@@ -87,6 +84,8 @@ export default class extends AbstractView {
             body: JSON.stringify({ "name": name, "sex": sex })
         })
         .then(p => p.json().then(data => {
+            table.innerHTML=``;
+            var i=0;
             data.forEach(d => {
                 table.innerHTML+=`
                 <tr>

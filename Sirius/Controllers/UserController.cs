@@ -235,5 +235,14 @@ namespace Sirius.Controllers
                 return BadRequest();
         }
 
+        [HttpGet("GetAllFilteredFriends/{userID}/{filter}")]
+        public async Task<ActionResult<List<User>>> GetAllFilteredFriends(int userID, string filter)
+        {
+            List<User> res = await service.GetAllFilteredFriends(userID, filter);
+            if (res != null)
+                return Ok(res);
+            else
+                return BadRequest();
+        }
     }
 }

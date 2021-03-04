@@ -63,6 +63,19 @@ export default class extends AbstractView {
                 <br/>
                 <h1>My Friends</h1>
                 <br/>
+                <div style="display:inline-block; width:100%;">
+                <form id="filter-form" style="width:100%">
+                    <div style="display:inline-block; width:38%">
+                        <div class="form-group col-md-10">
+                        <label for="filterUsername">Username: </label>
+                        <input type="text" style="width:70%" class="form-control" id="filterUsername" placeholder="Title">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width:15%; float:right;" filterBtn>Filter</button>
+                </form>
+                </div>
+                </br>
+                </br>
                 <table class="table table-striped">
                     <thead>
                         <tr>
@@ -72,7 +85,7 @@ export default class extends AbstractView {
                         <th scope="col"></th>
                         </tr>
                     </thead>
-                    <tbody>`;
+                    <tbody id="tcontent">`;
                 i=0;
                 await fetch("https://localhost:44365/User/GetAllFriends/"+localStorage.userid, {method: "GET"})
                 .then(p => p.json().then(data => {
@@ -150,7 +163,11 @@ export default class extends AbstractView {
 
         if (response.ok) {
             alert("Friend added!");
-        }   
+        } 
+        else
+        {
+            alert("Error!");
+        }  
     }
 
     async RemoveRequest(requestID, senderID)
@@ -159,6 +176,10 @@ export default class extends AbstractView {
 
         if (response.ok) {
             alert("Request removed!");
+        } 
+        else
+        {
+            alert("Error!");
         }   
     }
 
@@ -169,6 +190,34 @@ export default class extends AbstractView {
             {
                 alert("User unfriended!");
             }
+            else
+            {
+                alert("Error!");
+            } 
         });
+    }
+
+    async Filter()
+    {
+        const filterForm = document.querySelector('#filter-form');
+        const username = filterForm['filterUsername'].value;
+        const table = document.body.querySelector("#tcontent");
+
+        await fetch("https://localhost:44365/User/GetAllFilteredFriends/"+localStorage.userid+"/"+username, {method: "GET"})
+        .then(p => p.json().then(data => {
+            table.innerHTML=``;
+            var i=0;
+            data.forEach(d => {
+                table.innerHTML+=`
+                <tr id="${d["id"]}">
+                <th scope="row">${++i}</th>
+                <td>${d["username"]}</td>
+                <td><a href="/favourites/${d["id"]}" data-link>View</a></td>
+                <td>
+                    <button type="submit" class="btn btn-danger" style="width:50%" id="RF ${d["id"]}">Unfriend</button>
+                </td>
+                </tr>`;
+            });
+        }));   
     }
 }

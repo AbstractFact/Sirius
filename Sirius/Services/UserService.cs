@@ -36,13 +36,13 @@ namespace Sirius.Services
                         .Match("(u:User)")
                         .Return<int>(u => u.As<User>().ID)
                         .OrderByDescending("u.ID")
-                        //.Return<int>("ID(s)")
-                        //.OrderByDescending("ID(s)")
+                        //.Return<int>("ID(u)")
+                        //.OrderByDescending("ID(u)")
                         .ResultsAsync;
 
                 return query.FirstOrDefault();
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return -1;
             }
@@ -62,7 +62,7 @@ namespace Sirius.Services
 
                 return res;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return null;
             }    
@@ -80,7 +80,7 @@ namespace Sirius.Services
 
                 return res.FirstOrDefault();
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return null;
             }
@@ -127,7 +127,7 @@ namespace Sirius.Services
 
                 return res.FirstOrDefault();
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return null;
             }
@@ -150,7 +150,7 @@ namespace Sirius.Services
 
                     return newUser;
                 }
-                catch(Exception e)
+                catch(Exception)
                 {
                     return null;
                 }
@@ -172,7 +172,7 @@ namespace Sirius.Services
                 await res.ExecuteWithoutResultsAsync();
                 return user;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return null;
             }
@@ -190,7 +190,7 @@ namespace Sirius.Services
                 await res.ExecuteWithoutResultsAsync();
                 return id;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return -1;
             }
@@ -207,7 +207,7 @@ namespace Sirius.Services
                        .ResultsAsync;
                 return res.ToList();
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return null;
             }
@@ -232,7 +232,7 @@ namespace Sirius.Services
 
                 return res;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return null;
             }
@@ -253,7 +253,7 @@ namespace Sirius.Services
 
                 return res;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return null;
             }  
@@ -288,7 +288,7 @@ namespace Sirius.Services
 
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return false;
             }
@@ -333,7 +333,7 @@ namespace Sirius.Services
                 await redisDB.SetRemoveAsync("friend:" + senderId + ":request", receiverId);
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return false;
             }
@@ -349,7 +349,7 @@ namespace Sirius.Services
 
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return false;
             }
@@ -365,7 +365,7 @@ namespace Sirius.Services
 
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return false;
             }
@@ -380,7 +380,7 @@ namespace Sirius.Services
 
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return false;
             }
@@ -401,7 +401,7 @@ namespace Sirius.Services
                 return arr;
 
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return null;
             }
@@ -421,7 +421,40 @@ namespace Sirius.Services
 
                 return arr;
             }
-            catch (Exception e)
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        public async Task<List<User>> GetAllFilteredFriends(int userID, string filter)
+        {
+            try
+            {
+                var res = new List<User>();
+
+                if(filter!="")
+                {
+                    res = (List<User>)await _client.Cypher
+                      .Match("(user:User)-[FRIENDS]-(friend:User)")
+                      .Where((User user) => user.ID == userID)
+                      .AndWhere((User friend) => friend.Username.Contains(filter))
+                      .Return(friend => friend.As<User>())
+                      .ResultsAsync;
+                    
+                }
+                else
+                {
+                    res = (List<User>)await _client.Cypher
+                     .Match("(user:User)-[FRIENDS]-(friend:User)")
+                     .Where((User user) => user.ID == userID)
+                     .Return(friend => friend.As<User>())
+                     .ResultsAsync;
+                }
+
+                return res;
+            }
+            catch (Exception)
             {
                 return null;
             }

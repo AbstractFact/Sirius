@@ -32,7 +32,7 @@ namespace Sirius.Services
 
                 return query.FirstOrDefault();
             }
-            catch(Exception e)
+            catch(Exception)
             {
                 return -1;
             }
@@ -50,7 +50,7 @@ namespace Sirius.Services
 
                 return res;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return null;
             }
@@ -71,7 +71,7 @@ namespace Sirius.Services
 
                 return res;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return null;
             }
@@ -92,7 +92,7 @@ namespace Sirius.Services
 
                 return res;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return null;
             }
@@ -111,7 +111,7 @@ namespace Sirius.Services
               
                 return res.FirstOrDefault();
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return null;
             }
@@ -134,7 +134,7 @@ namespace Sirius.Services
 
                     return true;
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     return false;
                 } 
@@ -157,7 +157,7 @@ namespace Sirius.Services
                 await res.ExecuteWithoutResultsAsync();
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return false;
             }
@@ -176,7 +176,7 @@ namespace Sirius.Services
 
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return false;
             }
@@ -258,7 +258,7 @@ namespace Sirius.Services
 
                 return res;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return null;
             }
@@ -273,7 +273,7 @@ namespace Sirius.Services
                 {
                     res = (List<Person>)await _client.Cypher
                        .Match("(p:Person)-[d:DIRECTED]-(s:Series)")
-                       .Where((Person p) => p.Name == filter.Name)
+                       .Where((Person p) => p.Name.Contains(filter.Name))
                        .AndWhere((Person p) => p.Sex == filter.Sex)
                        .With("DISTINCT p as director")
                        .Return((director) => new Person
@@ -291,7 +291,7 @@ namespace Sirius.Services
                 {
                     res = (List<Person>)await _client.Cypher
                        .Match("(p:Person)-[d:DIRECTED]-(s:Series)")
-                       .Where((Person p) => p.Name == filter.Name)
+                       .Where((Person p) => p.Name.Contains(filter.Name))
                        .With("DISTINCT p as director")
                        .Return((director) => new Person
                        {
@@ -340,7 +340,7 @@ namespace Sirius.Services
 
                 return res;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return null;
             }

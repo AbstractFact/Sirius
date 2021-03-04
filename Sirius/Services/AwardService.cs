@@ -25,13 +25,13 @@ namespace Sirius.Services
                         .Match("(a:Award)")
                         .Return<int>(a => a.As<Award>().ID)
                         .OrderByDescending("a.ID")
-                        //.Return<int>("ID(s)")
-                        //.OrderByDescending("ID(s)")
+                        //.Return<int>("ID(a)")
+                        //.OrderByDescending("ID(a)")
                         .ResultsAsync;
 
                 return query.FirstOrDefault();
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return -1;
             }
@@ -49,7 +49,7 @@ namespace Sirius.Services
 
                 return res;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return null;
             }
@@ -68,7 +68,7 @@ namespace Sirius.Services
 
                 return res.FirstOrDefault();
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return null;
             }
@@ -91,7 +91,7 @@ namespace Sirius.Services
 
                     return true;
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     return false;
                 }
@@ -114,7 +114,7 @@ namespace Sirius.Services
                 await res.ExecuteWithoutResultsAsync();
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return false;
             }
@@ -133,7 +133,7 @@ namespace Sirius.Services
 
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return false;
             }
@@ -162,7 +162,7 @@ namespace Sirius.Services
 
                 return res;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return null;
             }

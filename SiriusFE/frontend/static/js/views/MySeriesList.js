@@ -65,10 +65,10 @@ export default class extends AbstractView {
                                 <td><a href="/series/${seriesID}" class="serid" id="${seriesID}" data-link>${title}</a></td>
                                 <td>${genre}</td>
                                 <td>
-                                    <button type="submit" class="btn btn-primary" style="width:40%" id="${seriesID} ${title} ${genre}" btnAcceptRecommendation>Add To List</button>
+                                    <button type="submit" class="btn btn-primary" style="width:40%" id="${seriesID}^${title}^${genre}" btnAcceptRecommendation>Add To List</button>
                                 </td>
                                 <td>
-                                    <button type="submit" class="btn btn-danger" style="width:40%" id="R${seriesID} ${title} ${genre}" btnRemoveRecommendation>Remove</button>
+                                    <button type="submit" class="btn btn-danger" style="width:40%" id="R${seriesID}^${title}^${genre}" btnRemoveRecommendation>Remove</button>
                                 </td>
                                 </tr>`;
                         });
@@ -85,6 +85,28 @@ export default class extends AbstractView {
                     html+=`
                         <h1>My Series List</h1>
                         <br/>
+                        <div style="display:inline-block; width:100%;">
+                            <form id="filter-form" style="width:100%">
+                                <div style="display:inline-block; width:38%">
+                                    <label for="filterStatus">Status: </label>
+                                    <select id="filterStatus" class="form-control">
+                                            <option selected>All</option>
+                                            <option>Plan to Watch</option>
+                                            <option>Watching</option>
+                                            <option>On Hold</option>
+                                            <option>Dropped</option>
+                                            <option>Completed</option>
+                                    </select>
+                                </div>
+                                <div style="display:inline-block; width:38%">
+                                    <input type="checkbox" id="filterFav" name="fav">
+                                    <label for="filterFav"> Favourites Only</label><br>
+                                </div>
+                                <button type="submit" class="btn btn-primary" style="width:15%; float:right;" filterBtn>Filter</button>
+                            </form>
+                        </div>
+                        </br>
+                        </br>
                         <table class="table table-striped">
                             <thead>
                                 <tr>
@@ -101,7 +123,7 @@ export default class extends AbstractView {
                                 <th scope="col"></th>
                                 </tr>
                             </thead>
-                            <tbody>`;
+                            <tbody id="tcontent">`;
 
                 data.forEach(d => {
                         const series = new Series(d["series"]["id"], d["series"]["title"], d["series"]["year"], d["series"]["genre"], d["series"]["plot"], d["series"]["seasons"], d["series"]["rating"]);
@@ -120,7 +142,7 @@ export default class extends AbstractView {
                             <td><a href="/series/${series.id}" class="serid" id="${series.id}" data-link>${series.title}</a></td>
                             <td>${series.genre}</td>
                             <td>${series.seasons}</td>
-                            <td>`+ +(Math.round(series.rating + "e+1") + "e-1")+`</td>
+                            <td>${(series.rating === 0)? "Not rated" : +(Math.round(series.rating + "e+1") + "e-1")}</td>
                             <td>
                                 <select id="inputStatus" class="form-control">
                                     <option selected>${status}</option>
@@ -182,7 +204,11 @@ export default class extends AbstractView {
 
         if (response.ok){
             alert("Entry "+serid+" edited!");
-        };
+        }
+        else
+        {
+            alert("Error!");
+        }
     }
 
     DeleteEntry(id)
@@ -190,6 +216,10 @@ export default class extends AbstractView {
         fetch("https://localhost:44365/UserSeriesList/"+id, { method: "DELETE"}).then(p => {
             if (p.ok) {
                 alert("Entry deleted!");
+            }
+            else
+            {
+                alert("Error!");
             }
         });
     }
@@ -259,12 +289,16 @@ export default class extends AbstractView {
             if (p.ok) {
                 console.log("Changes saved!");
             }
+            else
+            {
+                alert("Error!");
+            }
         });
     }
 
     async DeleteRecommendation(id)
     {
-        const params = id.substring(1).split(" ");
+        const params = id.substring(1).split("^");
         const seriesID = parseInt(params[0]);
         const title = params[1];
         const genre = params[2];
@@ -278,12 +312,16 @@ export default class extends AbstractView {
                 alert("Recommendation deleted!");
                 window.location.reload();
             }
+            else
+            {
+                alert("Error!");
+            }
         });
     }
 
     async AcceptRecommendation(id)
     {
-        const params = id.split(" ");
+        const params = id.split("^");
         const seriesID = parseInt(params[0]);
         const title = params[1];
         const genre = params[2];
@@ -301,8 +339,75 @@ export default class extends AbstractView {
                 alert("Series is already in your list!");
             }
         });
-        
-
     }
 
+    async Filter()
+    {
+        const filterForm = document.querySelector('#filter-form');
+        const status = filterForm['filterStatus'].value;
+        const favourite = filterForm['filterFav'].checked;
+        const table = document.body.querySelector("#tcontent");
+
+        await fetch("https://localhost:44365/UserSeriesList/GetUserSeriesFiltered/"+localStorage.userid, {method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ "status": status, "favourite": favourite })
+        })
+        .then(p => p.json().then(data => {
+            table.innerHTML=``;
+            var i=0;
+            data.forEach(d => {
+              
+                const series = new Series(d["series"]["id"], d["series"]["title"], d["series"]["year"], d["series"]["genre"], d["series"]["plot"], d["series"]["seasons"], d["series"]["rating"]);
+                const status = d["status"];
+                const stars = d["stars"];
+                const comment = d["comment"];
+                const favourite = d["favourite"];
+                const checked= favourite?`checked`:``;
+                const entry = new MySeriesList(d["id"], series, status, stars, comment, favourite);
+
+                table.innerHTML+=`
+                <tr id="${entry.id}">
+                <th scope="row">${++i}</th>
+                <td><a href="/series/${series.id}" class="serid" id="${series.id}" data-link>${series.title}</a></td>
+                <td>${series.genre}</td>
+                <td>${series.seasons}</td>
+                <td>${(series.rating === 0)? "Not rated" : +(Math.round(series.rating + "e+1") + "e-1")}</td>
+                <td>
+                    <select id="inputStatus" class="form-control">
+                        <option selected>${status}</option>
+                        <option>Watching</option>
+                        <option>Plan to Watch</option>
+                        <option>On Hold</option>
+                        <option>Dropped</option>
+                        <option>Completed</option>
+                    </select>
+                </td>
+                <td>
+                    <select id="inputStars" class="form-control">
+                        <option selected>${stars}</option>
+                        <option>1</option>
+                        <option>2</option>
+                        <option>3</option>
+                        <option>4</option>
+                        <option>5</option>
+                    </select>
+                </td>
+                <td>
+                    <textarea type="text" class="form-control" id="inputComment">${comment}</textarea>
+                </td>
+                <td>
+                    <input type="checkbox" id="inputFav" name="fav" ${checked}>
+                </td>
+                <td>
+                    <button type="submit" class="btn btn-primary" style="width:60%" id="SS ${entry.id}">Save Changes</button>
+                </td>
+                <td>
+                    <button type="submit" class="btn btn-danger" style="width:100%" id="RS ${entry.id}">X</button>
+                </td>
+                </tr>`;
+            });
+        }));    
+    }
 }
