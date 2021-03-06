@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Sirius.Services;
 using Sirius.Entities;
+using Sirius.DTOs;
 
 namespace Sirius.Controllers
 {
@@ -58,7 +59,7 @@ namespace Sirius.Controllers
 
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> Put([FromBody] Directed directed, int id)
+        public async Task<ActionResult> Put([FromBody] DirectedDTO directed, int id)
         {
             bool res = await service.Put(directed, id);
             if (res)

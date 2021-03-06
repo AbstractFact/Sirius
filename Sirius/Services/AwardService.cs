@@ -1,4 +1,6 @@
 ﻿using Neo4jClient;
+using Neo4jClient.Cypher;
+using Sirius.DTOs;
 using Sirius.Entities;
 using System;
 using System.Collections.Generic;
@@ -10,32 +12,9 @@ namespace Sirius.Services
     public class AwardService
     {
         private readonly IGraphClient _client;
-        private int maxID;
         public AwardService(IGraphClient client)
         {
             _client = client;
-            maxID = 0;
-        }
-
-        private async Task<int> MaxID()
-        {
-            try
-            {
-                var query = await _client.Cypher
-                        .Match("(a:Award)")
-                        .Return<int>(a => a.As<Award>().ID)
-                        .OrderByDescending("a.ID")
-                        //.Return<int>("ID(a)")
-                        //.OrderByDescending("ID(a)")
-                        .ResultsAsync;
-
-                return query.FirstOrDefault();
-            }
-            catch (Exception)
-            {
-                return -1;
-            }
-
         }
 
         public async Task<Object> GetAll()
@@ -44,7 +23,12 @@ namespace Sirius.Services
             {
                 var res = await _client.Cypher
                       .Match("(award:Award)")
-                      .Return(award => award.As<Award>())
+                      .Return((award) => new AwardDTO
+                      {
+                           ID = Return.As<int>("ID(award)"),
+                           Name = Return.As<string>("award.Name"),
+                           Description = Return.As<string>("award.Description")
+                      })
                       .ResultsAsync;
 
                 return res;
@@ -55,14 +39,20 @@ namespace Sirius.Services
             }
         }
 
-        public async Task<Award> GetAward(int awardID)
+        public async Task<AwardDTO> GetAward(int awardID)
         {
             try
             {
                 var res = await _client.Cypher
                      .Match("(a:Award)")
-                     .Where((Award a) => a.ID == awardID)
-                     .Return(a => a.As<Award>())
+                     .Where("ID(a) = $awardID")
+                     .WithParam("awardID", awardID)
+                     .Return((a) => new AwardDTO
+                     {
+                          ID = Return.As<int>("ID(a)"),
+                          Name = Return.As<string>("a.Name"),
+                          Description = Return.As<string>("a.Description")
+                     })
                      .ResultsAsync;
 
 
@@ -76,38 +66,30 @@ namespace Sirius.Services
 
         public async Task<bool> Post(Award a)
         {
-            maxID = await MaxID();
-
-            if (maxID != -1)
+            try
             {
-                try
-                {
-                    var newAward = new Award { ID = maxID + 1, Name = a.Name, Description = a.Description };
-                    var res = _client.Cypher
-                                .Create("(award:Award $newAward)")
-                                .WithParam("newAward", newAward);
+                var res = _client.Cypher
+                                .Create("(award:Award $a)")
+                                .WithParam("a", a);
 
-                    await res.ExecuteWithoutResultsAsync();
+                await res.ExecuteWithoutResultsAsync();
 
-                    return true;
-                }
-                catch (Exception)
-                {
-                    return false;
-                }
+                return true;
             }
-            else
+            catch (Exception)
+            {
                 return false;
-
+            }
         }
 
-        public async Task<bool> Put(Award award, int id)
+        public async Task<bool> Put(AwardDTO award, int id)
         {
             try
             {
                 var res = _client.Cypher
                               .Match("(a:Award)")
-                              .Where((Award a) => a.ID == id)
+                              .Where("ID(a) = $id")
+                              .WithParam("id", id)
                               .Set("a = $award")
                               .WithParam("award", award);
 
@@ -126,7 +108,8 @@ namespace Sirius.Services
             {
                 var res = _client.Cypher
                              .Match("(a:Award)")
-                             .Where((Award a) => a.ID == id)
+                             .Where("ID(a) = $id")
+                             .WithParam("id", id)
                              .DetachDelete("a");
 
                 await res.ExecuteWithoutResultsAsync();
@@ -139,24 +122,34 @@ namespace Sirius.Services
             }
         }
 
-        public async Task<List<Award>> GetAwardsFiltered(string filter)
+        public async Task<List<AwardDTO>> GetAwardsFiltered(string filter)
         {
             try
             {
-                var res = new List<Award>();
+                var res = new List<AwardDTO>();
                 if (filter != "All")
                 {
-                    res = (List<Award>)await _client.Cypher
+                    res = (List<AwardDTO>)await _client.Cypher
                      .Match("(a:Award)")
-                     .Where((Award a) => a.Name.Contains(filter))
-                     .Return(a => a.As<Award>())
+                     .Where((AwardDTO a) => a.Name.Contains(filter))
+                     .Return((a) => new AwardDTO
+                     {
+                         ID = Return.As<int>("ID(a)"),
+                         Name = Return.As<string>("a.Name"),
+                         Description = Return.As<string>("a.Description")
+                     })
                      .ResultsAsync;
                 }
                 else
                 {
-                    res = (List<Award>)await _client.Cypher
+                    res = (List<AwardDTO>)await _client.Cypher
                      .Match("(a:Award)")
-                     .Return(a => a.As<Award>())
+                     .Return((a) => new AwardDTO
+                     {
+                         ID = Return.As<int>("ID(a)"),
+                         Name = Return.As<string>("a.Name"),
+                         Description = Return.As<string>("a.Description")
+                     })
                      .ResultsAsync;
                 }
 

@@ -55,7 +55,7 @@ export default class extends AbstractView {
                 </table>`;
             }
             else
-                html=`<h1>User has no recommendations!</h1>`;
+                html=`<h1>User has no favourites!</h1>`;
         }));
 
         return html;

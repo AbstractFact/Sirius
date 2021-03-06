@@ -1,5 +1,4 @@
 import AbstractView from "./AbstractView.js";
-import {Series} from "../models/Series.js";
 import {Award} from "../models/Award.js";
 
 export default class extends AbstractView {
@@ -61,14 +60,11 @@ export default class extends AbstractView {
                         <tbody>`;
 
                 d.forEach(data => {
-
-                    const series = new Series(data["series"]["id"], data["series"]["title"], data["series"]["year"], data["series"]["genre"], data["series"]["plot"], data["series"]["seasons"], data["series"]["rating"]);
-
                     html+=`
                         <tr>
                         <th scope="row">${++i}</th>
-                        <td><a href="/series/${series.id}" data-link>${series.title}</a></td>
-                        <td>${data["year"]}</td>
+                        <td><a href="/series/${data.id}" data-link>${data.title}</a></td>
+                        <td>${data.year}</td>
                         </tr>`;
                 });
 

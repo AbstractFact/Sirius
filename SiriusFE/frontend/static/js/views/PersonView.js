@@ -104,16 +104,11 @@ export default class extends AbstractView {
                         <tbody>`;
 
                 d.forEach(data => {
-
-                    const actor = new Person(data["actor"]["id"], data["actor"]["name"], data["actor"]["birthplace"], data["actor"]["birthday"], data["actor"]["biography"]);
-                    const series = new Series(data["series"]["id"], data["series"]["title"], data["series"]["year"], data["series"]["genre"], data["series"]["plot"], data["series"]["seasons"], data["series"]["rating"]);
-                    const role = new Role(data["id"], actor, series, data["inRole"]);
-
                     html+=`
                         <tr>
                         <th scope="row">${++i}</th>
-                        <td>${role.inrole}</td>
-                        <td><a href="/series/${series.id}" data-link>${role.series.title}</a></td>
+                        <td>${data.inRole}</td>
+                        <td><a href="/series/${data.seriesID}" data-link>${data.title}</a></td>
                         </tr>`;
                 });
 
@@ -143,15 +138,13 @@ export default class extends AbstractView {
                         <tbody>`;
 
                 d.forEach(data => {
-
-                    const director = new Person(data["director"]["id"], data["director"]["name"], data["director"]["birthplace"], data["director"]["birthday"], data["director"]["biography"]);
-                    const series = new Series(data["series"]["id"], data["series"]["title"], data["series"]["year"], data["series"]["genre"], data["series"]["plot"], data["series"]["seasons"], data["series"]["rating"]);
-                    const role = new Directed(data["id"], director, series);
+                    
+                    const series = new Series(data["seriesID"], data["title"], data["year"], data["genre"], data["plot"], data["seasons"], data["rating"]);
 
                     html+=`
                         <tr>
                         <th scope="row">${++i}</th>
-                        <td><a href="/series/${series.id}" data-link>${role.series.title}</a></td>
+                        <td><a href="/series/${series.id}" data-link>${series.title}</a></td>
                         <td>${series.genre}</td>
                         <td>${series.year}</td>
                         <td>${(series.rating === 0)? "Not rated" : series.rating}</td>

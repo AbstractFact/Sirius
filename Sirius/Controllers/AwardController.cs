@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Sirius.Entities;
+using Sirius.DTOs;
 using Sirius.Services;
 using System.Threading.Tasks;
 
@@ -29,7 +30,7 @@ namespace Sirius.Controllers
         [HttpGet("GetAward/{awardID}")]
         public async Task<ActionResult> GetAward(int awardID)
         {
-            Award res = await service.GetAward(awardID);
+            AwardDTO res = await service.GetAward(awardID);
             if (res != null)
                 return Ok(res);
             else
@@ -49,7 +50,7 @@ namespace Sirius.Controllers
 
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> Put([FromBody] Award award, int id)
+        public async Task<ActionResult> Put([FromBody] AwardDTO award, int id)
         {
             bool res = await service.Put(award, id);
 

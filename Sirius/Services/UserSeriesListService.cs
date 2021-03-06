@@ -31,7 +31,7 @@ namespace Sirius.Services
             {
                 var query = await _client.Cypher
                        .Match("(u:User)-[l:LISTED]-(s:Series)")
-                       .Return(l => l.As<UserSeriesList>().ID)
+                       .Return(l => l.As<UserSeriesListDTO>().ID)
                        .OrderByDescending("l.ID")
                        //.Return<int>("ID(l)")
                        //.OrderByDescending("ID(l)")
@@ -51,15 +51,15 @@ namespace Sirius.Services
             {
                 var res = await _client.Cypher
                        .Match("(u:User)-[l:LISTED]-(s:Series)")
-                       .Where((User u) => u.ID == userID)
+                       .Where((UserDTO u) => u.ID == userID)
                        .Return((u, l, s) => new
                        {
-                           l.As<UserSeriesList>().ID,
-                           Series = s.As<Series>(),
-                           l.As<UserSeriesList>().Status,
-                           l.As<UserSeriesList>().Stars,
-                           l.As<UserSeriesList>().Comment,
-                           l.As<UserSeriesList>().Favourite
+                           l.As<UserSeriesListDTO>().ID,
+                           Series = s.As<SeriesDTO>(),
+                           l.As<UserSeriesListDTO>().Status,
+                           l.As<UserSeriesListDTO>().Stars,
+                           l.As<UserSeriesListDTO>().Comment,
+                           l.As<UserSeriesListDTO>().Favourite
                        })
                        .ResultsAsync;
 
@@ -78,12 +78,12 @@ namespace Sirius.Services
             {
                 var res = await _client.Cypher
                         .Match("(u:User)-[l:LISTED]-(s:Series)")
-                        .Where((User u) => u.ID == userID)
-                        .AndWhere((UserSeriesList l) => l.Favourite == true)
+                        .Where((UserDTO u) => u.ID == userID)
+                        .AndWhere((UserSeriesListDTO l) => l.Favourite == true)
                         .Return((s, u) => new
                         {
-                            Series = s.As<Series>(),
-                            u.As<User>().Username
+                            Series = s.As<SeriesDTO>(),
+                            u.As<UserDTO>().Username
                         })
                         .ResultsAsync;
 
@@ -101,24 +101,24 @@ namespace Sirius.Services
             {
                 var frs = await _client.Cypher
                        .OptionalMatch("(user:User)-[FRIENDS]-(friend:User)")
-                       .Where((User user) => user.ID == userID)
-                       .Return(friend => friend.As<User>())
+                       .Where((UserDTO user) => user.ID == userID)
+                       .Return(friend => friend.As<UserDTO>())
                        .ResultsAsync;
 
                 var friends = frs.ToList();
                 List<Object> res = new List<Object>();
-                foreach (User fr in friends)
+                foreach (UserDTO fr in friends)
                 {
                     if (fr != null)
                     {
                         var rs = await _client.Cypher
                             .Match("(u:User)-[l:LISTED]-(s:Series)")
-                            .Where((User u) => u.ID == fr.ID)
-                            .AndWhere((UserSeriesList l) => l.Favourite == true)
+                            .Where((UserDTO u) => u.ID == fr.ID)
+                            .AndWhere((UserSeriesListDTO l) => l.Favourite == true)
                             .Return((s, u) => new
                             {
-                                Series = s.As<Series>(),
-                                u.As<User>().Username
+                                Series = s.As<SeriesDTO>(),
+                                u.As<UserDTO>().Username
                             })
                             .ResultsAsync;
 
@@ -143,7 +143,7 @@ namespace Sirius.Services
             {
                 var res = await _client.Cypher
                       .Match("(u:User)-[l:LISTED]-(s:Series)")
-                      .Where((Series s) => s.ID == seriesID)
+                      .Where((SeriesDTO s) => s.ID == seriesID)
                       .Return(s => new
                       {
                           Popularity = All.Count()
@@ -181,11 +181,11 @@ namespace Sirius.Services
                           .Match("(u:User)-[l:LISTED]-(s:Series)")
                           .Return((s, l) => new TopPopularDTO
                           {
-                              SeriesID = s.As<Series>().ID,
-                              Title = s.As<Series>().Title,
-                              Year = s.As<Series>().Year,
-                              Genre = s.As<Series>().Genre,
-                              Rating = s.As<Series>().Rating,
+                              SeriesID = s.As<SeriesDTO>().ID,
+                              Title = s.As<SeriesDTO>().Title,
+                              Year = s.As<SeriesDTO>().Year,
+                              Genre = s.As<SeriesDTO>().Genre,
+                              Rating = s.As<SeriesDTO>().Rating,
                               Popularity = (int) l.Count()
                           })
                           .OrderBy("COUNT(l) DESC").Limit(10)
@@ -212,16 +212,16 @@ namespace Sirius.Services
             {
                 var res = await _client.Cypher
                        .Match("(u:User)-[l:LISTED]-(s:Series)")
-                       .Where((UserSeriesList l) => l.ID == id)
+                       .Where((UserSeriesListDTO l) => l.ID == id)
                        .Return((u, l, s) => new
                        {
-                           l.As<UserSeriesList>().ID,
-                           User = u.As<User>(),
-                           Series = s.CollectAs<Series>(),
-                           l.As<UserSeriesList>().Status,
-                           l.As<UserSeriesList>().Stars,
-                           l.As<UserSeriesList>().Comment,
-                           l.As<UserSeriesList>().Favourite
+                           l.As<UserSeriesListDTO>().ID,
+                           User = u.As<UserDTO>(),
+                           Series = s.CollectAs<SeriesDTO>(),
+                           l.As<UserSeriesListDTO>().Status,
+                           l.As<UserSeriesListDTO>().Stars,
+                           l.As<UserSeriesListDTO>().Comment,
+                           l.As<UserSeriesListDTO>().Favourite
                        })
                        .ResultsAsync;
 
@@ -239,11 +239,11 @@ namespace Sirius.Services
             {
                 var res = await _client.Cypher
                         .Match("(u:User)-[l:LISTED]-(s:Series)")
-                        .Where((Series s) => s.ID == seriesID)
-                        .AndWhere((User u) => u.ID == userID)
+                        .Where((SeriesDTO s) => s.ID == seriesID)
+                        .AndWhere((UserDTO u) => u.ID == userID)
                         .Return((u, l, s) => new
                         {
-                            l.As<UserSeriesList>().ID,
+                            l.As<UserSeriesListDTO>().ID,
                         })
                         .ResultsAsync;
 
@@ -270,8 +270,8 @@ namespace Sirius.Services
                 {
                     var res = _client.Cypher
                             .Match("(user:User)", "(series:Series)")
-                            .Where((User user) => user.ID == userID)
-                            .AndWhere((Series series) => series.ID == seriesID)
+                            .Where((UserDTO user) => user.ID == userID)
+                            .AndWhere((SeriesDTO series) => series.ID == seriesID)
                             .Create("(user)-[:LISTED { ID: $id, Status: $status, Stars: 0, Comment: \"\", Favourite: $fav}]->(series)")
                             .WithParam("status", status)
                             .WithParam("fav", fav)
@@ -297,7 +297,7 @@ namespace Sirius.Services
             {
                 var res = _client.Cypher
                        .Match("(u:User)-[l:LISTED]-(s:Series)")
-                       .Where((UserSeriesList l) => l.ID == id)
+                       .Where((UserSeriesListDTO l) => l.ID == id)
                        .Set("l.Status = $status")
                        .Set("l.Stars = $stars")
                        .Set("l.Comment = $comment")
@@ -330,7 +330,7 @@ namespace Sirius.Services
             {
                 var res = _client.Cypher
                                .Match("(s:Series)")
-                               .Where((Series s) => s.ID == id)
+                               .Where((SeriesDTO s) => s.ID == id)
                                .Set("s.Rating = $rating")
                                .WithParam("rating", rating);
 
@@ -350,8 +350,8 @@ namespace Sirius.Services
             {
                 var res = await _client.Cypher
                            .Match("(u:User)-[l:LISTED]-(s:Series)")
-                           .Where((Series s) => s.ID == seriesID)
-                           .AndWhere((UserSeriesList l) => l.Stars != 0)
+                           .Where((SeriesDTO s) => s.ID == seriesID)
+                           .AndWhere((UserSeriesListDTO l) => l.Stars != 0)
                            .Return((l) => Return.As<string>("avg(l.Stars)"))
                            .ResultsAsync;
 
@@ -373,7 +373,7 @@ namespace Sirius.Services
             {
                 var res = _client.Cypher
                               .Match("(u:User)-[l:LISTED]->(s:Series)")
-                              .Where((UserSeriesList l) => l.ID == id)
+                              .Where((UserSeriesListDTO l) => l.ID == id)
                               .Delete("l");
 
                 await res.ExecuteWithoutResultsAsync();
@@ -394,17 +394,17 @@ namespace Sirius.Services
                 {
                     res = (List<UserSeriesListFilteredDTO>)await _client.Cypher
                        .Match("(u:User)-[l:LISTED]->(s:Series)")
-                       .Where((User u) => u.ID == userID)
-                       .AndWhere((UserSeriesList l) => l.Status == filter.Status)
-                       .AndWhere((UserSeriesList l) => l.Favourite == filter.Favourite)
+                       .Where((UserDTO u) => u.ID == userID)
+                       .AndWhere((UserSeriesListDTO l) => l.Status == filter.Status)
+                       .AndWhere((UserSeriesListDTO l) => l.Favourite == filter.Favourite)
                        .Return((u, l, s) => new UserSeriesListFilteredDTO
                        {
-                           ID = l.As<UserSeriesList>().ID,
-                           Series = s.As<Series>(),
-                           Status = l.As<UserSeriesList>().Status,
-                           Stars = l.As<UserSeriesList>().Stars,
-                           Comment = l.As<UserSeriesList>().Comment,
-                           Favourite = l.As<UserSeriesList>().Favourite
+                           ID = l.As<UserSeriesListDTO>().ID,
+                           Series = s.As<SeriesDTO>(),
+                           Status = l.As<UserSeriesListDTO>().Status,
+                           Stars = l.As<UserSeriesListDTO>().Stars,
+                           Comment = l.As<UserSeriesListDTO>().Comment,
+                           Favourite = l.As<UserSeriesListDTO>().Favourite
                        })
                        .ResultsAsync;
                 }
@@ -412,16 +412,16 @@ namespace Sirius.Services
                 {
                     res = (List<UserSeriesListFilteredDTO>)await _client.Cypher
                        .Match("(u:User)-[l:LISTED]->(s:Series)")
-                       .Where((User u) => u.ID == userID)
-                       .AndWhere((UserSeriesList l) => l.Status == filter.Status)
+                       .Where((UserDTO u) => u.ID == userID)
+                       .AndWhere((UserSeriesListDTO l) => l.Status == filter.Status)
                        .Return((u, l, s) => new UserSeriesListFilteredDTO
                        {
-                           ID = l.As<UserSeriesList>().ID,
-                           Series = s.As<Series>(),
-                           Status = l.As<UserSeriesList>().Status,
-                           Stars = l.As<UserSeriesList>().Stars,
-                           Comment = l.As<UserSeriesList>().Comment,
-                           Favourite = l.As<UserSeriesList>().Favourite
+                           ID = l.As<UserSeriesListDTO>().ID,
+                           Series = s.As<SeriesDTO>(),
+                           Status = l.As<UserSeriesListDTO>().Status,
+                           Stars = l.As<UserSeriesListDTO>().Stars,
+                           Comment = l.As<UserSeriesListDTO>().Comment,
+                           Favourite = l.As<UserSeriesListDTO>().Favourite
                        })
                        .ResultsAsync;
                 }
@@ -429,16 +429,16 @@ namespace Sirius.Services
                 {
                     res = (List<UserSeriesListFilteredDTO>)await _client.Cypher
                        .Match("(u:User)-[l:LISTED]->(s:Series)")
-                       .Where((User u) => u.ID == userID)
-                       .AndWhere((UserSeriesList l) => l.Favourite == filter.Favourite)
+                       .Where((UserDTO u) => u.ID == userID)
+                       .AndWhere((UserSeriesListDTO l) => l.Favourite == filter.Favourite)
                        .Return((u, l, s) => new UserSeriesListFilteredDTO
                        {
-                           ID = l.As<UserSeriesList>().ID,
-                           Series = s.As<Series>(),
-                           Status = l.As<UserSeriesList>().Status,
-                           Stars = l.As<UserSeriesList>().Stars,
-                           Comment = l.As<UserSeriesList>().Comment,
-                           Favourite = l.As<UserSeriesList>().Favourite
+                           ID = l.As<UserSeriesListDTO>().ID,
+                           Series = s.As<SeriesDTO>(),
+                           Status = l.As<UserSeriesListDTO>().Status,
+                           Stars = l.As<UserSeriesListDTO>().Stars,
+                           Comment = l.As<UserSeriesListDTO>().Comment,
+                           Favourite = l.As<UserSeriesListDTO>().Favourite
                        })
                        .ResultsAsync;
                 }
@@ -446,15 +446,15 @@ namespace Sirius.Services
                 {
                     res = (List<UserSeriesListFilteredDTO>)await _client.Cypher
                        .Match("(u:User)-[l:LISTED]->(s:Series)")
-                       .Where((User u) => u.ID == userID)
+                       .Where((UserDTO u) => u.ID == userID)
                        .Return((u, l, s) => new UserSeriesListFilteredDTO
                        {
-                           ID = l.As<UserSeriesList>().ID,
-                           Series = s.As<Series>(),
-                           Status = l.As<UserSeriesList>().Status,
-                           Stars = l.As<UserSeriesList>().Stars,
-                           Comment = l.As<UserSeriesList>().Comment,
-                           Favourite = l.As<UserSeriesList>().Favourite
+                           ID = l.As<UserSeriesListDTO>().ID,
+                           Series = s.As<SeriesDTO>(),
+                           Status = l.As<UserSeriesListDTO>().Status,
+                           Stars = l.As<UserSeriesListDTO>().Stars,
+                           Comment = l.As<UserSeriesListDTO>().Comment,
+                           Favourite = l.As<UserSeriesListDTO>().Favourite
                        })
                        .ResultsAsync;
                 }

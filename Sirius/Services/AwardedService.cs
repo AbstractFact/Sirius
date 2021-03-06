@@ -1,7 +1,8 @@
 ﻿using Neo4jClient;
+using Neo4jClient.Cypher;
+using Sirius.DTOs;
 using Sirius.Entities;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Sirius.Services
@@ -9,32 +10,10 @@ namespace Sirius.Services
     public class AwardedService
     {
         private readonly IGraphClient _client;
-        private int maxID;
 
         public AwardedService(IGraphClient client)
         {
             _client = client;
-            maxID = 0;
-        }
-
-        private async Task<int> MaxID()
-        {
-            try
-            {
-                var query = await _client.Cypher
-                        .Match("(a:Award)-[aw:AWARDED]-(s:Series)")
-                        .Return(aw => aw.As<Awarded>().ID)
-                        .OrderByDescending("aw.ID")
-                        //.Return<int>("ID(aw)")
-                        //.OrderByDescending("ID(aw)")
-                        .ResultsAsync;
-
-                return query.FirstOrDefault();
-            }
-            catch (Exception)
-            {
-                return -1;
-            }
         }
 
         public async Task<Object> GetSeriesAwards(int seriesID)
@@ -43,13 +22,14 @@ namespace Sirius.Services
             {
                 var res = await _client.Cypher
                        .Match("(a:Award)-[aw:AWARDED]-(s:Series)")
-                       .Where((Series s) => s.ID == seriesID)
+                       .Where("ID(s) = $seriesID")
+                       .WithParam("seriesID", seriesID)
                        .Return((a, aw, s) => new
                        {
-                           aw.As<Awarded>().ID,
-                           Award = a.As<Award>(),
-                           Series = s.As<Series>(),
-                           aw.As<Awarded>().Year
+                           ID = Return.As<int>("ID(aw)"),
+                           AwardID = Return.As<int>("ID(a)"),
+                           Name = Return.As<string>("a.Name"),
+                           aw.As<AwardedDTO>().Year
                        })
                        .ResultsAsync;
 
@@ -67,11 +47,13 @@ namespace Sirius.Services
             {
                 var res = await _client.Cypher
                        .Match("(a:Award)-[aw:AWARDED]-(s:Series)")
-                       .Where((Award a) => a.ID == awardID)
+                       .Where("ID(a) = $awardID")
+                       .WithParam("awardID", awardID)
                        .Return((aw, s) => new
                        {
-                           Series = s.As<Series>(),
-                           Year = aw.As<Awarded>().Year
+                           ID = Return.As<int>("ID(s)"),
+                           Title = Return.As<string>("s.Title"),
+                           Year = aw.As<AwardedDTO>().Year
                        })
                        .ResultsAsync;
 
@@ -89,13 +71,22 @@ namespace Sirius.Services
             {
                 var res = await _client.Cypher
                         .Match("(a:Award)-[aw:AWARDED]-(s:Series)")
-                        .Where((Awarded aw) => aw.ID == id)
+                        .Where("ID(aw) = $id")
+                        .WithParam("id", id)
                         .Return((a, aw, s) => new
                         {
-                            aw.As<Awarded>().ID,
-                            Award = a.As<Award>(),
-                            Series = s.CollectAs<Series>(),
-                            aw.As<Awarded>().Year
+                            ID = Return.As<int>("ID(aw)"),
+                            AwardID = Return.As<int>("ID(a)"),
+                            Name = Return.As<string>("a.Name"),
+                            Description = Return.As<string>("a.Description"),
+                            SeriesID = Return.As<int>("ID(s)"),
+                            Title = Return.As<string>("s.Title"),
+                            SeriesYear = Return.As<int>("s.Year"),
+                            Genre = Return.As<string>("s.Genre"),
+                            Plot = Return.As<string>("s.Plot"),
+                            Seasons = Return.As<int>("s.Seasons"),
+                            Rating = Return.As<float>("s.Rating"),
+                            aw.As<AwardedDTO>().Year
                         })
                         .ResultsAsync;
 
@@ -110,24 +101,18 @@ namespace Sirius.Services
         {
             try
             {
-                maxID = await MaxID();
+                var res = _client.Cypher
+                   .Match("(award:Award)", "(series:Series)")
+                   .Where("ID(award) = $awardID")
+                   .WithParam("awardID", awardID)
+                   .AndWhere("ID(series) = $seriesID")
+                   .WithParam("seriesID", seriesID)
+                   .Create("(award)-[:AWARDED { Year: $year }]->(series)")
+                   .WithParam("year", year);
 
-                if (maxID != -1)
-                {
-                    var res = _client.Cypher
-                       .Match("(award:Award)", "(series:Series)")
-                       .Where((Award award) => award.ID == awardID)
-                       .AndWhere((Series series) => series.ID == seriesID)
-                       .Create("(award)-[:AWARDED { ID: $id, Year: $year }]->(series)")
-                       .WithParam("year", year)
-                       .WithParam("id", maxID + 1);
+                await res.ExecuteWithoutResultsAsync();
 
-                    await res.ExecuteWithoutResultsAsync();
-
-                    return true;
-                }
-                else
-                    return false;
+                return true;
 
             }
             catch (Exception)
@@ -142,7 +127,8 @@ namespace Sirius.Services
             {
                 var res = _client.Cypher
                         .Match("(a:Award)-[aw:AWARDED]-(s:Series)")
-                        .Where((Awarded aw) => aw.ID == id)
+                        .Where("ID(aw) = $id")
+                        .WithParam("id", id)
                         .Set("aw.Year = $year")
                         .WithParam("year", year);
 
@@ -162,7 +148,8 @@ namespace Sirius.Services
             {
                 var res = _client.Cypher
                              .Match("(a:Award)-[aw:AWARDED]->(s:Series)")
-                             .Where((Awarded aw) => aw.ID == id)
+                             .Where("ID(aw) = $id")
+                             .WithParam("id", id)
                              .Delete("aw");
 
                 await res.ExecuteWithoutResultsAsync();

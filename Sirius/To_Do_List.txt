@@ -1,7 +1,6 @@
-Neo4J:
 
--Proveriti funkciju za generisanje ID-jeva (MaxID). Probati sa lock
 
-Redis:
-
--Da li koristiti stream za friend request?
+-Proveriti funkciju za generisanje ID-jeva (MaxID), samo jos User i UserSeriesList
+-Obrisati user-a iz grupe kad zatreba
+-Dodati brisanje naloga
+-delete kod serije prepraviti (detach)

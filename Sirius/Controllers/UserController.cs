@@ -32,9 +32,9 @@ namespace Sirius.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<User>> Get(int id)
+        public async Task<ActionResult<UserDTO>> Get(int id)
         {
-            User res = await service.Get(id);
+            UserDTO res = await service.Get(id);
             if (res != null)
                 return Ok(res);
             else
@@ -42,9 +42,9 @@ namespace Sirius.Controllers
         }
 
         [HttpPost("Login")]
-        public async Task<ActionResult<User>> Login([FromBody] User user)
+        public async Task<ActionResult<UserDTO>> Login([FromBody] User user)
         {
-            User res = await service.Login(user);
+            UserDTO res = await service.Login(user);
             if (res != null)
                 return Ok(res);
             else
@@ -52,9 +52,9 @@ namespace Sirius.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<User>> Post([FromBody] User u)
+        public async Task<ActionResult<UserDTO>> Post([FromBody] User u)
         {
-            User user = await service.Post(u);
+            UserDTO user = await service.Post(u);
             if (user != null)
                 return Ok(user);
             else
@@ -62,9 +62,9 @@ namespace Sirius.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<User>> Put([FromBody] User user, int id)
+        public async Task<ActionResult<UserDTO>> Put([FromBody] UserDTO user, int id)
         {
-            User res = await service.Put(user, id);
+            UserDTO res = await service.Put(user, id);
             if (res != null)
                 return Ok(res);
             else
@@ -82,9 +82,9 @@ namespace Sirius.Controllers
         }
 
         [HttpGet("GetAllFriends/{userID}")]
-        public async Task<ActionResult<List<User>>> GetAllFriends(int userID)
+        public async Task<ActionResult<List<UserDTO>>> GetAllFriends(int userID)
         {
-            List<User> res = await service.GetAllFriends(userID);
+            List<UserDTO> res = await service.GetAllFriends(userID);
             if (res != null)
                 return Ok(res);
             else
@@ -118,7 +118,7 @@ namespace Sirius.Controllers
             if (receiverId == -1)
                 return NotFound();
 
-            List<User> friends = await service.GetAllFriends(sender.ID);
+            List<UserDTO> friends = await service.GetAllFriends(sender.ID);
             if (friends.Count != 0)
                 if (friends.FirstOrDefault(fr => fr.ID == receiverId) != null)
                     return BadRequest();
@@ -236,9 +236,9 @@ namespace Sirius.Controllers
         }
 
         [HttpGet("GetAllFilteredFriends/{userID}/{filter}")]
-        public async Task<ActionResult<List<User>>> GetAllFilteredFriends(int userID, string filter)
+        public async Task<ActionResult<List<UserDTO>>> GetAllFilteredFriends(int userID, string filter)
         {
-            List<User> res = await service.GetAllFilteredFriends(userID, filter);
+            List<UserDTO> res = await service.GetAllFilteredFriends(userID, filter);
             if (res != null)
                 return Ok(res);
             else

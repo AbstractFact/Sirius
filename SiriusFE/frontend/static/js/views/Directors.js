@@ -49,8 +49,7 @@ export default class extends AbstractView {
                     <tbody id="tcontent">`;
 
             data.forEach(d => {
-                    const director = new Person(d["director"]["id"], d["director"]["name"], d["director"]["sex"], d["director"]["birthplace"], d["director"]["birthday"], d["director"]["biography"]);
-
+                    const director = new Person(d["id"], d["name"], d["sex"], d["birthplace"], d["birthday"], d["biography"]);
                     html+=`
                     <tr>
                         <th scope="row">${++i}</th>
@@ -87,13 +86,14 @@ export default class extends AbstractView {
             table.innerHTML=``;
             var i=0;
             data.forEach(d => {
+                const director = new Person(d["id"], d["name"], d["sex"], d["birthplace"], d["birthday"], d["biography"]);
                 table.innerHTML+=`
                 <tr>
                 <th scope="row">${++i}</th>
-                <td><a href="/actors/${d["id"]}" data-link>${d["name"]}</a></td>
-                <td>${d["sex"]}</td>
-                <td>${d["birthplace"]}</td>
-                <td>${d["birthday"]}</td>
+                <td><a href="/actors/${director.id}" data-link>${director.name}</a></td>
+                <td>${director.sex}</td>
+                <td>${director.birthplace}</td>
+                <td>${director.birthday}</td>
                 </tr>`;
             });
         }));

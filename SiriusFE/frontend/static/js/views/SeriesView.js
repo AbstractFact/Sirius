@@ -18,7 +18,7 @@ export default class extends AbstractView {
 
         await fetch("https://localhost:44365/Directed/GetSeriesWithDirector/"+this.postId, {method: "GET"})
         .then(p => p.json().then(d => {
-                const series = new Series(d["series"]["id"], d["series"]["title"], d["series"]["year"], d["series"]["genre"], d["series"]["plot"], d["series"]["seasons"], d["series"]["rating"]);
+                const series = new Series(d["seriesID"], d["title"], d["year"], d["genre"], d["plot"], d["seasons"], d["rating"]);
                 html=`
                     <h1>Series: ${series.title}</h1>
                     <br/>
@@ -36,7 +36,7 @@ export default class extends AbstractView {
                             <tr>
                             <td>${series.year}</td>
                             <td>${series.genre}</td>
-                            <td><a href="/directors/${d["director"]["id"]}" data-link>${d["director"]["name"]}</a></td>
+                            <td><a href="/directors/${d["directorID"]}" data-link>${d["name"]}</a></td>
                             <td>${series.seasons}</td>
                             <td>${(series.rating === 0)? "Not rated" : +(Math.round(series.rating + "e+1") + "e-1")}</td>
                             </tr>
@@ -138,31 +138,26 @@ export default class extends AbstractView {
                         <tbody>`;
 
                 d.forEach(data => {
-
-                    const actor = new Person(data["actor"]["id"], data["actor"]["name"], data["actor"]["sex"], data["actor"]["birthplace"], data["actor"]["birthday"], data["actor"]["biography"]);
-                    const series = new Series(data["series"]["id"], data["series"]["title"], data["series"]["year"], data["series"]["genre"], data["series"]["plot"], data["series"]["seasons"], data["series"]["rating"]);
-                    const role = new Role(data["id"], actor, series, data["inRole"]);
-
                     html+=`
-                    <tr id="${role.id}">
+                    <tr id="${data.id}">
                         <th scope="row">${++i}</th>`;
 
                         if(localStorage.username=="Admin" && localStorage.logged==1)
                             html+=`
-                            <td><input type="text" class="form-control" id="editRole" value="${role.inrole}"></td>`;
+                            <td><input type="text" class="form-control" id="editRole" value="${data.inRole}"></td>`;
                         else
                             html+=`
-                            <td>${role.inrole}</td>`;
+                            <td>${data.inRole}</td>`;
 
                         html+=`
-                        <td><a href="/actors/${role.actor.id}" data-link>${role.actor.name}</a></td>`;
+                        <td><a href="/actors/${data.actorID}" data-link>${data.name}</a></td>`;
 
                         if(localStorage.username=="Admin" && localStorage.logged==1)
                         html+=`<td>
-                            <button type="submit" class="btn btn-primary" style="width:60%" id="SR ${role.id}">Save Changes</button>
+                            <button type="submit" class="btn btn-primary" style="width:60%" id="SR ${data.id}">Save Changes</button>
                         </td>
                         <td>
-                            <button type="submit" class="btn btn-danger" style="width:100%" id="RR ${role.id}">X</button>
+                            <button type="submit" class="btn btn-danger" style="width:100%" id="RR ${data.id}">X</button>
                         </td>`;
                         html+=`</tr>`;
                 });
@@ -221,27 +216,27 @@ export default class extends AbstractView {
 
                 d.forEach(data => {
 
-                    const award = new Awarded(data["id"], data["award"], data["series"], data["year"]);
+                    //const award = new Awarded(data["id"], data["award"], data["series"], data["year"]);
 
                     html+=`
-                    <tr id="${award.id}">
+                    <tr id="${data.id}">
                         <th scope="row">${++i}</th>
-                        <td><a href="/awards/${award.award.id}" data-link>${award.award.name}</a></td>`;
+                        <td><a href="/awards/${data.awardID}" data-link>${data.name}</a></td>`;
 
                     if(localStorage.username=="Admin" && localStorage.logged==1)
                         html+=`
-                        <td><input type="number" class="form-control" id="editYear1" value="${award.year}" style="width:50%"></td>`;
+                        <td><input type="number" class="form-control" id="editYear1" value="${data.year}" style="width:50%"></td>`;
                     else
                         html+=`
-                        <td>${award.year}</td>`;
+                        <td>${data.year}</td>`;
 
                     if(localStorage.username=="Admin" && localStorage.logged==1)
                         html+=`
                         <td>
-                            <button type="submit" class="btn btn-primary" style="width:60%" id="SA ${award.id}">Save Changes</button>
+                            <button type="submit" class="btn btn-primary" style="width:60%" id="SA ${data.id}">Save Changes</button>
                         </td>
                         <td>
-                            <button type="submit" class="btn btn-danger" style="width:100%" id="RA ${award.id}">X</button>
+                            <button type="submit" class="btn btn-danger" style="width:100%" id="RA ${data.id}">X</button>
                         </td>`; 
 
                     html+=`</tr>`;
@@ -369,9 +364,17 @@ export default class extends AbstractView {
         }
     }
 
-    DeleteRole(id)
+    async DeleteRole(id)
     {
-        fetch("https://localhost:44365/Role/"+id, { method: "DELETE"});
+        const response = await fetch("https://localhost:44365/Role/"+id, { method: "DELETE"});
+        if(response.ok)
+        {
+            alert("Role added!");
+        }
+        else
+        {
+            alert("Error!");
+        }
     }
 
     async GiveAward()
@@ -409,9 +412,9 @@ export default class extends AbstractView {
         }
     }
 
-    RemoveAward(id)
+    async RemoveAward(id)
     {
-        const response = fetch("https://localhost:44365/Awarded/"+id, { method: "DELETE"});
+        const response = await fetch("https://localhost:44365/Awarded/"+id, { method: "DELETE"});
         if(response.ok)
         {
             alert("Award edited!");

@@ -1,4 +1,6 @@
 ﻿using Neo4jClient;
+using Neo4jClient.Cypher;
+using Sirius.DTOs;
 using Sirius.Entities;
 using System;
 using System.Linq;
@@ -9,32 +11,9 @@ namespace Sirius.Services
     public class DirectedService
     {
         private readonly IGraphClient _client;
-        private int maxID;
-
         public DirectedService(IGraphClient client)
         {
             _client = client;
-            maxID = 0;
-        }
-
-        private async Task<int> MaxID()
-        {
-            try
-            {
-                var query = await _client.Cypher
-                        .Match("(p:Person)-[d:DIRECTED]-(s:Series)")
-                        .Return(d => d.As<Directed>().ID)
-                        .OrderByDescending("d.ID")
-                        //.Return<int>("ID(d)")
-                        //.OrderByDescending("ID(d)")
-                        .ResultsAsync;
-
-            return query.FirstOrDefault();
-            }
-            catch (Exception)
-            {
-                return -1;
-            }
         }
 
         public async Task<Object> GetSeriesWithDirector(int seriesID)
@@ -42,13 +21,21 @@ namespace Sirius.Services
             try
             {
                 var res = await _client.Cypher
-                       .Match("(p:Person)-[d:DIRECTED]-(s:Series)")
-                       .Where((Series s) => s.ID == seriesID)
-                       .Return((p, d, s) => new
+                       .Match("(p:Person)-[d:DIRECTED]->(s:Series)")
+                       .Where("ID(s) = $seriesID")
+                       .WithParam("seriesID", seriesID)
+                       .Return(() => new
                        {
-                           d.As<Directed>().ID,
-                           Director = p.As<Person>(),
-                           Series = s.As<Series>(),
+                           ID = Return.As<int>("ID(d)"),
+                           SeriesID = Return.As<int>("ID(s)"),
+                           Title = Return.As<string>("s.Title"),
+                           Year = Return.As<int>("s.Year"),
+                           Genre = Return.As<string>("s.Genre"),
+                           Plot = Return.As<string>("s.Plot"),
+                           Seasons = Return.As<int>("s.Seasons"),
+                           Rating = Return.As<float>("s.Rating"),
+                           DirectorID = Return.As<int>("ID(p)"),
+                           Name = Return.As<string>("p.Name"),
                        })
                        .ResultsAsync;
 
@@ -66,12 +53,17 @@ namespace Sirius.Services
             {
                 var res = await _client.Cypher
                        .Match("(p:Person)-[d:DIRECTED]-(s:Series)")
-                       .Where((Person p) => p.ID == directorID)
+                       .Where("ID(p) = $directorID")
+                       .WithParam("directorID", directorID)
                        .Return((p, d, s) => new
                        {
-                           d.As<Directed>().ID,
-                           Director = p.As<Person>(),
-                           Series = s.As<Series>(),
+                           SeriesID = Return.As<int>("ID(s)"),
+                           Title = Return.As<string>("s.Title"),
+                           Year = Return.As<int>("s.Year"),
+                           Genre = Return.As<string>("s.Genre"),
+                           Plot = Return.As<string>("s.Plot"),
+                           Seasons = Return.As<int>("s.Seasons"),
+                           Rating = Return.As<float>("s.Rating")
                        })
                        .ResultsAsync;
 
@@ -89,12 +81,24 @@ namespace Sirius.Services
             {
                 var res = await _client.Cypher
                         .Match("(p:Person)-[d:DIRECTED]-(s:Series)")
-                        .Where((Directed d) => d.ID == id)
+                        .Where("ID(d) = $id")
+                        .WithParam("id", id)
                         .Return((p, d, s) => new
                         {
-                            d.As<Directed>().ID,
-                            Director = p.As<Person>(),
-                            Series = s.CollectAs<Series>(),
+                            ID = Return.As<int>("ID(d)"),
+                            DirectorID = Return.As<int>("ID(p)"),
+                            Name = Return.As<string>("p.Name"),
+                            Sex = Return.As<string>("p.Sex"),
+                            Birthplace = Return.As<string>("p.Birthplace"),
+                            Birthday = Return.As<string>("p.Birthday"),
+                            Biography = Return.As<string>("p.Biography"),
+                            SeriesID = Return.As<int>("ID(s)"),
+                            Title = Return.As<string>("s.Title"),
+                            Year = Return.As<int>("s.Year"),
+                            Genre = Return.As<string>("s.Genre"),
+                            Plot = Return.As<string>("s.Plot"),
+                            Seasons = Return.As<int>("s.Seasons"),
+                            Rating = Return.As<float>("s.Rating")
                         })
                         .ResultsAsync;
 
@@ -107,39 +111,34 @@ namespace Sirius.Services
         }
         public async Task<bool> AddDirected(int directorID, int seriesID)
         {
-            maxID = await MaxID();
-
-            if (maxID != -1)
+            try
             {
-                try
-                {
-                    var res = _client.Cypher
-                            .Match("(person:Person)", "(series:Series)")
-                            .Where((Person person) => person.ID == directorID)
-                            .AndWhere((Series series) => series.ID == seriesID)
-                            .Create("(person)-[:DIRECTED { ID: $id }]->(series)")
-                            .WithParam("id", maxID + 1);
+                var res = _client.Cypher
+                        .Match("(person:Person)", "(series:Series)")
+                        .Where("ID(person) = $directorID")
+                        .WithParam("directorID", directorID)
+                        .AndWhere("ID(series) = $seriesID")
+                        .WithParam("seriesID", seriesID)
+                        .Create("(person)-[:DIRECTED]->(series)");
 
-                    await res.ExecuteWithoutResultsAsync();
+                await res.ExecuteWithoutResultsAsync();
 
-                    return true;
-                }
-                catch (Exception)
-                {
-                    return false;
-                }
+                return true;
             }
-            else
+            catch (Exception)
+            {
                 return false;
+            }
         }
 
-        public async Task<bool> Put(Directed directed, int id)
+        public async Task<bool> Put(DirectedDTO directed, int id)
         {
             try
             {
                 var res = _client.Cypher
                         .Match("(p:Person)-[d:DIRECTED]-(s:Series)")
-                        .Where((Directed d) => d.ID == id)
+                        .Where("ID(d) = $id")
+                        .WithParam("id", id)
                         .Set("d = $directed")
                         .WithParam("directed", directed);
 
@@ -159,7 +158,8 @@ namespace Sirius.Services
             {
                 var res = _client.Cypher
                              .Match("(p:Person)-[d:DIRECTED]->(s:Series)")
-                             .Where((Directed d) => d.ID == id)
+                             .Where("ID(d) = $id")
+                             .WithParam("id", id)
                              .Delete("d");
 
                 await res.ExecuteWithoutResultsAsync();

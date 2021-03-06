@@ -1,4 +1,5 @@
 ﻿using Neo4jClient;
+using Neo4jClient.Cypher;
 using Sirius.DTOs;
 using Sirius.Entities;
 using System;
@@ -11,32 +12,9 @@ namespace Sirius.Services
     public class PersonService
     {
         private readonly IGraphClient _client;
-        private int maxID;
         public PersonService(IGraphClient client)
         {
             _client = client;
-            maxID = 0;
-        }
-
-        private async Task<int> MaxID()
-        {
-            try
-            {
-                var query = await _client.Cypher
-                        .Match("(p:Person)")
-                        .Return<int>(p => p.As<Person>().ID)
-                        .OrderByDescending("p.ID")
-                        //.Return<int>("ID(p)")
-                        //.OrderByDescending("ID(p)")
-                        .ResultsAsync;
-
-                return query.FirstOrDefault();
-            }
-            catch(Exception)
-            {
-                return -1;
-            }
-            
         }
 
         public async Task<Object> GetAll()
@@ -44,8 +22,16 @@ namespace Sirius.Services
             try
             {
                 var res = await _client.Cypher
-                      .Match("(person:Person)")
-                      .Return(person => person.As<Person>())
+                       .Match("(person:Person)")
+                       .Return((person) => new PersonDTO
+                       {
+                           ID = Return.As<int>("ID(person)"),
+                           Name = Return.As<string>("person.Name"),
+                           Sex = Return.As<string>("person.Sex"),
+                           Birthplace = Return.As<string>("person.Birthplace"),
+                           Birthday = Return.As<string>("person.Birthday"),
+                           Biography = Return.As<string>("person.Biography")
+                       })
                       .ResultsAsync;
 
                 return res;
@@ -63,9 +49,14 @@ namespace Sirius.Services
                 var res = await _client.Cypher
                        .Match("(p:Person)-[r:IN_ROLE]-(s:Series)")
                        .With("DISTINCT p as actor")
-                       .Return((actor) => new
+                       .Return((actor) => new 
                        {
-                           Actor = actor.As<Person>()
+                           ID = Return.As<int>("ID(actor)"),
+                           Name = Return.As<string>("actor.Name"),
+                           Sex = Return.As<string>("actor.Sex"),
+                           Birthplace = Return.As<string>("actor.Birthplace"),
+                           Birthday = Return.As<string>("actor.Birthday"),
+                           Biography = Return.As<string>("actor.Biography")
                        })
                        .ResultsAsync;
 
@@ -86,7 +77,12 @@ namespace Sirius.Services
                        .With("DISTINCT p as director")
                        .Return((director) => new
                        {
-                           Director = director.As<Person>()
+                           ID = Return.As<int>("ID(director)"),
+                           Name = Return.As<string>("director.Name"),
+                           Sex = Return.As<string>("director.Sex"),
+                           Birthplace = Return.As<string>("director.Birthplace"),
+                           Birthday = Return.As<string>("director.Birthday"),
+                           Biography = Return.As<string>("director.Biography")
                        })
                        .ResultsAsync;
 
@@ -98,14 +94,23 @@ namespace Sirius.Services
             }
         }
 
-        public async Task<Person> GetPerson(int personID)
+        public async Task<PersonDTO> GetPerson(int personID)
         {
             try
             {
                 var res = await _client.Cypher
                      .Match("(p:Person)")
-                     .Where((Person p) => p.ID == personID)
-                     .Return(p => p.As<Person>())
+                     .Where("ID(p) = $personID")
+                     .WithParam("personID", personID)
+                     .Return((p) => new PersonDTO
+                      {
+                          ID = Return.As<int>("ID(p)"),
+                          Name = Return.As<string>("p.Name"),
+                          Sex = Return.As<string>("p.Sex"),
+                          Birthplace = Return.As<string>("p.Birthplace"),
+                          Birthday = Return.As<string>("p.Birthday"),
+                          Biography = Return.As<string>("p.Biography")
+                      })
                      .ResultsAsync;
 
               
@@ -119,42 +124,35 @@ namespace Sirius.Services
 
         public async Task<bool> Post(Person p)
         {
-            maxID = await MaxID();
-
-            if (maxID != -1)
+            try
             {
-                try
-                {
-                    var newPerson = new Person { ID = maxID + 1, Name = p.Name, Sex = p.Sex, Birthplace = p.Birthplace, Birthday = p.Birthday, Biography = p.Biography };
-                    var res = _client.Cypher
-                                .Create("(person:Person $newPerson)")
-                                .WithParam("newPerson", newPerson);
+                var res = _client.Cypher
+                            .Create("(person:Person $p)")
+                            .WithParam("p", p);
 
-                    await res.ExecuteWithoutResultsAsync();
+                await res.ExecuteWithoutResultsAsync();
 
-                    return true;
-                }
-                catch (Exception)
-                {
-                    return false;
-                } 
+                return true;
             }
-            else
+            catch (Exception)
+            {
                 return false;
-            
+            }             
         }
 
-        public async Task<bool> Put(Person person, int id)
+        public async Task<bool> Put(PersonDTO person, int id)
         {
             try
             {
                 var res = _client.Cypher
                               .Match("(p:Person)")
-                              .Where((Person p) => p.ID == id)
+                              .Where("ID(p) = $id")
+                              .WithParam("id", id)
                               .Set("p = $person")
                               .WithParam("person", person);
 
                 await res.ExecuteWithoutResultsAsync();
+
                 return true;
             }
             catch (Exception)
@@ -169,7 +167,8 @@ namespace Sirius.Services
             {
                 var res = _client.Cypher
                              .Match("(p:Person)")
-                             .Where((Person p) => p.ID == id)
+                             .Where("ID(p) = $id")
+                             .WithParam("id", id)
                              .DetachDelete("p");
 
                 await res.ExecuteWithoutResultsAsync();
@@ -182,76 +181,76 @@ namespace Sirius.Services
             }
         }
 
-        public async Task<List<Person>> GetActorsFiltered(PersonFilterDTO filter)
+        public async Task<List<PersonDTO>> GetActorsFiltered(PersonFilterDTO filter)
         {
             try
             {
-                var res = new List<Person>();
+                var res = new List<PersonDTO>();
                 if (filter.Name != "" && filter.Sex != "All")
                 {
-                    res = (List<Person>) await _client.Cypher
+                    res = (List<PersonDTO>) await _client.Cypher
                        .Match("(p:Person)-[d:IN_ROLE]-(s:Series)")
-                       .Where((Person p) => p.Name == filter.Name)
-                       .AndWhere((Person p) => p.Sex == filter.Sex)
+                       .Where((PersonDTO p) => p.Name == filter.Name)
+                       .AndWhere((PersonDTO p) => p.Sex == filter.Sex)
                        .With("DISTINCT p as actor")
-                       .Return((actor) => new Person
+                       .Return((actor) => new PersonDTO
                        {
-                           ID = actor.As<Person>().ID,
-                           Name = actor.As<Person>().Name,
-                           Sex = actor.As<Person>().Sex,
-                           Birthplace = actor.As<Person>().Birthplace,
-                           Birthday = actor.As<Person>().Birthday,
-                           Biography = actor.As<Person>().Biography
+                           ID = Return.As<int>("ID(actor)"),
+                           Name = actor.As<PersonDTO>().Name,
+                           Sex = actor.As<PersonDTO>().Sex,
+                           Birthplace = actor.As<PersonDTO>().Birthplace,
+                           Birthday = actor.As<PersonDTO>().Birthday,
+                           Biography = actor.As<PersonDTO>().Biography
                        })
                        .ResultsAsync;
                 }
                 else if (filter.Name != "" && filter.Sex == "All")
                 {
-                    res = (List<Person>)await _client.Cypher
+                    res = (List<PersonDTO>)await _client.Cypher
                        .Match("(p:Person)-[d:IN_ROLE]-(s:Series)")
-                       .Where((Person p) => p.Name == filter.Name)
+                       .Where((PersonDTO p) => p.Name == filter.Name)
                        .With("DISTINCT p as actor")
-                       .Return((actor) => new Person
+                       .Return((actor) => new PersonDTO
                        {
-                           ID = actor.As<Person>().ID,
-                           Name = actor.As<Person>().Name,
-                           Sex = actor.As<Person>().Sex,
-                           Birthplace = actor.As<Person>().Birthplace,
-                           Birthday = actor.As<Person>().Birthday,
-                           Biography = actor.As<Person>().Biography
+                           ID = Return.As<int>("ID(actor)"),
+                           Name = actor.As<PersonDTO>().Name,
+                           Sex = actor.As<PersonDTO>().Sex,
+                           Birthplace = actor.As<PersonDTO>().Birthplace,
+                           Birthday = actor.As<PersonDTO>().Birthday,
+                           Biography = actor.As<PersonDTO>().Biography
                        })
                        .ResultsAsync;
                 }
                 else if (filter.Name == "" && filter.Sex != "All")
                 {
-                    res = (List<Person>)await _client.Cypher
+                    res = (List<PersonDTO>)await _client.Cypher
                        .Match("(p:Person)-[d:IN_ROLE]-(s:Series)")
-                       .Where((Person p) => p.Sex == filter.Sex)
+                       .Where((PersonDTO p) => p.Sex == filter.Sex)
                        .With("DISTINCT p as actor")
-                       .Return((actor) => new Person
+                       .Return((actor) => new PersonDTO
                        {
-                           ID = actor.As<Person>().ID,
-                           Name = actor.As<Person>().Name,
-                           Sex = actor.As<Person>().Sex,
-                           Birthplace = actor.As<Person>().Birthplace,
-                           Birthday = actor.As<Person>().Birthday,
-                           Biography = actor.As<Person>().Biography
+                           ID = Return.As<int>("ID(actor)"),
+                           Name = actor.As<PersonDTO>().Name,
+                           Sex = actor.As<PersonDTO>().Sex,
+                           Birthplace = actor.As<PersonDTO>().Birthplace,
+                           Birthday = actor.As<PersonDTO>().Birthday,
+                           Biography = actor.As<PersonDTO>().Biography
                        })
                        .ResultsAsync;
                 }
                 else
                 {
-                    res = (List<Person>)await _client.Cypher
+                    res = (List<PersonDTO>)await _client.Cypher
                        .Match("(p:Person)-[d:IN_ROLE]-(s:Series)")
                        .With("DISTINCT p as actor")
-                       .Return((actor) => new Person
+                       .Return((actor) => new PersonDTO
                        {
-                           ID = actor.As<Person>().ID,
-                           Name = actor.As<Person>().Name,
-                           Sex = actor.As<Person>().Sex,
-                           Birthplace = actor.As<Person>().Birthplace,
-                           Birthday = actor.As<Person>().Birthday,
-                           Biography = actor.As<Person>().Biography
+                           ID = Return.As<int>("ID(actor)"),
+                           Name = actor.As<PersonDTO>().Name,
+                           Sex = actor.As<PersonDTO>().Sex,
+                           Birthplace = actor.As<PersonDTO>().Birthplace,
+                           Birthday = actor.As<PersonDTO>().Birthday,
+                           Biography = actor.As<PersonDTO>().Biography
                        })
                        .ResultsAsync;
                 }
@@ -264,76 +263,76 @@ namespace Sirius.Services
             }
         }
 
-        public async Task<List<Person>> GetDirectorsFiltered(PersonFilterDTO filter)
+        public async Task<List<PersonDTO>> GetDirectorsFiltered(PersonFilterDTO filter)
         {
             try
             {
-                var res = new List<Person>();
+                var res = new List<PersonDTO>();
                 if (filter.Name != "" && filter.Sex != "All")
                 {
-                    res = (List<Person>)await _client.Cypher
+                    res = (List<PersonDTO>)await _client.Cypher
                        .Match("(p:Person)-[d:DIRECTED]-(s:Series)")
-                       .Where((Person p) => p.Name.Contains(filter.Name))
-                       .AndWhere((Person p) => p.Sex == filter.Sex)
+                       .Where((PersonDTO p) => p.Name.Contains(filter.Name))
+                       .AndWhere((PersonDTO p) => p.Sex == filter.Sex)
                        .With("DISTINCT p as director")
-                       .Return((director) => new Person
+                       .Return((director) => new PersonDTO
                        {
-                           ID = director.As<Person>().ID,
-                           Name = director.As<Person>().Name,
-                           Sex = director.As<Person>().Sex,
-                           Birthplace = director.As<Person>().Birthplace,
-                           Birthday = director.As<Person>().Birthday,
-                           Biography = director.As<Person>().Biography
+                           ID = Return.As<int>("ID(director)"),
+                           Name = director.As<PersonDTO>().Name,
+                           Sex = director.As<PersonDTO>().Sex,
+                           Birthplace = director.As<PersonDTO>().Birthplace,
+                           Birthday = director.As<PersonDTO>().Birthday,
+                           Biography = director.As<PersonDTO>().Biography
                        })
                        .ResultsAsync;
                 }
                 else if (filter.Name != "" && filter.Sex == "All")
                 {
-                    res = (List<Person>)await _client.Cypher
+                    res = (List<PersonDTO>)await _client.Cypher
                        .Match("(p:Person)-[d:DIRECTED]-(s:Series)")
-                       .Where((Person p) => p.Name.Contains(filter.Name))
+                       .Where((PersonDTO p) => p.Name.Contains(filter.Name))
                        .With("DISTINCT p as director")
-                       .Return((director) => new Person
+                       .Return((director) => new PersonDTO
                        {
-                           ID = director.As<Person>().ID,
-                           Name = director.As<Person>().Name,
-                           Sex = director.As<Person>().Sex,
-                           Birthplace = director.As<Person>().Birthplace,
-                           Birthday = director.As<Person>().Birthday,
-                           Biography = director.As<Person>().Biography
+                           ID = Return.As<int>("ID(director)"),
+                           Name = director.As<PersonDTO>().Name,
+                           Sex = director.As<PersonDTO>().Sex,
+                           Birthplace = director.As<PersonDTO>().Birthplace,
+                           Birthday = director.As<PersonDTO>().Birthday,
+                           Biography = director.As<PersonDTO>().Biography
                        })
                        .ResultsAsync;
                 }
                 else if (filter.Name == "" && filter.Sex != "All")
                 {
-                    res = (List<Person>)await _client.Cypher
+                    res = (List<PersonDTO>)await _client.Cypher
                        .Match("(p:Person)-[d:DIRECTED]-(s:Series)")
-                       .Where((Person p) => p.Sex == filter.Sex)
+                       .Where((PersonDTO p) => p.Sex == filter.Sex)
                        .With("DISTINCT p as director")
-                       .Return((director) => new Person
+                       .Return((director) => new PersonDTO
                        {
-                           ID = director.As<Person>().ID,
-                           Name = director.As<Person>().Name,
-                           Sex = director.As<Person>().Sex,
-                           Birthplace = director.As<Person>().Birthplace,
-                           Birthday = director.As<Person>().Birthday,
-                           Biography = director.As<Person>().Biography
+                           ID = Return.As<int>("ID(director)"),
+                           Name = director.As<PersonDTO>().Name,
+                           Sex = director.As<PersonDTO>().Sex,
+                           Birthplace = director.As<PersonDTO>().Birthplace,
+                           Birthday = director.As<PersonDTO>().Birthday,
+                           Biography = director.As<PersonDTO>().Biography
                        })
                        .ResultsAsync;
                 }
                 else
                 {
-                    res = (List<Person>)await _client.Cypher
+                    res = (List<PersonDTO>)await _client.Cypher
                        .Match("(p:Person)-[d:DIRECTED]-(s:Series)")
                        .With("DISTINCT p as director")
-                       .Return((director) => new Person
+                       .Return((director) => new PersonDTO
                        {
-                           ID = director.As<Person>().ID,
-                           Name = director.As<Person>().Name,
-                           Sex = director.As<Person>().Sex,
-                           Birthplace = director.As<Person>().Birthplace,
-                           Birthday = director.As<Person>().Birthday,
-                           Biography = director.As<Person>().Biography
+                           ID = Return.As<int>("ID(director)"),
+                           Name = director.As<PersonDTO>().Name,
+                           Sex = director.As<PersonDTO>().Sex,
+                           Birthplace = director.As<PersonDTO>().Birthplace,
+                           Birthday = director.As<PersonDTO>().Birthday,
+                           Biography = director.As<PersonDTO>().Biography
                        })
                        .ResultsAsync;
                 }

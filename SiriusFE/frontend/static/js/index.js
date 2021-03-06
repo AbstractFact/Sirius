@@ -289,14 +289,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         {
             if (e.target.id.includes("SR")) {
                 e.preventDefault();
-                view.EditRole(e.target.id.split(" ")[1]);
-                location.reload();
+                handleEditRole(e.target.id.split(" ")[1]);
             };
 
             if (e.target.id.includes("RR")) {
                 e.preventDefault();
-                view.DeleteRole(e.target.id.split(" ")[1]);
-                location.reload();
+                handleDeleteRole(e.target.id.split(" ")[1]);
             };
 
             if (e.target.id.includes("SA")) {
@@ -388,6 +386,18 @@ async function handleDeletePerson()
 async function handleAddRole()
 {
     await view.AddRole();
+    location.reload();
+}
+
+async function handleDeleteRole(id)
+{
+    await view.DeleteRole(id);
+    location.reload();
+}
+
+async function handleEditRole(id)
+{
+    await view.EditRole(id);
     location.reload();
 }
 

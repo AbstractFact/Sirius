@@ -32,7 +32,7 @@ namespace Sirius.Controllers
         [HttpGet("GetSeries/{seriesID}")]
         public async Task<ActionResult> GetSeries(int seriesID)
         {
-            Series res = await service.GetSeries(seriesID);
+            SeriesDTO res = await service.GetSeries(seriesID);
 
             if (res != null)
                 return Ok(res);
@@ -56,7 +56,7 @@ namespace Sirius.Controllers
 
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> Put([FromBody] Series series, int id)
+        public async Task<ActionResult> Put([FromBody] SeriesDTO series, int id)
         {
             bool res = await service.Put(series, id);
 
