@@ -1,9 +1,7 @@
 import AbstractView from "./AbstractView.js";
 import {Series} from "../models/Series.js";
 import {Person} from "../models/Person.js";
-import {Role} from "../models/Role.js";
 import {Award} from "../models/Award.js"
-import {Awarded} from "../models/Awarded.js"
 
 export default class extends AbstractView {
     constructor(params) {
@@ -215,8 +213,6 @@ export default class extends AbstractView {
                         <tbody>`;
 
                 d.forEach(data => {
-
-                    //const award = new Awarded(data["id"], data["award"], data["series"], data["year"]);
 
                     html+=`
                     <tr id="${data.id}">

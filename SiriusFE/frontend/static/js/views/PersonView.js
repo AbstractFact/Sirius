@@ -2,8 +2,6 @@
 import AbstractView from "./AbstractView.js";
 import {Series} from "../models/Series.js";
 import {Person} from "../models/Person.js";
-import {Role} from "../models/Role.js";
-import {Directed} from "../models/Directed.js";
 
 export default class extends AbstractView {
     constructor(params) {
