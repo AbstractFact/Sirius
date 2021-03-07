@@ -42,7 +42,7 @@ namespace Sirius.Controllers
         }
 
         [HttpPost("Login")]
-        public async Task<ActionResult<UserDTO>> Login([FromBody] User user)
+        public async Task<ActionResult<UserDTO>> Login([FromBody] UserLoginDTO user)
         {
             UserDTO res = await service.Login(user);
             if (res != null)
@@ -62,9 +62,9 @@ namespace Sirius.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<UserDTO>> Put([FromBody] UserDTO user, int id)
+        public async Task<ActionResult<User>> Put([FromBody] User user, int id)
         {
-            UserDTO res = await service.Put(user, id);
+            User res = await service.Put(user, id);
             if (res != null)
                 return Ok(res);
             else
@@ -85,6 +85,16 @@ namespace Sirius.Controllers
         public async Task<ActionResult<List<UserDTO>>> GetAllFriends(int userID)
         {
             List<UserDTO> res = await service.GetAllFriends(userID);
+            if (res != null)
+                return Ok(res);
+            else
+                return BadRequest();
+        }
+
+        [HttpGet("GetAllFilteredFriends/{userID}/{filter}")]
+        public async Task<ActionResult<List<UserDTO>>> GetAllFilteredFriends(int userID, string filter)
+        {
+            List<UserDTO> res = await service.GetAllFilteredFriends(userID, filter);
             if (res != null)
                 return Ok(res);
             else
@@ -229,16 +239,6 @@ namespace Sirius.Controllers
         {
             List<RecommendationDTO> res = await service.GetUserRecommendations(userID);
 
-            if (res != null)
-                return Ok(res);
-            else
-                return BadRequest();
-        }
-
-        [HttpGet("GetAllFilteredFriends/{userID}/{filter}")]
-        public async Task<ActionResult<List<UserDTO>>> GetAllFilteredFriends(int userID, string filter)
-        {
-            List<UserDTO> res = await service.GetAllFilteredFriends(userID, filter);
             if (res != null)
                 return Ok(res);
             else

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using Neo4jClient;
+using Neo4jClient.Cypher;
 using Sirius.DTOs;
 using Sirius.Entities;
 using Sirius.Hubs;
@@ -18,34 +19,12 @@ namespace Sirius.Services
         private readonly IGraphClient _client;
         private readonly IHubContext<MessageHub> _hub;
         private readonly IConnectionMultiplexer _redisConnection;
-        private int maxID;
 
         public UserService(IGraphClient client, IRedisService builder, IHubContext<MessageHub> hub)
         {
             _client = client;
             _redisConnection = builder.Connection;
             _hub = hub;
-            maxID = 0;
-        }
-
-        private async Task<int> MaxID()
-        {
-            try
-            {
-                var query = await _client.Cypher
-                        .Match("(u:User)")
-                        .Return<int>(u => u.As<UserDTO>().ID)
-                        .OrderByDescending("u.ID")
-                        //.Return<int>("ID(u)")
-                        //.OrderByDescending("ID(u)")
-                        .ResultsAsync;
-
-                return query.FirstOrDefault();
-            }
-            catch (Exception)
-            {
-                return -1;
-            }
         }
 
         public async Task<Object> GetAll()
@@ -53,12 +32,16 @@ namespace Sirius.Services
             try
             {
                 var res = await _client.Cypher
-                        .OptionalMatch("(user:User)-[FRIENDS]-(friend:User)")
-                        .Return((user, friend) => new
+                        .Match("(user:User)")
+                        .Return((user) => new UserDTO
                         {
-                            User = user.As<UserDTO>(),
-                            Friends = friend.CollectAs<UserDTO>()
-                        }).ResultsAsync;
+                            ID = Return.As<int>("ID(user)"),
+                            Name = Return.As<string>("user.Name"),
+                            Email = Return.As<string>("user.Email"),
+                            Username = Return.As<string>("user.Username"),
+                            Password = Return.As<string>("user.Password")
+                        })
+                        .ResultsAsync;
 
                 return res;
             }
@@ -74,8 +57,16 @@ namespace Sirius.Services
             {
                 var res = await _client.Cypher
                      .Match("(user:User)")
-                     .Where((UserDTO user) => user.ID == id)
-                     .Return(user => user.As<UserDTO>())
+                     .Where("ID(user) = $id")
+                     .WithParam("id", id)
+                     .Return((user) => new UserDTO
+                     {
+                         ID = Return.As<int>("ID(user)"),
+                         Name = Return.As<string>("user.Name"),
+                         Email = Return.As<string>("user.Email"),
+                         Username = Return.As<string>("user.Username"),
+                         Password = Return.As<string>("user.Password")
+                     })
                      .ResultsAsync;
 
                 return res.FirstOrDefault();
@@ -90,8 +81,11 @@ namespace Sirius.Services
         {
             var res = await _client.Cypher
                         .Match("(user:User)")
-                        .Where((UserDTO user) => user.Username == username)
-                        .Return(user => user.As<UserDTO>())
+                        .Where((User user) => user.Username == username)
+                        .Return((user) => new 
+                        {
+                             ID = Return.As<int>("ID(user)")
+                        })
                         .ResultsAsync;
 
             if (res.Count() != 0)
@@ -104,8 +98,12 @@ namespace Sirius.Services
 
             var res = await _client.Cypher
                         .Match("(user:User)")
-                        .Where((UserDTO user) => user.ID == userID)
-                        .Return(user => user.As<UserDTO>())
+                        .Where("ID(user) = $userID")
+                        .WithParam("userID", userID)
+                        .Return((user) => new 
+                        {
+                             Username = Return.As<string>("user.Username") 
+                        })
                         .ResultsAsync;
 
             if (res.Count() != 0)
@@ -114,15 +112,22 @@ namespace Sirius.Services
                 return null;
         }
 
-        public async Task<UserDTO> Login(User user)
+        public async Task<UserDTO> Login(UserLoginDTO user)
         {
             try
             {
                 var res = await _client.Cypher
                       .Match("(u:User)")
-                      .Where((UserDTO u) => u.Username == user.Username)
-                      .AndWhere((UserDTO u) => u.Password == user.Password)
-                      .Return(u => u.As<UserDTO>())
+                      .Where((User u) => u.Username == user.Username)
+                      .AndWhere((User u) => u.Password == user.Password)
+                      .Return((user) => new UserDTO
+                      {
+                          ID = Return.As<int>("ID(user)"),
+                          Name = Return.As<string>("user.Name"),
+                          Email = Return.As<string>("user.Email"),
+                          Username = Return.As<string>("user.Username"),
+                          Password = Return.As<string>("user.Password")
+                      })
                       .ResultsAsync;
 
                 return res.FirstOrDefault();
@@ -135,18 +140,26 @@ namespace Sirius.Services
 
         public async Task<UserDTO> Post(User u)
         {
-            maxID = await MaxID();
             int id = await GetUserID(u.Username);
 
-            if (id == -1 && maxID!=-1)
+            if (id == -1 )
             {
                 try
                 {
-                    var newUser = new UserDTO { ID = maxID + 1, Name = u.Name, Email = u.Email, Username = u.Username, Password = u.Password };
-                    var res = _client.Cypher.Create("(user:User $newUser)")
-                                            .WithParam("newUser", newUser);
+                    var res = await _client.Cypher
+                           .Create("(user: User $u)")
+                           .WithParam("u", u)
+                           .Return((user) => new UserDTO
+                           {
+                                ID = Return.As<int>("ID(user)"),
+                                Name = Return.As<string>("user.Name"),
+                                Email = Return.As<string>("user.Email"),
+                                Username = Return.As<string>("user.Username"),
+                                Password = Return.As<string>("user.Password")
+                           })
+                           .ResultsAsync;
 
-                    await res.ExecuteWithoutResultsAsync();
+                    UserDTO newUser = res.Single();
 
                     return newUser;
                 }
@@ -159,16 +172,18 @@ namespace Sirius.Services
                 return null;
         }
 
-        public async Task<UserDTO> Put(UserDTO user, int id)
+        public async Task<User> Put(User user, int id)
         {
             try
             {
-                var res = _client.Cypher
+                var res =  _client.Cypher
                              .Match("(u:User)")
-                             .Where((SeriesDTO u) => u.ID == id)
+                             .Where("ID(u) = $id")
+                             .WithParam("id", id)
                              .Set("u = $user")
-                             .WithParam("user", user);
-
+                             .WithParam("user", user)
+                             .Return((u) => u.As<User>());
+              
                 await res.ExecuteWithoutResultsAsync();
                 return user;
             }
@@ -184,7 +199,8 @@ namespace Sirius.Services
             {
                 var res = _client.Cypher
                              .Match("(u:User)")
-                             .Where((UserDTO u) => u.ID == id)
+                             .Where("ID(u) = $id")
+                             .WithParam("id", id)
                              .Delete("u");
 
                 await res.ExecuteWithoutResultsAsync();
@@ -202,10 +218,68 @@ namespace Sirius.Services
             {
                 var res = await _client.Cypher
                        .Match("(user:User)-[FRIENDS]-(friend:User)")
-                       .Where((UserDTO user) => user.ID == userID)
-                       .Return(friend => friend.As<UserDTO>())
+                       .Where("ID(user) = $userID")
+                       .WithParam("userID", userID)
+                       .Return((friend) => new UserDTO
+                       {
+                            ID = Return.As<int>("ID(friend)"),
+                            Name = Return.As<string>("friend.Name"),
+                            Email = Return.As<string>("friend.Email"),
+                            Username = Return.As<string>("friend.Username"),
+                            Password = Return.As<string>("friend.Password")
+                       })
                        .ResultsAsync;
+
                 return res.ToList();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        public async Task<List<UserDTO>> GetAllFilteredFriends(int userID, string filter)
+        {
+            try
+            {
+                var res = new List<UserDTO>();
+
+                if (filter != "")
+                {
+                    res = (List<UserDTO>)await _client.Cypher
+                      .Match("(user:User)-[FRIENDS]-(friend:User)")
+                      .Where("ID(user) = $userID")
+                      .WithParam("userID", userID)
+                      .AndWhere((User friend) => friend.Username.Contains(filter))
+                      .Return((friend) => new UserDTO
+                      {
+                          ID = Return.As<int>("ID(friend)"),
+                          Name = Return.As<string>("friend.Name"),
+                          Email = Return.As<string>("friend.Email"),
+                          Username = Return.As<string>("friend.Username"),
+                          Password = Return.As<string>("friend.Password")
+                      })
+                      .ResultsAsync;
+
+                }
+                else
+                {
+                    res = (List<UserDTO>)await _client.Cypher
+                     .Match("(user:User)-[FRIENDS]-(friend:User)")
+                     .Where("ID(user) = $userID")
+                     .WithParam("userID", userID)
+                     .Return((friend) => new UserDTO
+                     {
+                         ID = Return.As<int>("ID(friend)"),
+                         Name = Return.As<string>("friend.Name"),
+                         Email = Return.As<string>("friend.Email"),
+                         Username = Return.As<string>("friend.Username"),
+                         Password = Return.As<string>("friend.Password")
+                     })
+                     .ResultsAsync;
+                }
+
+                return res;
             }
             catch (Exception)
             {
@@ -224,8 +298,10 @@ namespace Sirius.Services
                 await DeleteFriendRequest(receiverID, requestID, senderID);
                 var res = _client.Cypher
                         .Match("(user1:User)", "(user2:User)")
-                        .Where((UserDTO user1) => user1.ID == senderID)
-                        .AndWhere((UserDTO user2) => user2.ID == receiverID)
+                        .Where("ID(user1) = $senderID")
+                        .WithParam("senderID", senderID)
+                        .AndWhere("ID(user2) = $receiverID")
+                        .WithParam("receiverID", receiverID)
                         .Merge("(user1)-[:FRIENDS]->(user2)");
 
                 await res.ExecuteWithoutResultsAsync();
@@ -245,8 +321,10 @@ namespace Sirius.Services
             {
                 var res = _client.Cypher
                     .Match("(user1:User)-[f:FRIENDS]-(user2:User)")
-                    .Where((UserDTO user1) => user1.ID == user1ID)
-                    .AndWhere((UserDTO user2) => user2.ID == user2ID)
+                    .Where("ID(user1) = $user1ID")
+                    .WithParam("user1ID", user1ID)
+                    .AndWhere("ID(user2) = $user2ID")
+                    .WithParam("user2ID", user2ID)
                     .Delete("f");
 
                 await res.ExecuteWithoutResultsAsync();
@@ -420,39 +498,6 @@ namespace Sirius.Services
                     arr.Add(JsonSerializer.Deserialize<RecommendationDTO>(res));
 
                 return arr;
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
-
-        public async Task<List<UserDTO>> GetAllFilteredFriends(int userID, string filter)
-        {
-            try
-            {
-                var res = new List<UserDTO>();
-
-                if(filter!="")
-                {
-                    res = (List<UserDTO>)await _client.Cypher
-                      .Match("(user:User)-[FRIENDS]-(friend:User)")
-                      .Where((UserDTO user) => user.ID == userID)
-                      .AndWhere((UserDTO friend) => friend.Username.Contains(filter))
-                      .Return(friend => friend.As<UserDTO>())
-                      .ResultsAsync;
-                    
-                }
-                else
-                {
-                    res = (List<UserDTO>)await _client.Cypher
-                     .Match("(user:User)-[FRIENDS]-(friend:User)")
-                     .Where((UserDTO user) => user.ID == userID)
-                     .Return(friend => friend.As<UserDTO>())
-                     .ResultsAsync;
-                }
-
-                return res;
             }
             catch (Exception)
             {

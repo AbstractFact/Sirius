@@ -33,8 +33,8 @@ namespace Sirius.Services
             {
                 var res = await _client.Cypher
                         .Match("(series:Series)")
-                         .Return((series) => new SeriesDTO
-                         {
+                        .Return((series) => new SeriesDTO
+                        {
                              ID = Return.As<int>("ID(series)"),
                              Title = Return.As<string>("series.Title"),
                              Year = Return.As<int>("series.Year"),
@@ -42,7 +42,7 @@ namespace Sirius.Services
                              Plot = Return.As<string>("series.Plot"),
                              Seasons = Return.As<int>("series.Seasons"),
                              Rating = Return.As<float>("series.Rating")
-                         })
+                        })
                         .ResultsAsync;
 
                 return res;
