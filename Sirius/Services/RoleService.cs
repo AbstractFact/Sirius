@@ -29,7 +29,7 @@ namespace Sirius.Services
                            ID=Return.As<int>("ID(r)"),
                            ActorID = Return.As<int>("ID(p)"),
                            Name = Return.As<string>("p.Name"),
-                           r.As<RoleDTO>().InRole
+                           r.As<Role>().InRole
                        })
                        .ResultsAsync;
 

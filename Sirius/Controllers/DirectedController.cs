@@ -57,9 +57,8 @@ namespace Sirius.Controllers
                 return BadRequest();
         }
 
-
         [HttpPut("{id}")]
-        public async Task<ActionResult> Put([FromBody] DirectedDTO directed, int id)
+        public async Task<ActionResult> Put([FromBody] Directed directed, int id)
         {
             bool res = await service.Put(directed, id);
             if (res)

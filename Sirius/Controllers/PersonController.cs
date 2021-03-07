@@ -70,7 +70,7 @@ namespace Sirius.Controllers
 
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> Put([FromBody] PersonDTO person, int id)
+        public async Task<ActionResult> Put([FromBody] Person person, int id)
         {
             bool res = await service.Put(person, id);
 

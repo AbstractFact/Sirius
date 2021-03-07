@@ -1,5 +1,4 @@
 import AbstractView from "./AbstractView.js";
-import {Series} from "../models/Series.js";
 
 export default class extends AbstractView {
     constructor(params) 
@@ -26,9 +25,7 @@ export default class extends AbstractView {
                             <tr>
                             <th scope="col">#</th>
                             <th scope="col">Title</th>
-                            <th scope="col">Year</th>
                             <th scope="col">Genre</th>
-                            <th scope="col">Plot</th>
                             <th scope="col">Seasons</th>
                             <th scope="col">Rating</th>
                             </tr>
@@ -36,17 +33,14 @@ export default class extends AbstractView {
                         <tbody>`;
 
             data.forEach(d => {
-                    const series = new Series(d["series"]["id"], d["series"]["title"], d["series"]["year"], d["series"]["genre"], d["series"]["plot"], d["series"]["seasons"], d["series"]["rating"]);
 
                     html+=`
                         <tr>
                         <th scope="row">${++i}</th>
-                        <td><a href="/series/${series.id}" data-link>${series.title}</a></td>
-                        <td>${series.year}</td>
-                        <td>${series.genre}</td>
-                        <td>${series.plot}</td>
-                        <td>${series.seasons}</td>
-                        <td>`+ +(Math.round(series.rating + "e+1") + "e-1")+`</td>
+                        <td><a href="/series/${d.seriesID}" data-link>${d.title}</a></td>
+                        <td>${d.genre}</td>
+                        <td>${d.seasons}</td>
+                        <td>`+ +(Math.round(d.rating + "e+1") + "e-1")+`</td>
                         </tr>`;
                  });
 

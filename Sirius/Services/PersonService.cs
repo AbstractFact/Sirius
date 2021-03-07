@@ -140,7 +140,7 @@ namespace Sirius.Services
             }             
         }
 
-        public async Task<bool> Put(PersonDTO person, int id)
+        public async Task<bool> Put(Person person, int id)
         {
             try
             {

@@ -28,8 +28,8 @@ namespace Sirius.Services
                        {
                            ID = Return.As<int>("ID(aw)"),
                            AwardID = Return.As<int>("ID(a)"),
-                           Name = Return.As<string>("a.Name"),
-                           aw.As<AwardedDTO>().Year
+                           Name = a.As<Award>().Name,
+                           Year = aw.As<Awarded>().Year
                        })
                        .ResultsAsync;
 
@@ -52,8 +52,8 @@ namespace Sirius.Services
                        .Return((aw, s) => new
                        {
                            ID = Return.As<int>("ID(s)"),
-                           Title = Return.As<string>("s.Title"),
-                           Year = aw.As<AwardedDTO>().Year
+                           Title = s.As<Series>().Title,
+                           Year = aw.As<Awarded>().Year
                        })
                        .ResultsAsync;
 

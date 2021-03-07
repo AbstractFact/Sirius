@@ -543,7 +543,7 @@ async function fillEditProfileForm()
 
 function logout()
 {
-    localStorage.userid=0;
+    localStorage.userid=-1;
     localStorage.logged=0;
     navigateTo("/");
     location.reload();

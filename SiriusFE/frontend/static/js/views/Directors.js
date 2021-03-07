@@ -96,7 +96,6 @@ export default class extends AbstractView {
                 <td>${director.birthday}</td>
                 </tr>`;
             });
-        }));
-          
+        }));      
     }
 }

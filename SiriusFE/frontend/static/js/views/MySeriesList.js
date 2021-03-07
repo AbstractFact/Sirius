@@ -1,6 +1,4 @@
 import AbstractView from "./AbstractView.js";
-import {Series} from "../models/Series.js"
-import {MySeriesList} from "../models/MySeriesList.js"
 
 export default class extends AbstractView {
     constructor(params) {
@@ -11,8 +9,7 @@ export default class extends AbstractView {
     async getHtml() 
     {
         var html,i;
-
-        if(localStorage.userid!=0)
+        if(localStorage.logged!=0)
         {
             await fetch("https://localhost:44365/User/GetUserSubsciptions/"+localStorage.userid, {method: "GET"})
             .then(p => p.json().then(data => {
@@ -126,23 +123,20 @@ export default class extends AbstractView {
                             <tbody id="tcontent">`;
 
                 data.forEach(d => {
-                        const series = new Series(d["series"]["id"], d["series"]["title"], d["series"]["year"], d["series"]["genre"], d["series"]["plot"], d["series"]["seasons"], d["series"]["rating"]);
+                
                         const status = d["status"];
                         const stars = d["stars"];
                         const comment = d["comment"];
                         const favourite = d["favourite"];
-
                         const checked= favourite?`checked`:``;
 
-                        const entry = new MySeriesList(d["id"], series, status, stars, comment, favourite);
-
                         html+=`
-                            <tr id="${entry.id}">
+                            <tr id="${d.id}">
                             <th scope="row">${++i}</th>
-                            <td><a href="/series/${series.id}" class="serid" id="${series.id}" data-link>${series.title}</a></td>
-                            <td>${series.genre}</td>
-                            <td>${series.seasons}</td>
-                            <td>${(series.rating === 0)? "Not rated" : +(Math.round(series.rating + "e+1") + "e-1")}</td>
+                            <td><a href="/series/${d.seriesID}" class="serid" id="${d.seriesID}" data-link>${d.title}</a></td>
+                            <td>${d.genre}</td>
+                            <td>${d.seasons}</td>
+                            <td>${(d.rating === 0)? "Not rated" : +(Math.round(d.rating + "e+1") + "e-1")}</td>
                             <td>
                                 <select id="inputStatus" class="form-control">
                                     <option selected>${status}</option>
@@ -170,10 +164,10 @@ export default class extends AbstractView {
                                 <input type="checkbox" id="inputFav" name="fav" ${checked}>
                             </td>
                             <td>
-                                <button type="submit" class="btn btn-primary" style="width:60%" id="SS ${entry.id}">Save Changes</button>
+                                <button type="submit" class="btn btn-primary" style="width:60%" id="SS ${d.id}">Save Changes</button>
                             </td>
                             <td>
-                                <button type="submit" class="btn btn-danger" style="width:100%" id="RS ${entry.id}">X</button>
+                                <button type="submit" class="btn btn-danger" style="width:100%" id="RS ${d.id}">X</button>
                             </td>
                             </tr>`;
                     });
@@ -211,9 +205,9 @@ export default class extends AbstractView {
         }
     }
 
-    DeleteEntry(id)
+    async DeleteEntry(id)
     {
-        fetch("https://localhost:44365/UserSeriesList/"+id, { method: "DELETE"}).then(p => {
+        await fetch("https://localhost:44365/UserSeriesList/"+id, { method: "DELETE"}).then(p => {
             if (p.ok) {
                 alert("Entry deleted!");
             }
@@ -359,21 +353,19 @@ export default class extends AbstractView {
             var i=0;
             data.forEach(d => {
               
-                const series = new Series(d["series"]["id"], d["series"]["title"], d["series"]["year"], d["series"]["genre"], d["series"]["plot"], d["series"]["seasons"], d["series"]["rating"]);
                 const status = d["status"];
                 const stars = d["stars"];
                 const comment = d["comment"];
                 const favourite = d["favourite"];
                 const checked= favourite?`checked`:``;
-                const entry = new MySeriesList(d["id"], series, status, stars, comment, favourite);
 
                 table.innerHTML+=`
-                <tr id="${entry.id}">
+                <tr id="${d.id}">
                 <th scope="row">${++i}</th>
-                <td><a href="/series/${series.id}" class="serid" id="${series.id}" data-link>${series.title}</a></td>
-                <td>${series.genre}</td>
-                <td>${series.seasons}</td>
-                <td>${(series.rating === 0)? "Not rated" : +(Math.round(series.rating + "e+1") + "e-1")}</td>
+                <td><a href="/series/${d.seriesID}" class="serid" id="${d.seriesID}" data-link>${d.seriesTitle}</a></td>
+                <td>${d.seriesGenre}</td>
+                <td>${d.seriesSeasons}</td>
+                <td>${(d.seriesRating === 0)? "Not rated" : +(Math.round(d.seriesRating + "e+1") + "e-1")}</td>
                 <td>
                     <select id="inputStatus" class="form-control">
                         <option selected>${status}</option>
@@ -401,10 +393,10 @@ export default class extends AbstractView {
                     <input type="checkbox" id="inputFav" name="fav" ${checked}>
                 </td>
                 <td>
-                    <button type="submit" class="btn btn-primary" style="width:60%" id="SS ${entry.id}">Save Changes</button>
+                    <button type="submit" class="btn btn-primary" style="width:60%" id="SS ${d.id}">Save Changes</button>
                 </td>
                 <td>
-                    <button type="submit" class="btn btn-danger" style="width:100%" id="RS ${entry.id}">X</button>
+                    <button type="submit" class="btn btn-danger" style="width:100%" id="RS ${d.id}">X</button>
                 </td>
                 </tr>`;
             });

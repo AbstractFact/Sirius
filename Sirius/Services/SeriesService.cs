@@ -17,14 +17,12 @@ namespace Sirius.Services
     public class SeriesService
     {
         private readonly IGraphClient _client;
-        private readonly IHubContext<MessageHub> _hub;
         private readonly IConnectionMultiplexer _redisConnection;
 
-        public SeriesService(IGraphClient client, IRedisService builder, IHubContext<MessageHub> hub)
+        public SeriesService(IGraphClient client, IRedisService builder)
         {
             _client = client;
             _redisConnection = builder.Connection;
-            _hub = hub;
         }
 
         public async Task<Object> GetAll()
@@ -133,7 +131,7 @@ namespace Sirius.Services
             }
         }
 
-        public async Task<bool> Put(SeriesDTO series, int id)
+        public async Task<bool> Put(Series series, int id)
         {
             try
             {
@@ -178,10 +176,7 @@ namespace Sirius.Services
                              .Match("(s:Series)")
                              .Where("ID(s) = $id")
                              .WithParam("id", id)
-                             .OptionalMatch("(s:Series)<-[r]-()")
-                             .Where("ID(s) = $id")
-                             .WithParam("id", id)
-                             .Delete("r, s");
+                             .DetachDelete("s");
 
                 await res.ExecuteWithoutResultsAsync();
 

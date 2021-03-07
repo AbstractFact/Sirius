@@ -9,7 +9,6 @@ namespace Sirius.Controllers
     public class AwardedController : ControllerBase
     {
         private AwardedService service;
-
         public AwardedController(AwardedService _service)
         {
             service = _service;

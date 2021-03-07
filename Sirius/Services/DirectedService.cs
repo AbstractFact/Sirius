@@ -131,7 +131,7 @@ namespace Sirius.Services
             }
         }
 
-        public async Task<bool> Put(DirectedDTO directed, int id)
+        public async Task<bool> Put(Directed directed, int id)
         {
             try
             {

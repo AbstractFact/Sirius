@@ -44,7 +44,7 @@ export default class extends AbstractView {
         
         if (!response.ok) {
             alert("User not found!");
-            localStorage.userid=0;
+            localStorage.userid=-1;
             localStorage.logged=0;
             localStorage.username=0;
         }

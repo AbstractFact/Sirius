@@ -120,13 +120,13 @@ namespace Sirius.Services
                       .Match("(u:User)")
                       .Where((User u) => u.Username == user.Username)
                       .AndWhere((User u) => u.Password == user.Password)
-                      .Return((user) => new UserDTO
+                      .Return((u) => new UserDTO
                       {
-                          ID = Return.As<int>("ID(user)"),
-                          Name = Return.As<string>("user.Name"),
-                          Email = Return.As<string>("user.Email"),
-                          Username = Return.As<string>("user.Username"),
-                          Password = Return.As<string>("user.Password")
+                          ID = Return.As<int>("ID(u)"),
+                          Name = Return.As<string>("u.Name"),
+                          Email = Return.As<string>("u.Email"),
+                          Username = Return.As<string>("u.Username"),
+                          Password = Return.As<string>("u.Password")
                       })
                       .ResultsAsync;
 
@@ -201,9 +201,10 @@ namespace Sirius.Services
                              .Match("(u:User)")
                              .Where("ID(u) = $id")
                              .WithParam("id", id)
-                             .Delete("u");
+                             .DetachDelete("u");
 
                 await res.ExecuteWithoutResultsAsync();
+
                 return id;
             }
             catch (Exception)
@@ -392,7 +393,6 @@ namespace Sirius.Services
                             ID = int.Parse(request.Values.FirstOrDefault(value => value.Name == "sender_id").Value),
                             Username = request.Values.FirstOrDefault(value => value.Name == "sender_username").Value
                         }
-
                     }
                 );
             }
