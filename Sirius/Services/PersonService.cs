@@ -26,11 +26,11 @@ namespace Sirius.Services
                        .Return((person) => new PersonDTO
                        {
                            ID = Return.As<int>("ID(person)"),
-                           Name = Return.As<string>("person.Name"),
-                           Sex = Return.As<string>("person.Sex"),
-                           Birthplace = Return.As<string>("person.Birthplace"),
-                           Birthday = Return.As<string>("person.Birthday"),
-                           Biography = Return.As<string>("person.Biography")
+                           Name = person.As<Person>().Name,
+                           Sex = person.As<Person>().Sex,
+                           Birthplace = person.As<Person>().Birthplace,
+                           Birthday = person.As<Person>().Birthday,
+                           Biography = person.As<Person>().Biography,
                        })
                       .ResultsAsync;
 
@@ -52,11 +52,11 @@ namespace Sirius.Services
                        .Return((actor) => new 
                        {
                            ID = Return.As<int>("ID(actor)"),
-                           Name = Return.As<string>("actor.Name"),
-                           Sex = Return.As<string>("actor.Sex"),
-                           Birthplace = Return.As<string>("actor.Birthplace"),
-                           Birthday = Return.As<string>("actor.Birthday"),
-                           Biography = Return.As<string>("actor.Biography")
+                           Name = actor.As<Person>().Name,
+                           Sex = actor.As<Person>().Sex,
+                           Birthplace = actor.As<Person>().Birthplace,
+                           Birthday = actor.As<Person>().Birthday,
+                           Biography = actor.As<Person>().Biography,
                        })
                        .ResultsAsync;
 
@@ -78,11 +78,11 @@ namespace Sirius.Services
                        .Return((director) => new
                        {
                            ID = Return.As<int>("ID(director)"),
-                           Name = Return.As<string>("director.Name"),
-                           Sex = Return.As<string>("director.Sex"),
-                           Birthplace = Return.As<string>("director.Birthplace"),
-                           Birthday = Return.As<string>("director.Birthday"),
-                           Biography = Return.As<string>("director.Biography")
+                           Name = director.As<Person>().Name,
+                           Sex = director.As<Person>().Sex,
+                           Birthplace = director.As<Person>().Birthplace,
+                           Birthday = director.As<Person>().Birthday,
+                           Biography = director.As<Person>().Biography,
                        })
                        .ResultsAsync;
 
@@ -104,13 +104,13 @@ namespace Sirius.Services
                      .WithParam("personID", personID)
                      .Return((p) => new PersonDTO
                       {
-                          ID = Return.As<int>("ID(p)"),
-                          Name = Return.As<string>("p.Name"),
-                          Sex = Return.As<string>("p.Sex"),
-                          Birthplace = Return.As<string>("p.Birthplace"),
-                          Birthday = Return.As<string>("p.Birthday"),
-                          Biography = Return.As<string>("p.Biography")
-                      })
+                         ID = Return.As<int>("ID(p)"),
+                         Name = p.As<Person>().Name,
+                         Sex = p.As<Person>().Sex,
+                         Birthplace = p.As<Person>().Birthplace,
+                         Birthday = p.As<Person>().Birthday,
+                         Biography = p.As<Person>().Biography,
+                     })
                      .ResultsAsync;
 
               
@@ -190,17 +190,17 @@ namespace Sirius.Services
                 {
                     res = (List<PersonDTO>) await _client.Cypher
                        .Match("(p:Person)-[d:IN_ROLE]-(s:Series)")
-                       .Where((PersonDTO p) => p.Name == filter.Name)
-                       .AndWhere((PersonDTO p) => p.Sex == filter.Sex)
+                       .Where((Person p) => p.Name == filter.Name)
+                       .AndWhere((Person p) => p.Sex == filter.Sex)
                        .With("DISTINCT p as actor")
                        .Return((actor) => new PersonDTO
                        {
                            ID = Return.As<int>("ID(actor)"),
-                           Name = actor.As<PersonDTO>().Name,
-                           Sex = actor.As<PersonDTO>().Sex,
-                           Birthplace = actor.As<PersonDTO>().Birthplace,
-                           Birthday = actor.As<PersonDTO>().Birthday,
-                           Biography = actor.As<PersonDTO>().Biography
+                           Name = actor.As<Person>().Name,
+                           Sex = actor.As<Person>().Sex,
+                           Birthplace = actor.As<Person>().Birthplace,
+                           Birthday = actor.As<Person>().Birthday,
+                           Biography = actor.As<Person>().Biography
                        })
                        .ResultsAsync;
                 }
@@ -208,16 +208,16 @@ namespace Sirius.Services
                 {
                     res = (List<PersonDTO>)await _client.Cypher
                        .Match("(p:Person)-[d:IN_ROLE]-(s:Series)")
-                       .Where((PersonDTO p) => p.Name == filter.Name)
+                       .Where((Person p) => p.Name == filter.Name)
                        .With("DISTINCT p as actor")
                        .Return((actor) => new PersonDTO
                        {
                            ID = Return.As<int>("ID(actor)"),
-                           Name = actor.As<PersonDTO>().Name,
-                           Sex = actor.As<PersonDTO>().Sex,
-                           Birthplace = actor.As<PersonDTO>().Birthplace,
-                           Birthday = actor.As<PersonDTO>().Birthday,
-                           Biography = actor.As<PersonDTO>().Biography
+                           Name = actor.As<Person>().Name,
+                           Sex = actor.As<Person>().Sex,
+                           Birthplace = actor.As<Person>().Birthplace,
+                           Birthday = actor.As<Person>().Birthday,
+                           Biography = actor.As<Person>().Biography
                        })
                        .ResultsAsync;
                 }
@@ -225,16 +225,16 @@ namespace Sirius.Services
                 {
                     res = (List<PersonDTO>)await _client.Cypher
                        .Match("(p:Person)-[d:IN_ROLE]-(s:Series)")
-                       .Where((PersonDTO p) => p.Sex == filter.Sex)
+                       .Where((Person p) => p.Sex == filter.Sex)
                        .With("DISTINCT p as actor")
                        .Return((actor) => new PersonDTO
                        {
                            ID = Return.As<int>("ID(actor)"),
-                           Name = actor.As<PersonDTO>().Name,
-                           Sex = actor.As<PersonDTO>().Sex,
-                           Birthplace = actor.As<PersonDTO>().Birthplace,
-                           Birthday = actor.As<PersonDTO>().Birthday,
-                           Biography = actor.As<PersonDTO>().Biography
+                           Name = actor.As<Person>().Name,
+                           Sex = actor.As<Person>().Sex,
+                           Birthplace = actor.As<Person>().Birthplace,
+                           Birthday = actor.As<Person>().Birthday,
+                           Biography = actor.As<Person>().Biography
                        })
                        .ResultsAsync;
                 }
@@ -246,11 +246,11 @@ namespace Sirius.Services
                        .Return((actor) => new PersonDTO
                        {
                            ID = Return.As<int>("ID(actor)"),
-                           Name = actor.As<PersonDTO>().Name,
-                           Sex = actor.As<PersonDTO>().Sex,
-                           Birthplace = actor.As<PersonDTO>().Birthplace,
-                           Birthday = actor.As<PersonDTO>().Birthday,
-                           Biography = actor.As<PersonDTO>().Biography
+                           Name = actor.As<Person>().Name,
+                           Sex = actor.As<Person>().Sex,
+                           Birthplace = actor.As<Person>().Birthplace,
+                           Birthday = actor.As<Person>().Birthday,
+                           Biography = actor.As<Person>().Biography
                        })
                        .ResultsAsync;
                 }
@@ -272,17 +272,17 @@ namespace Sirius.Services
                 {
                     res = (List<PersonDTO>)await _client.Cypher
                        .Match("(p:Person)-[d:DIRECTED]-(s:Series)")
-                       .Where((PersonDTO p) => p.Name.Contains(filter.Name))
-                       .AndWhere((PersonDTO p) => p.Sex == filter.Sex)
+                       .Where((Person p) => p.Name.Contains(filter.Name))
+                       .AndWhere((Person p) => p.Sex == filter.Sex)
                        .With("DISTINCT p as director")
                        .Return((director) => new PersonDTO
                        {
                            ID = Return.As<int>("ID(director)"),
-                           Name = director.As<PersonDTO>().Name,
-                           Sex = director.As<PersonDTO>().Sex,
-                           Birthplace = director.As<PersonDTO>().Birthplace,
-                           Birthday = director.As<PersonDTO>().Birthday,
-                           Biography = director.As<PersonDTO>().Biography
+                           Name = director.As<Person>().Name,
+                           Sex = director.As<Person>().Sex,
+                           Birthplace = director.As<Person>().Birthplace,
+                           Birthday = director.As<Person>().Birthday,
+                           Biography = director.As<Person>().Biography
                        })
                        .ResultsAsync;
                 }
@@ -290,16 +290,16 @@ namespace Sirius.Services
                 {
                     res = (List<PersonDTO>)await _client.Cypher
                        .Match("(p:Person)-[d:DIRECTED]-(s:Series)")
-                       .Where((PersonDTO p) => p.Name.Contains(filter.Name))
+                       .Where((Person p) => p.Name.Contains(filter.Name))
                        .With("DISTINCT p as director")
                        .Return((director) => new PersonDTO
                        {
                            ID = Return.As<int>("ID(director)"),
-                           Name = director.As<PersonDTO>().Name,
-                           Sex = director.As<PersonDTO>().Sex,
-                           Birthplace = director.As<PersonDTO>().Birthplace,
-                           Birthday = director.As<PersonDTO>().Birthday,
-                           Biography = director.As<PersonDTO>().Biography
+                           Name = director.As<Person>().Name,
+                           Sex = director.As<Person>().Sex,
+                           Birthplace = director.As<Person>().Birthplace,
+                           Birthday = director.As<Person>().Birthday,
+                           Biography = director.As<Person>().Biography
                        })
                        .ResultsAsync;
                 }
@@ -307,16 +307,16 @@ namespace Sirius.Services
                 {
                     res = (List<PersonDTO>)await _client.Cypher
                        .Match("(p:Person)-[d:DIRECTED]-(s:Series)")
-                       .Where((PersonDTO p) => p.Sex == filter.Sex)
+                       .Where((Person p) => p.Sex == filter.Sex)
                        .With("DISTINCT p as director")
                        .Return((director) => new PersonDTO
                        {
                            ID = Return.As<int>("ID(director)"),
-                           Name = director.As<PersonDTO>().Name,
-                           Sex = director.As<PersonDTO>().Sex,
-                           Birthplace = director.As<PersonDTO>().Birthplace,
-                           Birthday = director.As<PersonDTO>().Birthday,
-                           Biography = director.As<PersonDTO>().Biography
+                           Name = director.As<Person>().Name,
+                           Sex = director.As<Person>().Sex,
+                           Birthplace = director.As<Person>().Birthplace,
+                           Birthday = director.As<Person>().Birthday,
+                           Biography = director.As<Person>().Biography
                        })
                        .ResultsAsync;
                 }
@@ -328,11 +328,11 @@ namespace Sirius.Services
                        .Return((director) => new PersonDTO
                        {
                            ID = Return.As<int>("ID(director)"),
-                           Name = director.As<PersonDTO>().Name,
-                           Sex = director.As<PersonDTO>().Sex,
-                           Birthplace = director.As<PersonDTO>().Birthplace,
-                           Birthday = director.As<PersonDTO>().Birthday,
-                           Biography = director.As<PersonDTO>().Biography
+                           Name = director.As<Person>().Name,
+                           Sex = director.As<Person>().Sex,
+                           Birthplace = director.As<Person>().Birthplace,
+                           Birthday = director.As<Person>().Birthday,
+                           Biography = director.As<Person>().Biography
                        })
                        .ResultsAsync;
                 }

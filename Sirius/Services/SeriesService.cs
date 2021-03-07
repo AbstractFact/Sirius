@@ -34,12 +34,12 @@ namespace Sirius.Services
                         .Return((series) => new SeriesDTO
                         {
                              ID = Return.As<int>("ID(series)"),
-                             Title = Return.As<string>("series.Title"),
-                             Year = Return.As<int>("series.Year"),
-                             Genre = Return.As<string>("series.Genre"),
-                             Plot = Return.As<string>("series.Plot"),
-                             Seasons = Return.As<int>("series.Seasons"),
-                             Rating = Return.As<float>("series.Rating")
+                             Title = series.As<Series>().Title,
+                             Year = series.As<Series>().Year,
+                             Genre = series.As<Series>().Genre,
+                             Plot = series.As<Series>().Plot,
+                             Seasons = series.As<Series>().Seasons,
+                             Rating = series.As<Series>().Rating
                         })
                         .ResultsAsync;
 
@@ -56,18 +56,18 @@ namespace Sirius.Services
             try
             {
                 var res = await _client.Cypher
-                       .Match("(s:Series)")
-                       .Where("ID(s) = $seriesID")
+                       .Match("(series:Series)")
+                       .Where("ID(series) = $seriesID")
                        .WithParam("seriesID", seriesID)
-                       .Return((s) => new SeriesDTO
+                       .Return((series) => new SeriesDTO
                        {
-                            ID = Return.As<int>("ID(s)"),
-                            Title = Return.As<string>("s.Title"),
-                            Year = Return.As<int>("s.Year"),
-                            Genre = Return.As<string>("s.Genre"),
-                            Plot = Return.As<string>("s.Plot"),
-                            Seasons = Return.As<int>("s.Seasons"),
-                            Rating = Return.As<float>("s.Rating")
+                           ID = Return.As<int>("ID(series)"),
+                           Title = series.As<Series>().Title,
+                           Year = series.As<Series>().Year,
+                           Genre = series.As<Series>().Genre,
+                           Plot = series.As<Series>().Plot,
+                           Seasons = series.As<Series>().Seasons,
+                           Rating = series.As<Series>().Rating
                        })
                        .ResultsAsync;
               
@@ -90,12 +90,12 @@ namespace Sirius.Services
                             .Return((series) => new SeriesDTO
                             {
                                 ID = Return.As<int>("ID(series)"),
-                                Title = Return.As<string>("series.Title"),
-                                Year = Return.As<int>("series.Year"),
-                                Genre = Return.As<string>("series.Genre"),
-                                Plot = Return.As<string>("series.Plot"),
-                                Seasons = Return.As<int>("series.Seasons"),
-                                Rating = Return.As<float>("series.Rating")
+                                Title = series.As<Series>().Title,
+                                Year = series.As<Series>().Year,
+                                Genre = series.As<Series>().Genre,
+                                Plot = series.As<Series>().Plot,
+                                Seasons = series.As<Series>().Seasons,
+                                Rating = series.As<Series>().Rating
                             })
                             .ResultsAsync;
 
@@ -212,10 +212,10 @@ namespace Sirius.Services
                           .Return(s => new TopRatedDTO
                           {
                               SeriesID = Return.As<int>("ID(s)"),
-                              Title = s.As<SeriesDTO>().Title,
-                              Year = s.As<SeriesDTO>().Year,
-                              Genre = s.As<SeriesDTO>().Genre,
-                              Rating = s.As<SeriesDTO>().Rating
+                              Title = s.As<Series>().Title,
+                              Year = s.As<Series>().Year,
+                              Genre = s.As<Series>().Genre,
+                              Rating = s.As<Series>().Rating
                           })
                           .OrderBy("s.Rating DESC").Limit(10)
                           .ResultsAsync;
@@ -243,68 +243,68 @@ namespace Sirius.Services
                 if(filter.Title!="" && filter.Genre!="All")
                 {
                     res = (List<SeriesDTO>)await _client.Cypher
-                    .Match("(s:Series)")
-                    .Where((SeriesDTO s) => s.Title.Contains(filter.Title))
-                    .AndWhere((SeriesDTO s) => s.Genre == filter.Genre)
-                    .Return((s) => new SeriesDTO
+                    .Match("(series:Series)")
+                    .Where((Series series) => series.Title.Contains(filter.Title))
+                    .AndWhere((Series series) => series.Genre == filter.Genre)
+                    .Return((series) => new SeriesDTO
                     {
-                        ID = Return.As<int>("ID(s)"),
-                        Title = Return.As<string>("s.Title"),
-                        Year = Return.As<int>("s.Year"),
-                        Genre = Return.As<string>("s.Genre"),
-                        Plot = Return.As<string>("s.Plot"),
-                        Seasons = Return.As<int>("s.Seasons"),
-                        Rating = Return.As<float>("s.Rating")
+                        ID = Return.As<int>("ID(series)"),
+                        Title = series.As<Series>().Title,
+                        Year = series.As<Series>().Year,
+                        Genre = series.As<Series>().Genre,
+                        Plot = series.As<Series>().Plot,
+                        Seasons = series.As<Series>().Seasons,
+                        Rating = series.As<Series>().Rating
                     })
                     .ResultsAsync;
                 }
                 else if (filter.Title != "" && filter.Genre == "All")
                 {
                     res = (List<SeriesDTO>)await _client.Cypher
-                    .Match("(s:Series)")
-                    .Where((SeriesDTO s) => s.Title.Contains(filter.Title))
-                    .Return((s) => new SeriesDTO
+                    .Match("(series:Series)")
+                    .Where((Series series) => series.Title.Contains(filter.Title))
+                    .Return((series) => new SeriesDTO
                     {
-                        ID = Return.As<int>("ID(s)"),
-                        Title = Return.As<string>("s.Title"),
-                        Year = Return.As<int>("s.Year"),
-                        Genre = Return.As<string>("s.Genre"),
-                        Plot = Return.As<string>("s.Plot"),
-                        Seasons = Return.As<int>("s.Seasons"),
-                        Rating = Return.As<float>("s.Rating")
+                        ID = Return.As<int>("ID(series)"),
+                        Title = series.As<Series>().Title,
+                        Year = series.As<Series>().Year,
+                        Genre = series.As<Series>().Genre,
+                        Plot = series.As<Series>().Plot,
+                        Seasons = series.As<Series>().Seasons,
+                        Rating = series.As<Series>().Rating
                     })
                    .ResultsAsync;
                 }
                 else if (filter.Title == "" && filter.Genre != "All")
                 {
                     res = (List<SeriesDTO>)await _client.Cypher
-                    .Match("(s:Series)")
-                    .Where((SeriesDTO s) => s.Genre == filter.Genre)
-                    .Return((s) => new SeriesDTO
+                    .Match("(series:Series)")
+                    .Where((Series series) => series.Genre == filter.Genre)
+                    .Return((series) => new SeriesDTO
                     {
-                        ID = Return.As<int>("ID(s)"),
-                        Title = Return.As<string>("s.Title"),
-                        Year = Return.As<int>("s.Year"),
-                        Genre = Return.As<string>("s.Genre"),
-                        Plot = Return.As<string>("s.Plot"),
-                        Seasons = Return.As<int>("s.Seasons"),
-                        Rating = Return.As<float>("s.Rating")
+                        ID = Return.As<int>("ID(series)"),
+                        Title = series.As<Series>().Title,
+                        Year = series.As<Series>().Year,
+                        Genre = series.As<Series>().Genre,
+                        Plot = series.As<Series>().Plot,
+                        Seasons = series.As<Series>().Seasons,
+                        Rating = series.As<Series>().Rating
                     })
                    .ResultsAsync;
                 }
                 else
                 {
                     res = (List<SeriesDTO>)await _client.Cypher
-                   .Match("(s:Series)")
-                   .Return((s) => new SeriesDTO
+                   .Match("(series:Series)")
+                   .Return((series) => new SeriesDTO
                    {
-                         ID = Return.As<int>("ID(s)"),
-                         Title = Return.As<string>("s.Title"),
-                         Year = Return.As<int>("s.Year"),
-                         Genre = Return.As<string>("s.Genre"),
-                         Plot = Return.As<string>("s.Plot"),
-                         Seasons = Return.As<int>("s.Seasons"),
-                         Rating = Return.As<float>("s.Rating")
+                       ID = Return.As<int>("ID(series)"),
+                       Title = series.As<Series>().Title,
+                       Year = series.As<Series>().Year,
+                       Genre = series.As<Series>().Genre,
+                       Plot = series.As<Series>().Plot,
+                       Seasons = series.As<Series>().Seasons,
+                       Rating = series.As<Series>().Rating
                    })
                    .ResultsAsync;
                 }

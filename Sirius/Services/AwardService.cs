@@ -26,8 +26,8 @@ namespace Sirius.Services
                       .Return((award) => new AwardDTO
                       {
                            ID = Return.As<int>("ID(award)"),
-                           Name = Return.As<string>("award.Name"),
-                           Description = Return.As<string>("award.Description")
+                           Name = award.As<Award>().Name,
+                           Description = award.As<Award>().Description
                       })
                       .ResultsAsync;
 
@@ -50,8 +50,8 @@ namespace Sirius.Services
                      .Return((a) => new AwardDTO
                      {
                           ID = Return.As<int>("ID(a)"),
-                          Name = Return.As<string>("a.Name"),
-                          Description = Return.As<string>("a.Description")
+                          Name = a.As<Award>().Name,
+                          Description = a.As<Award>().Description
                      })
                      .ResultsAsync;
 
@@ -135,8 +135,8 @@ namespace Sirius.Services
                      .Return((a) => new AwardDTO
                      {
                          ID = Return.As<int>("ID(a)"),
-                         Name = Return.As<string>("a.Name"),
-                         Description = Return.As<string>("a.Description")
+                         Name = a.As<Award>().Name,
+                         Description = a.As<Award>().Description
                      })
                      .ResultsAsync;
                 }
@@ -147,8 +147,8 @@ namespace Sirius.Services
                      .Return((a) => new AwardDTO
                      {
                          ID = Return.As<int>("ID(a)"),
-                         Name = Return.As<string>("a.Name"),
-                         Description = Return.As<string>("a.Description")
+                         Name = a.As<Award>().Name,
+                         Description = a.As<Award>().Description
                      })
                      .ResultsAsync;
                 }

@@ -36,10 +36,10 @@ namespace Sirius.Services
                         .Return((user) => new UserDTO
                         {
                             ID = Return.As<int>("ID(user)"),
-                            Name = Return.As<string>("user.Name"),
-                            Email = Return.As<string>("user.Email"),
-                            Username = Return.As<string>("user.Username"),
-                            Password = Return.As<string>("user.Password")
+                            Name = user.As<User>().Name,
+                            Email = user.As<User>().Email,
+                            Username = user.As<User>().Username,
+                            Password = user.As<User>().Password
                         })
                         .ResultsAsync;
 
@@ -62,10 +62,10 @@ namespace Sirius.Services
                      .Return((user) => new UserDTO
                      {
                          ID = Return.As<int>("ID(user)"),
-                         Name = Return.As<string>("user.Name"),
-                         Email = Return.As<string>("user.Email"),
-                         Username = Return.As<string>("user.Username"),
-                         Password = Return.As<string>("user.Password")
+                         Name = user.As<User>().Name,
+                         Email = user.As<User>().Email,
+                         Username = user.As<User>().Username,
+                         Password = user.As<User>().Password
                      })
                      .ResultsAsync;
 
@@ -102,7 +102,7 @@ namespace Sirius.Services
                         .WithParam("userID", userID)
                         .Return((user) => new 
                         {
-                             Username = Return.As<string>("user.Username") 
+                            Username = user.As<User>().Username
                         })
                         .ResultsAsync;
 
@@ -122,11 +122,11 @@ namespace Sirius.Services
                       .AndWhere((User u) => u.Password == user.Password)
                       .Return((u) => new UserDTO
                       {
-                          ID = Return.As<int>("ID(u)"),
-                          Name = Return.As<string>("u.Name"),
-                          Email = Return.As<string>("u.Email"),
-                          Username = Return.As<string>("u.Username"),
-                          Password = Return.As<string>("u.Password")
+                          ID = Return.As<int>("ID(user)"),
+                          Name = u.As<User>().Name,
+                          Email = u.As<User>().Email,
+                          Username = u.As<User>().Username,
+                          Password = u.As<User>().Password
                       })
                       .ResultsAsync;
 
@@ -151,11 +151,11 @@ namespace Sirius.Services
                            .WithParam("u", u)
                            .Return((user) => new UserDTO
                            {
-                                ID = Return.As<int>("ID(user)"),
-                                Name = Return.As<string>("user.Name"),
-                                Email = Return.As<string>("user.Email"),
-                                Username = Return.As<string>("user.Username"),
-                                Password = Return.As<string>("user.Password")
+                               ID = Return.As<int>("ID(user)"),
+                               Name = user.As<User>().Name,
+                               Email = user.As<User>().Email,
+                               Username = user.As<User>().Username,
+                               Password = user.As<User>().Password
                            })
                            .ResultsAsync;
 
@@ -223,11 +223,11 @@ namespace Sirius.Services
                        .WithParam("userID", userID)
                        .Return((friend) => new UserDTO
                        {
-                            ID = Return.As<int>("ID(friend)"),
-                            Name = Return.As<string>("friend.Name"),
-                            Email = Return.As<string>("friend.Email"),
-                            Username = Return.As<string>("friend.Username"),
-                            Password = Return.As<string>("friend.Password")
+                           ID = Return.As<int>("ID(friend)"),
+                           Name = friend.As<User>().Name,
+                           Email = friend.As<User>().Email,
+                           Username = friend.As<User>().Username,
+                           Password = friend.As<User>().Password
                        })
                        .ResultsAsync;
 
@@ -255,10 +255,10 @@ namespace Sirius.Services
                       .Return((friend) => new UserDTO
                       {
                           ID = Return.As<int>("ID(friend)"),
-                          Name = Return.As<string>("friend.Name"),
-                          Email = Return.As<string>("friend.Email"),
-                          Username = Return.As<string>("friend.Username"),
-                          Password = Return.As<string>("friend.Password")
+                          Name = friend.As<User>().Name,
+                          Email = friend.As<User>().Email,
+                          Username = friend.As<User>().Username,
+                          Password = friend.As<User>().Password
                       })
                       .ResultsAsync;
 
@@ -272,10 +272,10 @@ namespace Sirius.Services
                      .Return((friend) => new UserDTO
                      {
                          ID = Return.As<int>("ID(friend)"),
-                         Name = Return.As<string>("friend.Name"),
-                         Email = Return.As<string>("friend.Email"),
-                         Username = Return.As<string>("friend.Username"),
-                         Password = Return.As<string>("friend.Password")
+                         Name = friend.As<User>().Name,
+                         Email = friend.As<User>().Email,
+                         Username = friend.As<User>().Username,
+                         Password = friend.As<User>().Password
                      })
                      .ResultsAsync;
                 }

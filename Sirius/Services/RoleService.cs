@@ -28,8 +28,8 @@ namespace Sirius.Services
                        {
                            ID=Return.As<int>("ID(r)"),
                            ActorID = Return.As<int>("ID(p)"),
-                           Name = Return.As<string>("p.Name"),
-                           r.As<Role>().InRole
+                           Name = p.As<Person>().Name,
+                           InRole = r.As<Role>().InRole
                        })
                        .ResultsAsync;
 
@@ -51,10 +51,10 @@ namespace Sirius.Services
                        .WithParam("actorID", actorID)
                        .Return((p, r, s) => new
                        {
-                           r.As<RoleDTO>().ID,
+                           ID = Return.As<int>("ID(r)"),
                            SeriesID = Return.As<int>("ID(s)"),
-                           Title = Return.As<string>("s.Title"),
-                           r.As<RoleDTO>().InRole
+                           Title = s.As<Series>().Title,
+                           InRole = r.As<Role>().InRole
                        })
                        .ResultsAsync;
 
@@ -78,19 +78,19 @@ namespace Sirius.Services
                         {
                             ID = Return.As<int>("ID(r)"),
                             ActorID = Return.As<int>("ID(p)"),
-                            Name = Return.As<string>("p.Name"),
-                            Sex = Return.As<string>("p.Sex"),
-                            Birthplace = Return.As<string>("p.Birthplace"),
-                            Birthday = Return.As<string>("p.Birthday"),
-                            Biography = Return.As<string>("p.Biography"),
+                            Name = p.As<Person>().Name,
+                            Sex = p.As<Person>().Sex,
+                            Birthplace = p.As<Person>().Birthplace,
+                            Birthday = p.As<Person>().Birthday,
+                            Biography = p.As<Person>().Biography,
                             SeriesID = Return.As<int>("ID(s)"),
-                            Title = Return.As<string>("s.Title"),
-                            Year = Return.As<int>("s.Year"),
-                            Genre = Return.As<string>("s.Genre"),
-                            Plot = Return.As<string>("s.Plot"),
-                            Seasons = Return.As<int>("s.Seasons"),
-                            Rating = Return.As<float>("s.Rating"),
-                            r.As<RoleDTO>().InRole
+                            Title = s.As<Series>().Title,
+                            Year = s.As<Series>().Year,
+                            Genre = s.As<Series>().Genre,
+                            Plot = s.As<Series>().Plot,
+                            Seasons = s.As<Series>().Seasons,
+                            Rating = s.As<Series>().Rating,
+                            InRole =  r.As<Role>().InRole
                         })
                         .ResultsAsync;
 

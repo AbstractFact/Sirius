@@ -77,16 +77,16 @@ namespace Sirius.Services
                         {
                             ID = Return.As<int>("ID(aw)"),
                             AwardID = Return.As<int>("ID(a)"),
-                            Name = Return.As<string>("a.Name"),
-                            Description = Return.As<string>("a.Description"),
+                            Name = a.As<Award>().Name,
+                            Description = a.As<Award>().Description,
                             SeriesID = Return.As<int>("ID(s)"),
-                            Title = Return.As<string>("s.Title"),
-                            SeriesYear = Return.As<int>("s.Year"),
-                            Genre = Return.As<string>("s.Genre"),
-                            Plot = Return.As<string>("s.Plot"),
-                            Seasons = Return.As<int>("s.Seasons"),
-                            Rating = Return.As<float>("s.Rating"),
-                            aw.As<AwardedDTO>().Year
+                            Title = s.As<Series>().Title,
+                            SeriesYear = s.As<Series>().Year,
+                            Genre = s.As<Series>().Genre,
+                            Plot = s.As<Series>().Plot,
+                            Seasons = s.As<Series>().Seasons,
+                            Rating = s.As<Series>().Rating,
+                            aw.As<Awarded>().Year
                         })
                         .ResultsAsync;
 

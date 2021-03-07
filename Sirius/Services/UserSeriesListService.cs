@@ -34,15 +34,15 @@ namespace Sirius.Services
                        .Return((l, s) => new
                        {
                            ID = Return.As<int>("ID(l)"),
-                           Status = Return.As<string>("l.Status"),
-                           Stars = Return.As<int>("l.Stars"),
-                           Comment = Return.As<string>("l.Comment"),
-                           Favourite = Return.As<bool>("l.Favourite"),
+                           Status = l.As<UserSeriesList>().Status,
+                           Stars = l.As<UserSeriesList>().Stars,
+                           Comment = l.As<UserSeriesList>().Comment,
+                           Favourite = l.As<UserSeriesList>().Favourite,
                            SeriesID = Return.As<int>("ID(s)"),
-                           Title = Return.As<string>("s.Title"),
-                           Genre = Return.As<string>("s.Genre"),
-                           Seasons = Return.As<int>("s.Seasons"),
-                           Rating = Return.As<float>("s.Rating")
+                           Title = s.As<Series>().Title,
+                           Genre = s.As<Series>().Genre,
+                           Seasons = s.As<Series>().Seasons,
+                           Rating = s.As<Series>().Rating
 
                        })
                        .ResultsAsync;
@@ -68,11 +68,11 @@ namespace Sirius.Services
                         .Return((s, u) => new
                         {
                             SeriesID = Return.As<int>("ID(s)"),
-                            Title = Return.As<string>("s.Title"),
-                            Genre = Return.As<string>("s.Genre"),
-                            Seasons = Return.As<int>("s.Seasons"),
-                            Rating = Return.As<float>("s.Rating"),
-                            Username = Return.As<string>("u.Username")
+                            Title = s.As<Series>().Title,
+                            Genre = s.As<Series>().Genre,
+                            Seasons = s.As<Series>().Seasons,
+                            Rating = s.As<Series>().Rating,
+                            Username = u.As<User>().Username
                         })
                         .ResultsAsync;
 
@@ -94,11 +94,11 @@ namespace Sirius.Services
                        .WithParam("userID", userID)
                        .Return((friend) => new UserDTO
                        {
-                            ID = Return.As<int>("ID(friend)"),
-                            Name = Return.As<string>("friend.Name"),
-                            Email = Return.As<string>("friend.Email"),
-                            Username = Return.As<string>("friend.Username"),
-                            Password = Return.As<string>("friend.Password")
+                           ID = Return.As<int>("ID(friend)"),
+                           Name = friend.As<User>().Name,
+                           Email = friend.As<User>().Email,
+                           Username = friend.As<User>().Username,
+                           Password = friend.As<User>().Password
                        })
                        .ResultsAsync;
 
@@ -116,11 +116,11 @@ namespace Sirius.Services
                             .Return((s, u) => new
                             {
                                 SeriesID = Return.As<int>("ID(s)"),
-                                Title = Return.As<string>("s.Title"),
-                                Genre = Return.As<string>("s.Genre"),
-                                Seasons = Return.As<int>("s.Seasons"),
-                                Rating = Return.As<float>("s.Rating"),
-                                Username = Return.As<string>("u.Username")
+                                Title = s.As<Series>().Title,
+                                Genre = s.As<Series>().Genre,
+                                Seasons = s.As<Series>().Seasons,
+                                Rating = s.As<Series>().Rating,
+                                Username = u.As<User>().Username
                             })
                             .ResultsAsync;
 
@@ -222,10 +222,10 @@ namespace Sirius.Services
                            ID = Return.As<int>("ID(l)"),
                            User = u.As<User>(),
                            Series = s.CollectAs<Series>(),
-                           l.As<UserSeriesListDTO>().Status,
-                           l.As<UserSeriesListDTO>().Stars,
-                           l.As<UserSeriesListDTO>().Comment,
-                           l.As<UserSeriesListDTO>().Favourite
+                           l.As<UserSeriesList>().Status,
+                           l.As<UserSeriesList>().Stars,
+                           l.As<UserSeriesList>().Comment,
+                           l.As<UserSeriesList>().Favourite
                        })
                        .ResultsAsync;
 

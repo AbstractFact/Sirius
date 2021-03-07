@@ -365,7 +365,7 @@ export default class extends AbstractView {
         const response = await fetch("https://localhost:44365/Role/"+id, { method: "DELETE"});
         if(response.ok)
         {
-            alert("Role added!");
+            alert("Role removed!");
         }
         else
         {

@@ -184,6 +184,7 @@ export default class extends AbstractView {
     {
         const row = document.getElementById(id);
         const serid = row.querySelector('.serid').id;
+        const title = row.querySelector('.serid').innerHTML;
         const status = row.querySelector('#inputStatus').value;
         const stars = parseInt(row.querySelector('#inputStars').value);  
         const comment = row.querySelector('#inputComment').value;
@@ -197,7 +198,7 @@ export default class extends AbstractView {
         });
 
         if (response.ok){
-            alert("Entry "+serid+" edited!");
+            alert("Entry "+title+" edited!");
         }
         else
         {
