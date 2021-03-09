@@ -40,14 +40,14 @@ namespace Sirius.Services.Redis
                             {
                                 FriendRequestNotificationDTO deserializedMessage = JsonSerializer.Deserialize<FriendRequestNotificationDTO>(message.Message);
                                 string groupName = $"channel:{deserializedMessage.ReceiverId}";
-                                _ = _hub.Clients.Group(groupName).SendAsync("ReceiveFriendRequests", deserializedMessage);
+                                _hub.Clients.Group(groupName).SendAsync("ReceiveFriendRequests", deserializedMessage);
                             });
 
                             redisPubSub.Subscribe("genre.recommendations").OnMessage(message =>
                             {
                                 RecommendationDTO deserializedMessage = JsonSerializer.Deserialize<RecommendationDTO>(message.Message);
                                 string groupName = $"channel:{deserializedMessage.Genre}";
-                                _ = _hub.Clients.Group(groupName).SendAsync("ReceiveRecommendations", deserializedMessage);
+                                _hub.Clients.Group(groupName).SendAsync("ReceiveRecommendations", deserializedMessage);
                             });
                         }
                     }

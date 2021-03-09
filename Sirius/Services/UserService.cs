@@ -122,7 +122,7 @@ namespace Sirius.Services
                       .AndWhere((User u) => u.Password == user.Password)
                       .Return((u) => new UserDTO
                       {
-                          ID = Return.As<int>("ID(user)"),
+                          ID = Return.As<int>("ID(u)"),
                           Name = u.As<User>().Name,
                           Email = u.As<User>().Email,
                           Username = u.As<User>().Username,
@@ -344,8 +344,8 @@ namespace Sirius.Services
 
             var values = new NameValueEntry[]
             {
-                new NameValueEntry("sender_id", sender.ID),
-                new NameValueEntry("sender_username", sender.Username)
+                new NameValueEntry("senderID", sender.ID),
+                new NameValueEntry("senderUsername", sender.Username)
             };
 
             try
@@ -362,8 +362,8 @@ namespace Sirius.Services
                 };
 
                 var jsonMessage = JsonSerializer.Serialize(message);
-                ISubscriber chatPubSub = _redisConnection.GetSubscriber();
-                await chatPubSub.PublishAsync("friendship.requests", jsonMessage);
+                ISubscriber redisPubSub = _redisConnection.GetSubscriber();
+                await redisPubSub.PublishAsync("friendship.requests", jsonMessage);
 
                 return true;
             }
@@ -390,8 +390,8 @@ namespace Sirius.Services
                         ID = request.Id,
                         Request = new SendFriendRequestDTO
                         {
-                            ID = int.Parse(request.Values.FirstOrDefault(value => value.Name == "sender_id").Value),
-                            Username = request.Values.FirstOrDefault(value => value.Name == "sender_username").Value
+                            ID = int.Parse(request.Values.FirstOrDefault(value => value.Name == "senderID").Value),
+                            Username = request.Values.FirstOrDefault(value => value.Name == "senderUsername").Value
                         }
                     }
                 );
@@ -407,7 +407,7 @@ namespace Sirius.Services
             try
             {
                 IDatabase redisDB = _redisConnection.GetDatabase();
-                long deletedMessages = await redisDB.StreamDeleteAsync(channelName, new RedisValue[] { new RedisValue(requestId) });
+                await redisDB.StreamDeleteAsync(channelName, new RedisValue[] { new RedisValue(requestId) });
                 await redisDB.SetRemoveAsync("friend:" + senderId + ":request", receiverId);
                 return true;
             }
@@ -471,12 +471,12 @@ namespace Sirius.Services
                 IDatabase redisDB = _redisConnection.GetDatabase();
                 var result = await redisDB.SetMembersAsync("user:" + userID + ":subsciptions");
 
-                List<string> arr = new List<string>();
+                List<string> list = new List<string>();
 
                 foreach (var res in result)
-                    arr.Add(Convert.ToString(res));
+                    list.Add(Convert.ToString(res));
 
-                return arr;
+                return list;
 
             }
             catch (Exception)
@@ -492,12 +492,12 @@ namespace Sirius.Services
                 IDatabase redisDB = _redisConnection.GetDatabase();
                 var result = await redisDB.SetMembersAsync("user:" + userID + ":recommendations");
 
-                List<RecommendationDTO> arr = new List<RecommendationDTO>();
+                List<RecommendationDTO> list = new List<RecommendationDTO>();
 
                 foreach (var res in result)
-                    arr.Add(JsonSerializer.Deserialize<RecommendationDTO>(res));
+                    list.Add(JsonSerializer.Deserialize<RecommendationDTO>(res));
 
-                return arr;
+                return list;
             }
             catch (Exception)
             {
