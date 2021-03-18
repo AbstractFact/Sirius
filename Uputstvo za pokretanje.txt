@@ -1,0 +1,13 @@
+U fajlu "appsettings.json" nalaze se potrebne informacije za uspostavljanje Redis konekcije,
+a connection string za Neo4j nalazi se u "Startup.cs" u 29. liniji.
+
+Potrebno je skinuti Redis 5.0 zbog korišćenja stream-a i pokrenuti server, kao i Neo4j server.
+
+Takođe je potrebno pokrenuti i IIS Express server u okviru Microsoft Visual Studio-a u kome je učitan projekat "Sirius".
+
+Pre pokretanja projekta potrebno je pozicionirati se u folder projekta "SiriusFE" i u terminalu(powershell, cmd) ukucati:
+	npm install express
+nakon toga pokrenuti aplikaciju komandom:
+	node server.js
+	
+Link do početne stranice: http://localhost:5001
